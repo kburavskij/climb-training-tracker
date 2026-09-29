@@ -62,6 +62,7 @@
     }
 
     * { box-sizing: border-box; }
+    [hidden] { display: none !important; }
     html { scroll-behavior: smooth; max-width: 100%; overflow-x: hidden; }
     body {
       margin: 0;
@@ -179,7 +180,30 @@
     .heading-tools { flex: 0 0 auto; display: grid; justify-items: end; gap: 8px; }
     .date-strip { display: flex; align-items: center; gap: 7px; }
     .date-label { min-width: 174px; text-align: center; font-weight: 760; font-size: 14px; }
-    .date-nav { width: 39px; height: 39px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); }
+    .date-nav { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); }
+    .today-calendar { max-width: 100%; margin: -8px 0 18px; padding: 11px; overflow-x: hidden; overflow-x: clip; overscroll-behavior-x: none; touch-action: pan-y pinch-zoom; }
+    .today-calendar-head { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; gap: 7px; align-items: center; }
+    .calendar-range { min-height: 42px; padding: 5px 12px; border: 0; border-radius: 11px; background: var(--surface-2); color: var(--ink); font-weight: 790; }
+    .calendar-range span { display: block; color: var(--muted); font-size: 10px; font-weight: 700; }
+    .week-strip, .month-grid { width: 100%; min-width: 0; display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 5px; overflow-x: hidden; overflow-x: clip; }
+    .week-strip { margin-top: 9px; }
+    .calendar-day { min-width: 0; min-height: 58px; display: grid; place-items: center; gap: 1px; padding: 5px 2px; border: 1px solid transparent; border-radius: 11px; background: transparent; color: var(--muted); }
+    .calendar-day:hover { background: var(--surface-2); color: var(--ink); }
+    .calendar-day .weekday { font-size: 9px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
+    .calendar-day .day-number { font-size: 16px; font-weight: 850; line-height: 1; }
+    .calendar-day .type-dots { min-height: 9px; transform: scale(.72); }
+    .calendar-day.today { box-shadow: inset 0 0 0 2px var(--amber); color: var(--ink); }
+    .calendar-day.selected { border-color: var(--moss); background: var(--forest); color: #fff; }
+    .calendar-day.selected.outside-month { background: var(--forest); color: #fff; }
+    html[data-theme="dark"] .calendar-day.selected,
+    html[data-theme="dark"] .calendar-day.selected.outside-month { background: var(--lime); color: #18382f; }
+    .calendar-day.selected .type-dot.rest { background: rgba(255,255,255,.55); }
+    .month-calendar { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
+    .month-head { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; gap: 7px; margin-bottom: 7px; }
+    .month-head h3 { margin: 0; text-align: center; font: 720 18px/1 Georgia, serif; }
+    .month-weekday { padding: 5px 0; color: var(--faint); text-align: center; font-size: 9px; font-weight: 850; text-transform: uppercase; }
+    .month-grid .calendar-day { min-height: 46px; }
+    .calendar-day.outside-month { color: var(--muted); background: color-mix(in srgb,var(--surface-2) 40%,transparent); }
     .today-hero {
       position: relative; overflow: hidden; display: grid; grid-template-columns: 1fr auto; gap: 20px; padding: 25px;
       color: #f8fbf6; background: #18382f; border: 0; box-shadow: var(--shadow);
@@ -291,7 +315,33 @@
     .queue-item small { color: var(--muted); }
     .queue-actions { display: flex; gap: 3px; }
     .queue-actions button { width: 31px; height: 31px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: var(--muted); }
+    .queue-actions button.queue-preview { width: auto; padding: 0 8px; font-size: 10px; font-weight: 800; }
     .queue-actions button:hover { background: var(--surface-2); color: var(--ink); }
+
+    .demo-thumb { width: 84px; height: 62px; flex: 0 0 auto; }
+    .queue-item.with-demo { grid-template-columns: auto 84px minmax(0,1fr) auto; }
+    .demo-visual { position: relative; width: 100%; aspect-ratio: 16/10; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: #18382f; }
+    .demo-visual .demo-frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
+    .demo-visual .demo-frame:first-child { position: relative; display: block; }
+    .demo-visual.is-animated .demo-frame:nth-child(1) { animation: demo-frame-1 5s step-end 1 forwards; }
+    .demo-visual.is-animated .demo-frame:nth-child(2) { animation: demo-frame-2 5s step-end 1 forwards; }
+    .demo-visual.is-animated .demo-frame:nth-child(3) { animation: demo-frame-3 5s step-end 1 forwards; }
+    .demo-placeholder { display: grid; place-items: center; align-content: center; gap: 8px; padding: 18px; color: rgba(255,255,255,.82); text-align: center; }
+    .demo-placeholder svg { width: 26px; height: 26px; color: var(--lime); }
+    .demo-placeholder strong { font-size: 12px; }
+    .demo-placeholder small { max-width: 260px; color: rgba(255,255,255,.58); font-size: 10px; line-height: 1.4; }
+    .exercise-card .demo-visual { margin-bottom: 13px; }
+    .demo-note { margin: 9px 0 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
+    .demo-stage { width: min(430px,100%); margin: 0 auto 18px; }
+    .demo-credit { margin: 8px 0 0; color: var(--faint); font-size: 10px; text-align: center; }
+    .demo-credit a { color: inherit; }
+    .active-demo { width: min(360px,88%); margin: 17px auto 0; overflow: hidden; border: 1px solid rgba(255,255,255,.15); border-radius: 16px; background: #18382f; }
+    .active-demo .demo-visual { border: 0; border-radius: 0; }
+    .active-demo-copy { padding: 9px 12px; color: rgba(255,255,255,.72); background: rgba(0,0,0,.18); font-size: 11px; line-height: 1.4; }
+
+    @keyframes demo-frame-1 { 0%, 32.99% { opacity: 1; } 33%, 100% { opacity: 0; } }
+    @keyframes demo-frame-2 { 0%, 32.99%, 66%, 100% { opacity: 0; } 33%, 65.99% { opacity: 1; } }
+    @keyframes demo-frame-3 { 0%, 65.99% { opacity: 0; } 66%, 100% { opacity: 1; } }
 
     .active-timer { padding: 28px; color: #f8fbf6; background: #18382f; border: 0; min-height: 476px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
     .phase-pill { padding: 7px 12px; border-radius: 99px; background: rgba(255,255,255,.09); color: var(--lime); font-size: 11px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
@@ -314,7 +364,7 @@
     .exercise-card h3 { margin: 15px 0 7px; font-size: 17px; letter-spacing: -.02em; }
     .exercise-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
     .exercise-stats { display: flex; gap: 7px; margin-top: 13px; flex-wrap: wrap; }
-    .exercise-actions { display: flex; gap: 7px; margin-top: auto; padding-top: 16px; }
+    .exercise-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: auto; padding-top: 16px; }
 
     .history-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; margin-bottom: 17px; }
     .stat-card { padding: 18px; }
@@ -380,7 +430,16 @@
     dialog::backdrop { background: rgba(10,18,15,.58); backdrop-filter: blur(3px); }
     .dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 22px; border-bottom: 1px solid var(--line); }
     .dialog-head h2 { margin: 0; font: 720 23px/1 Georgia, serif; }
-    .dialog-body { max-height: calc(100vh - 180px); overflow-y: auto; padding: 21px 22px; }
+    .dialog-body {
+      max-height: calc(100vh - 180px);
+      overflow-x: hidden;
+      overflow-y: auto;
+      overscroll-behavior-x: none;
+      overscroll-behavior-y: contain;
+      touch-action: pan-y pinch-zoom;
+      -webkit-overflow-scrolling: touch;
+      padding: 21px 22px;
+    }
     .dialog-foot { display: flex; justify-content: flex-end; gap: 9px; padding: 15px 22px; border-top: 1px solid var(--line); background: var(--surface-2); }
     .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
     .field { display: grid; gap: 6px; }
@@ -400,6 +459,17 @@
     .day-checks span { min-height: 38px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 9px; font-size: 11px; font-weight: 780; }
     .day-checks input:checked + span { background: var(--moss); color: #fff; border-color: var(--moss); }
     .danger-zone { margin-top: 18px; padding-top: 18px; border-top: 1px solid var(--line); }
+    .update-panel { grid-column: 1/-1; padding: 14px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface-2); }
+    .update-panel strong { display: block; margin-bottom: 4px; }
+    .update-panel p { margin: 0 0 11px; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .update-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+
+    .update-banner { position: fixed; z-index: 80; right: 20px; bottom: 20px; width: min(370px,calc(100vw - 30px)); display: flex; align-items: center; gap: 12px; padding: 13px; border: 1px solid rgba(255,255,255,.14); border-radius: 15px; background: #18382f; color: #fff; box-shadow: 0 18px 50px rgba(0,0,0,.28); }
+    .update-banner[hidden] { display: none; }
+    .update-banner div { min-width: 0; flex: 1; }
+    .update-banner strong, .update-banner small { display: block; }
+    .update-banner small { margin-top: 3px; color: rgba(255,255,255,.65); line-height: 1.35; }
+    .update-banner .btn { flex: 0 0 auto; background: var(--lime); color: #18382f; }
 
     .toast-region { position: fixed; z-index: 100; right: 22px; top: 20px; display: grid; gap: 8px; pointer-events: none; }
     .toast { max-width: 330px; padding: 12px 15px; border-radius: 12px; background: var(--ink); color: var(--surface); box-shadow: var(--shadow); font-size: 12px; font-weight: 700; animation: toast-in .2s ease; }
@@ -446,6 +516,10 @@
       .heading-tools { width: 100%; justify-items: stretch; }
       .heading-tools > .btn { width: 100%; }
       .date-strip { justify-content: space-between; }
+      .today-calendar { width: calc(100% + 16px); max-width: calc(100% + 16px); margin: -3px -8px 18px; padding: 9px 6px; }
+      .week-strip, .month-grid { gap: 2px; }
+      .calendar-day { min-height: 54px; }
+      .calendar-day .weekday { letter-spacing: 0; }
       .today-hero { grid-template-columns: 1fr; padding: 21px; }
       .hero-controls { align-items: flex-start; justify-content: flex-start; }
       .day-select { flex: 1 1 135px; }
@@ -457,6 +531,9 @@
       .week-grid { grid-template-columns: repeat(7, 130px); }
       .cycle-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .exercise-grid { grid-template-columns: 1fr; }
+      .queue-item.with-demo { grid-template-columns: auto 62px minmax(0,1fr); }
+      .queue-item.with-demo .demo-thumb { width: 62px; height: 48px; }
+      .queue-item.with-demo .queue-actions { grid-column: 2 / -1; justify-content: flex-end; }
       .history-stats { grid-template-columns: repeat(2, 1fr); }
       .log-row { grid-template-columns: minmax(0,1fr) auto; gap: 8px 12px; }
       .log-date { grid-column: 1 / -1; }
@@ -475,6 +552,7 @@
         padding: 6px max(8px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
         background: color-mix(in srgb, var(--surface) 92%, transparent); border-top: 1px solid var(--line); backdrop-filter: blur(18px);
       }
+      .update-banner { right: 15px; bottom: calc(84px + env(safe-area-inset-bottom)); }
       .bottom-nav .nav-btn { min-height: 52px; display: grid; place-items: center; gap: 1px; padding: 4px 0; color: var(--muted); border-radius: 10px; font-size: 9px; }
       .bottom-nav .nav-btn span { display: block; }
       .bottom-nav .nav-btn .icon { width: 19px; height: 19px; }
@@ -486,6 +564,10 @@
         top: calc(10px + env(safe-area-inset-top));
       }
       .toast { max-width: none; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .demo-visual.is-animated { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); aspect-ratio: 16/6; }
+      .demo-visual.is-animated .demo-frame { position: static; width: 100%; height: 100%; animation: none !important; opacity: 1; object-fit: contain; }
     }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
@@ -520,6 +602,11 @@
     <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 18h7"/></symbol>
     <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></symbol>
   </svg>
+
+  <div class="update-banner" id="update-banner" role="status" aria-live="polite" hidden>
+    <div><strong>App update ready</strong><small>Your current version stays available until you choose to reload.</small></div>
+    <button class="btn small" type="button" data-action="apply-update">Update</button>
+  </div>
 
   <div class="shell">
     <aside class="sidebar" aria-label="Primary navigation">
@@ -587,6 +674,12 @@
           <div class="field"><label for="setting-week-start">Week A anchor</label><input id="setting-week-start" name="weekAnchor" type="date"><small>The Monday that starts your Week A plan.</small></div>
           <div class="field"><label for="setting-theme">Theme</label><select id="setting-theme" name="theme"><option value="system">Use system</option><option value="light">Light</option><option value="dark">Dark</option></select></div>
           <div class="field full"><label class="check-line"><input type="checkbox" name="sound"> Sound at timer phase changes</label><label class="check-line"><input type="checkbox" name="vibration"> Vibration when supported</label></div>
+          <section class="update-panel" aria-labelledby="update-panel-title">
+            <strong id="update-panel-title">App update</strong>
+            <p id="pwa-update-status" role="status" aria-live="polite">Version 3.0 · checking when online…</p>
+            <div class="update-actions"><button class="btn secondary small" type="button" data-action="check-update">Check for updates</button><button class="btn small" type="button" data-action="apply-update" hidden>Update & reload</button></div>
+          </section>
+          <p class="tiny muted" style="grid-column:1/-1;margin:0">Exercise illustrations: <a href="https://github.com/bryllim/workout-guide" target="_blank" rel="noopener">Workout Guide by Bryl Lim</a>, based on Everkinetic artwork, licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>. Original SVG frames are shown unmodified.</p>
         </div>
         <div class="danger-zone">
           <p class="tiny muted">This file has no cloud account. Export a backup if browser data may be cleared.</p>
@@ -607,6 +700,7 @@
         <div class="field"><label for="exercise-sets">Sets</label><input id="exercise-sets" name="sets" type="number" min="1" max="20" value="3" required></div>
         <div class="field"><label for="exercise-work">Work (seconds)</label><input id="exercise-work" name="workSec" type="number" min="5" max="3600" value="40" required></div>
         <div class="field"><label for="exercise-rest">Rest (seconds)</label><input id="exercise-rest" name="restSec" type="number" min="0" max="3600" value="60" required></div>
+        <div class="field full"><label for="exercise-demo">Demonstration</label><select id="exercise-demo" name="demo"><option value="none">Instructions only</option><option value="warmup">Warm-up flow</option><option value="scapular-pull">Scapular pull-up</option><option value="pushup">Push-up</option><option value="split-squat">Split squat</option><option value="dead-bug">Dead bug</option><option value="shoulder-cars">Arm-circle overview</option><option value="finger-extensors">Finger extensor opens · instructions only</option><option value="forearm-mobility">Forearm mobility · instructions only</option></select><small>Choose an exact or closely related overview. Unsupported movements stay instruction-only rather than showing an inaccurate animation.</small></div>
         <div class="field full"><label for="exercise-instructions">Instructions / reps</label><textarea id="exercise-instructions" name="instructions" maxlength="360" placeholder="Technique cues, reps, load or RPE target"></textarea></div>
       </div></div>
       <div class="dialog-foot"><button class="btn secondary" type="button" data-close-dialog>Cancel</button><button class="btn" type="submit" value="save">Save exercise</button></div>
@@ -675,6 +769,18 @@
     </form>
   </dialog>
 
+  <dialog id="demo-dialog" aria-labelledby="demo-dialog-title" aria-describedby="demo-dialog-copy">
+    <div class="dialog-head"><h2 id="demo-dialog-title">Movement preview</h2><button class="icon-btn" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
+    <div class="dialog-body">
+      <div class="demo-stage" id="demo-dialog-stage"></div>
+      <p id="demo-dialog-copy" class="muted" style="line-height:1.55;margin:0"></p>
+      <div class="exercise-stats" id="demo-dialog-stats"></div>
+      <p class="demo-note">Movement overview—not a prescribed tempo. Use a comfortable range and stop for sharp or increasing pain.</p>
+      <p class="demo-credit" id="demo-dialog-credit"></p>
+    </div>
+    <div class="dialog-foot"><button class="btn secondary" type="button" data-close-dialog>Back</button><button class="btn" id="demo-dialog-start" type="button" data-action="confirm-timer-start" hidden>Start 7-second prep</button></div>
+  </dialog>
+
   <dialog id="confirm-dialog" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message">
     <div class="dialog-head"><h2 id="confirm-dialog-title">Confirm action</h2><button class="icon-btn" type="button" data-confirm-cancel aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
     <div class="dialog-body"><p id="confirm-dialog-message" style="margin:0;color:var(--muted);line-height:1.6"></p></div>
@@ -687,11 +793,28 @@
     'use strict';
 
     const STORAGE_KEY = 'crux-routine-v1';
-    const SCHEMA_VERSION = 2;
+    const SCHEMA_VERSION = 3;
+    const APP_VERSION = '3.0';
+    const DEMO_PREP_MS = 7000;
     const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const DAY_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     const ACTIVITY_TYPES = ['climb','strength','prehab','recovery','rest'];
     const SECONDARY_ACTIVITY_TYPES = ['climb','strength','prehab','recovery'];
+    const DEMO_SOURCE_URL = 'https://github.com/bryllim/workout-guide';
+    const DEMO_LIBRARY = Object.freeze({
+      warmup:{label:'Warm-up flow overview',slug:'worlds-greatest-stretch',frames:3,alt:'Three positions in a world’s-greatest-stretch warm-up sequence',note:'Representative warm-up movement. Continue with the wrist, shoulder and progressive climbing cues in the instructions.'},
+      'scapular-pull':{label:'Scapular pull-up',slug:'scapular-pull-up',frames:3,alt:'Three positions of a controlled scapular pull-up'},
+      pushup:{label:'Push-up',slug:'push-up',frames:3,alt:'Three positions of a push-up'},
+      'split-squat':{label:'Split squat',slug:'split-squat',frames:3,alt:'Three positions of a split squat',note:'The illustration includes dumbbells; using body weight is also valid when it matches your saved instructions.'},
+      'dead-bug':{label:'Dead bug',slug:'dead-bug',frames:3,alt:'Three positions of a dead bug exercise',note:'The illustration demonstrates the dead-bug option. If your saved exercise calls for a hollow hold, follow its written cues instead.'},
+      'shoulder-cars':{label:'Arm-circle overview',slug:'arm-circles',frames:3,alt:'Three positions of a standing arm circle',note:'Related shoulder-circle overview, not a prescribed shoulder-CAR path. Move slowly through your own comfortable range.'},
+      'finger-extensors':{label:'Finger extensor opens',frames:0,note:'No vetted matching illustration is bundled. Follow the written cue and use a light band.'},
+      'forearm-mobility':{label:'Gentle forearm mobility',frames:0,note:'No vetted matching illustration is bundled. Follow the written cue and stay in a comfortable range.'},
+      generic:{label:'Movement instructions',frames:0,note:'This custom movement has written instructions only.'},
+      none:{label:'Instructions only',frames:0,note:'This exercise uses written instructions only.'}
+    });
+    const DEMO_IDS = Object.keys(DEMO_LIBRARY);
+    const BUILT_IN_DEMOS = {'e-warm':'warmup','e-scap':'scapular-pull','e-push':'pushup','e-split':'split-squat','e-hollow':'dead-bug','e-extensor':'finger-extensors','e-forearm':'forearm-mobility','e-shoulder':'shoulder-cars'};
     const VIEW_META = {
       today: ['Today', 'Your plan, one useful action at a time.'],
       plan: ['Plan', 'A repeatable rhythm with room to recover.'],
@@ -717,6 +840,8 @@
     }
     function addDays(value, count) { const d = parseLocalDate(value); d.setDate(d.getDate() + count); return localDate(d); }
     function startOfWeek(value) { const d = parseLocalDate(value); const delta = (d.getDay() + 6) % 7; d.setDate(d.getDate() - delta); return localDate(d); }
+    function startOfMonth(value) { const d=parseLocalDate(value); d.setDate(1); return localDate(d); }
+    function addMonths(value,count) { const d=parseLocalDate(startOfMonth(value)); d.setMonth(d.getMonth()+count); return localDate(d); }
     function diffDays(a, b) { return Math.round((parseLocalDate(a) - parseLocalDate(b)) / 86400000); }
     function formatDate(value, options = {weekday:'long', month:'short', day:'numeric'}) { return new Intl.DateTimeFormat(undefined, options).format(parseLocalDate(value)); }
     function formatTime(time) { if (!time) return 'Anytime'; const [h,m] = time.split(':').map(Number); return new Intl.DateTimeFormat(undefined,{hour:'numeric',minute:'2-digit'}).format(new Date(2000,0,1,h,m)); }
@@ -765,14 +890,14 @@
           {id:'r-monthly', title:'Monthly plan check', category:'recovery', time:'18:30', amount:'15 min', frequency:'monthly', weekdays:[], monthDay:1, detail:'Review the last block, deload if needed, and change only one main training variable.', optional:false, active:true}
         ],
         exercises: [
-          {id:'e-warm', name:'Climbing warm-up flow', category:'Warm-up', sets:2, workSec:180, restSec:30, instructions:'Pulse raiser, wrists/shoulders, easy hangs only if accustomed, then progressive easy climbs.'},
-          {id:'e-scap', name:'Scapular pull-up', category:'Strength', sets:3, workSec:30, restSec:60, instructions:'5–8 controlled reps. Keep elbows straight and avoid shrugging.'},
-          {id:'e-push', name:'Push-up', category:'Antagonist', sets:3, workSec:40, restSec:60, instructions:'6–12 smooth reps, 2–3 reps in reserve. Elevate hands if needed.'},
-          {id:'e-split', name:'Split squat', category:'Strength', sets:3, workSec:40, restSec:60, instructions:'6–10 reps per side with a steady knee and controlled depth.'},
-          {id:'e-hollow', name:'Dead bug / hollow hold', category:'Core', sets:3, workSec:35, restSec:40, instructions:'Keep ribs down and breathe; stop before the low back lifts.'},
-          {id:'e-extensor', name:'Finger extensor opens', category:'Finger care', sets:3, workSec:30, restSec:30, instructions:'Open fingers against a light band for 15–25 controlled reps.'},
-          {id:'e-forearm', name:'Gentle forearm mobility', category:'Mobility', sets:2, workSec:45, restSec:15, instructions:'Comfortable flexor/extensor positions; never force finger joints.'},
-          {id:'e-shoulder', name:'Shoulder CARs', category:'Mobility', sets:2, workSec:60, restSec:20, instructions:'Slow controlled circles in a pain-free range; avoid rib flare.'}
+          {id:'e-warm', name:'Climbing warm-up flow', category:'Warm-up', demo:'warmup', sets:2, workSec:180, restSec:30, instructions:'Pulse raiser, wrists/shoulders, easy hangs only if accustomed, then progressive easy climbs.'},
+          {id:'e-scap', name:'Scapular pull-up', category:'Strength', demo:'scapular-pull', sets:3, workSec:30, restSec:60, instructions:'5–8 controlled reps. Keep elbows straight and avoid shrugging.'},
+          {id:'e-push', name:'Push-up', category:'Antagonist', demo:'pushup', sets:3, workSec:40, restSec:60, instructions:'6–12 smooth reps, 2–3 reps in reserve. Elevate hands if needed.'},
+          {id:'e-split', name:'Split squat', category:'Strength', demo:'split-squat', sets:3, workSec:40, restSec:60, instructions:'6–10 reps per side with a steady knee and controlled depth.'},
+          {id:'e-hollow', name:'Dead bug / hollow hold', category:'Core', demo:'dead-bug', sets:3, workSec:35, restSec:40, instructions:'Keep ribs down and breathe; stop before the low back lifts.'},
+          {id:'e-extensor', name:'Finger extensor opens', category:'Finger care', demo:'finger-extensors', sets:3, workSec:30, restSec:30, instructions:'Open fingers against a light band for 15–25 controlled reps.'},
+          {id:'e-forearm', name:'Gentle forearm mobility', category:'Mobility', demo:'forearm-mobility', sets:2, workSec:45, restSec:15, instructions:'Comfortable flexor/extensor positions; never force finger joints.'},
+          {id:'e-shoulder', name:'Shoulder CARs', category:'Mobility', demo:'shoulder-cars', sets:2, workSec:60, restSec:20, instructions:'Slow controlled circles in a pain-free range; avoid rib flare.'}
         ],
         builderQueue: ['e-warm','e-scap','e-push','e-hollow'],
         activeTimer: null,
@@ -819,10 +944,12 @@
       };
     }
     function normalizeExercise(value,index=0) {
+      const id=cleanText(value?.id||`exercise-${index}-${Math.random().toString(36).slice(2,7)}`,100);
       return {
-        id:cleanText(value?.id||`exercise-${index}-${Math.random().toString(36).slice(2,7)}`,100),
+        id,
         name:cleanText(value?.name||'Untitled exercise',70),
         category:cleanText(value?.category||'Custom',40),
+        demo:value?.demo==='generic'?'none':(DEMO_IDS.includes(value?.demo)?value.demo:(BUILT_IN_DEMOS[id]||'none')),
         sets:cleanNumber(value?.sets,1,20,3),
         workSec:cleanNumber(value?.workSec,5,3600,40),
         restSec:cleanNumber(value?.restSec,0,3600,60),
@@ -942,6 +1069,19 @@
     let processingReminders = false;
     let pendingLaunchTask = '';
     let historySessionLimit = 20;
+    let todayCalendarExpanded = false;
+    let todayCalendarMonth = startOfMonth(state.selectedDate);
+    let todayCalendarFocus = '';
+    let swRegistration = null;
+    let waitingWorker = null;
+    let updateReloading = false;
+    let updateCheckPromise = null;
+    let updateActivationRequested = false;
+    let updateActivationTimer = null;
+    let serviceWorkerControllerSeen = Boolean('serviceWorker' in navigator && navigator.serviceWorker.controller);
+    let pendingTimerStart = false;
+    const watchedServiceWorkerRegistrations = new WeakSet();
+    const watchedInstallingWorkers = new WeakSet();
 
     function loadState() {
       try {
@@ -976,6 +1116,101 @@
       node.textContent = message;
       $('#toast-region').append(node);
       setTimeout(() => node.remove(), 3300);
+    }
+
+    function setPwaUpdateStatus(message) {
+      const status=$('#pwa-update-status');
+      if (status) status.textContent=`Version ${APP_VERSION} · ${message}`;
+    }
+
+    function showWaitingUpdate(worker) {
+      waitingWorker=worker;
+      $('#update-banner').hidden=false;
+      $('#update-banner small').textContent='Your current version stays available until you choose to reload.';
+      $$('[data-action="apply-update"]').forEach(button=>{button.hidden=false;button.disabled=false;});
+      setPwaUpdateStatus('update downloaded and ready');
+    }
+
+    function watchInstallingWorker(worker) {
+      if (!worker) return;
+      setPwaUpdateStatus('downloading update…');
+      const reflect=()=>{
+        if (worker.state==='installed') {
+          if (navigator.serviceWorker.controller) showWaitingUpdate(swRegistration?.waiting||worker);
+          else setPwaUpdateStatus('offline app installed');
+        }
+        if (worker.state==='redundant') setPwaUpdateStatus('update could not install; the current app is unchanged');
+      };
+      if (!watchedInstallingWorkers.has(worker)) {
+        watchedInstallingWorkers.add(worker);
+        worker.addEventListener('statechange',reflect);
+      }
+      reflect();
+    }
+
+    function attachServiceWorkerRegistration(registration) {
+      swRegistration=registration;
+      if (registration.waiting) showWaitingUpdate(registration.waiting);
+      if (registration.installing) watchInstallingWorker(registration.installing);
+      if (!watchedServiceWorkerRegistrations.has(registration)) {
+        watchedServiceWorkerRegistrations.add(registration);
+        registration.addEventListener('updatefound',()=>watchInstallingWorker(registration.installing));
+      }
+    }
+
+    async function checkForAppUpdate(manual=false) {
+      if (updateCheckPromise) return updateCheckPromise;
+      const task=(async()=>{
+        const checkButtons=$$('[data-action="check-update"]');
+        if (!('serviceWorker' in navigator)) { setPwaUpdateStatus('updates are not supported in this browser'); return; }
+        if (swRegistration?.waiting) { showWaitingUpdate(swRegistration.waiting); if (manual) toast('An update is ready.'); return; }
+        checkButtons.forEach(button=>button.disabled=true);
+        setPwaUpdateStatus('checking…');
+        try {
+          const registration=swRegistration||await navigator.serviceWorker.ready;
+          attachServiceWorkerRegistration(registration);
+          await registration.update();
+          if (registration.waiting) showWaitingUpdate(registration.waiting);
+          else if (registration.installing) watchInstallingWorker(registration.installing);
+          else { setPwaUpdateStatus(`up to date · checked ${formatTime(new Date().toTimeString().slice(0,5))}`); if (manual) toast('Crux Routine is up to date.'); }
+        } catch (error) {
+          setPwaUpdateStatus('could not reach the update server; using the installed app');
+          if (manual) toast('Could not check online. Your installed app is unchanged.',true);
+        } finally { checkButtons.forEach(button=>button.disabled=false); }
+      })();
+      updateCheckPromise=task;
+      try { return await task; }
+      finally { if (updateCheckPromise===task) updateCheckPromise=null; }
+    }
+
+    function applyAppUpdate() {
+      const worker=swRegistration?.waiting||waitingWorker;
+      if (!worker) { void checkForAppUpdate(true); return; }
+      if (worker.state!=='installed') {
+        waitingWorker=null;
+        setPwaUpdateStatus('that update is no longer ready; checking again…');
+        void checkForAppUpdate(true);
+        return;
+      }
+      setPwaUpdateStatus('activating update…');
+      $('#update-banner small').textContent='Updating safely; your local data and active timer will stay.';
+      $$('[data-action="apply-update"]').forEach(button=>button.disabled=true);
+      updateActivationRequested=true;
+      clearTimeout(updateActivationTimer);
+      updateActivationTimer=setTimeout(()=>{
+        if (updateReloading) return;
+        updateActivationRequested=false;
+        setPwaUpdateStatus('activation is taking longer than expected; the current app is unchanged');
+        $$('[data-action="apply-update"]').forEach(button=>button.disabled=false);
+        void checkForAppUpdate();
+      },15000);
+      try { worker.postMessage({type:'ACTIVATE_UPDATE'}); }
+      catch (error) {
+        clearTimeout(updateActivationTimer);
+        updateActivationRequested=false;
+        setPwaUpdateStatus('could not activate that update; the current app is unchanged');
+        $$('[data-action="apply-update"]').forEach(button=>button.disabled=false);
+      }
     }
 
     function closeConfirmation() {
@@ -1140,6 +1375,59 @@
       return [`${combinedDayLabel(planDay)} day`,`${primary[1]} The second activity is part of the same planned session, so adjust total load rather than treating both as maximum-effort work.`];
     }
 
+    function calendarDayButton(dateValue,{monthValue='',focusKey=''}={}) {
+      const planDay=getPlanDay(dateValue);
+      const selected=dateValue===state.selectedDate;
+      const today=dateValue===localDate();
+      const outside=monthValue&&startOfMonth(dateValue)!==monthValue;
+      const label=[formatDate(dateValue,{weekday:'long',month:'long',day:'numeric',year:'numeric'}),combinedDayLabel(planDay),`Week ${getWeekVariant(dateValue)}`,today?'today':'',selected?'selected':''].filter(Boolean).join(' · ');
+      return `<button class="calendar-day${selected?' selected':''}${today?' today':''}${outside?' outside-month':''}" type="button" data-action="calendar-select-date" data-date="${dateValue}" data-calendar-focus="${focusKey||`date-${dateValue}`}" aria-pressed="${selected}" ${today&&!monthValue?'aria-current="date"':''} aria-label="${esc(label)}"><span class="weekday">${esc(formatDate(dateValue,{weekday:'short'}))}</span><span class="day-number">${Number(dateValue.slice(-2))}</span><span class="type-dots" aria-hidden="true">${dayTypes(planDay).map(type=>`<span class="type-dot ${esc(type)}"></span>`).join('')}</span></button>`;
+    }
+
+    function weekRangeLabel(weekStart) {
+      const end=addDays(weekStart,6);
+      const startYear=weekStart.slice(0,4),endYear=end.slice(0,4);
+      return `${formatDate(weekStart,{month:'short',day:'numeric'})} – ${formatDate(end,{month:'short',day:'numeric'})}${startYear!==endYear?` ${endYear}`:''}`;
+    }
+
+    function renderTodayCalendar() {
+      const weekStart=startOfWeek(state.selectedDate);
+      const weekDays=Array.from({length:7},(_,index)=>addDays(weekStart,index));
+      const monthStart=startOfMonth(todayCalendarMonth);
+      const monthGridStart=startOfWeek(monthStart);
+      const monthDays=Array.from({length:42},(_,index)=>addDays(monthGridStart,index));
+      return `<section class="today-calendar card" aria-label="Choose a date">
+        <div class="today-calendar-head">
+          <button class="date-nav" type="button" data-action="calendar-week-prev" data-calendar-focus="week-prev" aria-label="Previous week">‹</button>
+          <button class="calendar-range" type="button" data-action="calendar-toggle-month" data-calendar-focus="month-toggle" aria-expanded="${todayCalendarExpanded}" ${todayCalendarExpanded?'aria-controls="today-month-calendar"':''}>${esc(weekRangeLabel(weekStart))}<span>${todayCalendarExpanded?'Hide month':'Open month calendar'}</span></button>
+          <button class="date-nav" type="button" data-action="calendar-week-next" data-calendar-focus="week-next" aria-label="Next week">›</button>
+        </div>
+        <div class="week-strip">${weekDays.map(date=>calendarDayButton(date)).join('')}</div>
+        ${todayCalendarExpanded?`<div class="month-calendar" id="today-month-calendar">
+          <div class="month-head"><button class="date-nav" type="button" data-action="calendar-month-prev" data-calendar-focus="month-prev" aria-label="Previous month">‹</button><h3>${esc(formatDate(monthStart,{month:'long',year:'numeric'}))}</h3><button class="date-nav" type="button" data-action="calendar-month-next" data-calendar-focus="month-next" aria-label="Next month">›</button></div>
+          <div class="month-grid" aria-hidden="true">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(day=>`<span class="month-weekday">${day}</span>`).join('')}</div>
+          <div class="month-grid">${monthDays.map(date=>calendarDayButton(date,{monthValue:monthStart,focusKey:`month-${date}`})).join('')}</div>
+        </div>`:''}
+      </section>`;
+    }
+
+    function restoreTodayCalendarFocus() {
+      if (!todayCalendarFocus) return;
+      const key=todayCalendarFocus;
+      todayCalendarFocus='';
+      requestAnimationFrame(()=>document.querySelector(`[data-calendar-focus="${CSS.escape(key)}"]`)?.focus());
+    }
+
+    function selectTodayDate(dateValue,{focus='',closeMonth=false}={}) {
+      if (!validLocalDate(dateValue)) return;
+      state.selectedDate=dateValue;
+      todayCalendarMonth=startOfMonth(dateValue);
+      if (closeMonth) todayCalendarExpanded=false;
+      todayCalendarFocus=focus;
+      saveState();
+      renderToday();
+    }
+
     function categoryMark(category) {
       return ({supplement:'S',mobility:'M',nutrition:'N',recovery:'R',training:'T',custom:'•'})[category] || '•';
     }
@@ -1166,12 +1454,13 @@
           <div class="heading-tools">
             <button class="btn secondary small" data-action="open-day-schedule">${icon('calendar')} Calendar & alerts</button>
             <div class="date-strip">
-              <button class="date-nav" data-action="date-prev" aria-label="Previous day">‹</button>
-              <button class="btn secondary small date-label" data-action="date-today">${isToday ? 'Today' : 'Back to today'}</button>
-              <button class="date-nav" data-action="date-next" aria-label="Next day">›</button>
+              <button class="date-nav" data-action="date-prev" data-calendar-focus="top-day-prev" aria-label="Previous day">‹</button>
+              <button class="btn secondary small date-label" data-action="date-today" data-calendar-focus="top-day-today">${isToday ? 'Today' : 'Back to today'}</button>
+              <button class="date-nav" data-action="date-next" data-calendar-focus="top-day-next" aria-label="Next day">›</button>
             </div>
           </div>
         </div>
+        ${renderTodayCalendar()}
         <div class="stack">
           <section class="today-hero card">
             <div>
@@ -1227,6 +1516,7 @@
           </div>
         </div>`;
       focusLaunchTarget();
+      restoreTodayCalendarFocus();
     }
 
     function readinessLine(key, label, value) {
@@ -1315,8 +1605,25 @@
         </div>`;
     }
 
+    function demoDefinition(exercise) {
+      return DEMO_LIBRARY[exercise?.demo] || DEMO_LIBRARY.none;
+    }
+
+    function demoVisualMarkup(exercise,{compact=false,eager=false}={}) {
+      const demo=demoDefinition(exercise);
+      if (!demo.frames || !demo.slug) {
+        return `<div class="demo-visual demo-placeholder${compact?' demo-thumb':''}" role="img" aria-label="${esc(`${demo.label}: instructions only`)}">${icon('exercise')}<strong>${esc(compact?'Instructions':demo.label)}</strong>${compact?'':`<small>${esc(demo.note||'Use the written movement cues.')}</small>`}</div>`;
+      }
+      const frames=Array.from({length:demo.frames},(_,index)=>`<img class="demo-frame" src="./demos/workout-guide/${esc(demo.slug)}/frame-${index+1}.svg" alt="" aria-hidden="true" ${eager?'':'loading="lazy"'} decoding="async">`).join('');
+      return `<div class="demo-visual is-animated${compact?' demo-thumb':''}" role="img" aria-label="${esc(demo.alt||demo.label)}">${frames}</div>`;
+    }
+
+    function demoCreditMarkup(exercise) {
+      return demoDefinition(exercise).frames ? `Illustration: <a href="${DEMO_SOURCE_URL}" target="_blank" rel="noopener">Workout Guide / Everkinetic · CC BY-SA 4.0</a>` : '';
+    }
+
     function estimateQueueSeconds(queue) {
-      return 5 + queue.reduce((sum,id,index) => {
+      return (DEMO_PREP_MS/1000*queue.length) + queue.reduce((sum,id,index) => {
         const e = state.exercises.find(x => x.id === id);
         return e ? sum + (e.workSec * e.sets) + (e.restSec * Math.max(0,e.sets - (index===queue.length-1 ? 1 : 0))) : sum;
       }, 0);
@@ -1335,21 +1642,50 @@
       return Number.isFinite(started)&&Number.isFinite(ended)?Math.max(0,Math.round((ended-started)/1000)):0;
     }
 
+    function timerDisplayContext(timer) {
+      const currentExercise=timer.queue[timer.exerciseIndex];
+      if (timer.phase==='rest'&&timer.nextPosition) {
+        const next=timer.nextPosition;
+        const exercise=timer.queue[next.exerciseIndex];
+        const changedExercise=next.exerciseIndex!==timer.exerciseIndex;
+        return {exercise,exerciseIndex:next.exerciseIndex,setIndex:next.setIndex,key:`rest-${exercise.id}-${next.setIndex}`,caption:changedExercise?'Up next: review the movement before the seven-second prep.':`Recover, then repeat set ${next.setIndex+1}.`};
+      }
+      const caption=timer.phase==='prepare'?'Watch the position sequence. Work begins when prep reaches zero.':'Movement overview—not a required tempo.';
+      return {exercise:currentExercise,exerciseIndex:timer.exerciseIndex,setIndex:timer.setIndex,key:`${timer.phase}-${currentExercise?.id}-${timer.setIndex}`,caption};
+    }
+
+    function timerMetaText(timer,context=timerDisplayContext(timer)) {
+      if (timer.phase==='rest') return `Rest · up next exercise ${context.exerciseIndex+1}/${timer.queue.length} · Set ${context.setIndex+1}/${context.exercise?.sets||1}`;
+      return `Exercise ${context.exerciseIndex+1}/${timer.queue.length} · Set ${context.setIndex+1}/${context.exercise?.sets||1}`;
+    }
+
+    function timerPhaseText(timer) {
+      const phase=timer.phase==='prepare'?'prep':timer.phase;
+      return timer.paused?`paused · ${phase}`:phase;
+    }
+
+    function activeDemoMarkup(timer) {
+      const context=timerDisplayContext(timer);
+      return `<div class="active-demo" id="active-demo" data-demo-key="${esc(context.key)}">${demoVisualMarkup(context.exercise,{eager:true})}<div class="active-demo-copy">${esc(context.caption)}</div></div>`;
+    }
+
     function renderTimer() {
       const root = $('#view-timer');
       if (state.activeTimer) {
         const timer = state.activeTimer;
-        const exercise = timer.queue[timer.exerciseIndex];
+        const context = timerDisplayContext(timer);
+        const exercise = context.exercise;
         const remaining = timerRemaining(timer);
         const total = timer.phaseDurationMs || 1;
         const progress = clamp(100 - (remaining / total * 100),0,100);
         const next = nextTimerLabel(timer);
         root.innerHTML = `<div class="page-heading"><div><p class="eyebrow">Session in progress</p><h2 id="timer-heading">Stay with the set</h2></div></div>
           <section class="active-timer card">
-            <div class="phase-pill" id="timer-phase">${esc(timer.phase)}</div>
+            <div class="phase-pill" id="timer-phase">${esc(timerPhaseText(timer))}</div>
             <div class="timer-clock" id="timer-clock">${formatCountdown(remaining)}</div>
             <div class="timer-exercise" id="timer-exercise">${esc(exercise?.name || 'Complete')}</div>
-            <div class="timer-meta" id="timer-meta">Exercise ${timer.exerciseIndex+1}/${timer.queue.length} · Set ${timer.setIndex+1}/${exercise?.sets || 1}</div>
+            <div class="timer-meta" id="timer-meta">${esc(timerMetaText(timer,context))}</div>
+            ${activeDemoMarkup(timer)}
             <div class="timer-progress"><div id="timer-progress-fill" style="width:${progress}%"></div></div>
             <div class="timer-controls">
               <button class="btn" data-action="timer-pause">${timer.paused ? 'Resume' : 'Pause'}</button>
@@ -1383,9 +1719,10 @@
             <div class="section-title"><div><h3>Session queue</h3><p>${queue.length} exercises · about ${humanDuration(estimateQueueSeconds(queue))}</p></div>${queue.length?'<button class="btn ghost small" data-action="timer-clear">Clear</button>':''}</div>
             <div class="queue">${queue.length ? queue.map((id,index) => {
               const e = state.exercises.find(x=>x.id===id);
-              return `<div class="queue-item"><span class="queue-num">${index+1}</span><div><b>${esc(e.name)}</b><small>${e.sets} × ${formatCountdown(e.workSec*1000)} work · ${formatCountdown(e.restSec*1000)} rest</small></div><div class="queue-actions"><button data-action="queue-up" data-index="${index}" aria-label="Move up">↑</button><button data-action="queue-down" data-index="${index}" aria-label="Move down">↓</button><button data-action="queue-remove" data-index="${index}" aria-label="Remove">×</button></div></div>`;
+              return `<div class="queue-item with-demo"><span class="queue-num">${index+1}</span>${demoVisualMarkup(e,{compact:true})}<div><b>${esc(e.name)}</b><small>${e.sets} × ${formatCountdown(e.workSec*1000)} work · ${formatCountdown(e.restSec*1000)} rest</small></div><div class="queue-actions"><button class="queue-preview" data-action="preview-exercise" data-id="${esc(e.id)}" aria-label="Preview ${esc(e.name)}">Preview</button><button data-action="queue-up" data-index="${index}" aria-label="Move up">↑</button><button data-action="queue-down" data-index="${index}" aria-label="Move down">↓</button><button data-action="queue-remove" data-index="${index}" aria-label="Remove">×</button></div></div>`;
             }).join('') : '<div class="empty">Choose a preset or add an exercise.</div>'}</div>
-            <button class="btn" style="width:100%;margin-top:17px" data-action="timer-start" ${queue.length?'':'disabled'}>${icon('timer')} Start with 5-second prep</button>
+            <button class="btn" style="width:100%;margin-top:17px" data-action="timer-start" ${queue.length?'':'disabled'}>${icon('timer')} Preview & start</button>
+            <p class="tiny muted" style="margin:11px 0 0">A seven-second movement preview runs before each new exercise, not between sets.</p>
             <p class="tiny muted" style="margin:11px 0 0">The timer uses timestamps, so it stays accurate when the tab is in the background. Keep this page open for cues.</p>
           </section>
         </div>`;
@@ -1400,9 +1737,9 @@
         <div class="page-heading"><div><p class="eyebrow">Editable movement library</p><h2 id="library-heading">Your exercises</h2><p>Save the work/rest values you actually use, then add movements to the interval timer in one tap.</p></div><div class="heading-actions"><button class="btn" data-action="add-exercise">${icon('plus')} New exercise</button></div></div>
         <div class="filter-row"><input class="search" type="search" data-action="library-search" value="${esc(filter.query)}" placeholder="Search exercises…" aria-label="Search exercises"><select class="search" style="flex:0 1 180px" data-action="library-category" aria-label="Filter by category">${categories.map(c=>`<option ${c===filter.category?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
         <div class="exercise-grid">${exercises.length ? exercises.map(e=>`<article class="exercise-card">
-          <span class="chip accent" style="align-self:flex-start">${esc(e.category)}</span><h3>${esc(e.name)}</h3><p>${esc(e.instructions || 'No instructions yet.')}</p>
+          ${demoVisualMarkup(e)}<span class="chip accent" style="align-self:flex-start">${esc(e.category)}</span><h3>${esc(e.name)}</h3><p>${esc(e.instructions || 'No instructions yet.')}</p>
           <div class="exercise-stats"><span class="chip">${e.sets} sets</span><span class="chip">${e.workSec}s work</span><span class="chip">${e.restSec}s rest</span></div>
-          <div class="exercise-actions"><button class="btn small" data-action="library-add-timer" data-id="${esc(e.id)}">${icon('plus')} Timer</button><button class="btn secondary small" data-action="edit-exercise" data-id="${esc(e.id)}">${icon('edit')} Edit</button><button class="btn ghost small" data-action="delete-exercise" data-id="${esc(e.id)}" aria-label="Delete ${esc(e.name)}">${icon('trash')}</button></div>
+          <div class="exercise-actions"><button class="btn secondary small" data-action="preview-exercise" data-id="${esc(e.id)}">Preview</button><button class="btn small" data-action="library-add-timer" data-id="${esc(e.id)}">${icon('plus')} Timer</button><button class="btn secondary small" data-action="edit-exercise" data-id="${esc(e.id)}">${icon('edit')} Edit</button><button class="btn ghost small" data-action="delete-exercise" data-id="${esc(e.id)}" aria-label="Delete ${esc(e.name)}">${icon('trash')}</button></div>
         </article>`).join('') : '<div class="empty" style="grid-column:1/-1">No exercises match that filter.</div>'}</div>`;
     }
 
@@ -1622,12 +1959,44 @@
       form.elements.sets.value = 3;
       form.elements.workSec.value = 40;
       form.elements.restSec.value = 60;
+      form.elements.demo.value = 'none';
       const exercise = state.exercises.find(e=>e.id===id);
       $('#exercise-dialog-title').textContent = exercise ? 'Edit exercise' : 'Add exercise';
       if (exercise) Object.entries(exercise).forEach(([key,value]) => { if (form.elements[key]) form.elements[key].value = value; });
       else form.elements.id.value = '';
       $('#exercise-dialog').showModal();
       setTimeout(()=>form.elements.name.focus(),0);
+    }
+
+    function openExerciseDemo(id,{startSession=false}={}) {
+      const exercise=state.exercises.find(item=>item.id===id);
+      if (!exercise) { toast('That exercise is no longer available.',true); return; }
+      pendingTimerStart=startSession;
+      const demo=demoDefinition(exercise);
+      $('#demo-dialog-title').textContent=startSession?`Ready for ${exercise.name}?`:exercise.name;
+      $('#demo-dialog-stage').innerHTML=demoVisualMarkup(exercise,{eager:true});
+      $('#demo-dialog-copy').textContent=[exercise.instructions||'No movement cues saved.',demo.note||''].filter(Boolean).join(' ');
+      $('#demo-dialog-stats').innerHTML=`<span class="chip">${exercise.sets} sets</span><span class="chip">${exercise.workSec}s work</span><span class="chip">${exercise.restSec}s rest</span>`;
+      $('#demo-dialog-credit').innerHTML=demoCreditMarkup(exercise);
+      const startButton=$('#demo-dialog-start');
+      startButton.hidden=!startSession;
+      startButton.textContent=`Start ${Math.round(DEMO_PREP_MS/1000)}-second prep`;
+      const dialog=$('#demo-dialog');
+      dialog.showModal();
+      setTimeout(()=>(startSession?startButton:dialog.querySelector('[data-close-dialog]'))?.focus(),0);
+    }
+
+    function requestTimerStart() {
+      const firstId=state.builderQueue.find(id=>state.exercises.some(exercise=>exercise.id===id));
+      if (!firstId) return;
+      openExerciseDemo(firstId,{startSession:true});
+    }
+
+    function confirmTimerStart() {
+      if (!pendingTimerStart) return;
+      pendingTimerStart=false;
+      $('#demo-dialog').close();
+      startTimer();
     }
 
     function updateRoutineFormFields() {
@@ -1781,7 +2150,8 @@
       timer.phaseEnd = anchor + timer.phaseDurationMs;
       timer.remainingMs = timer.phaseDurationMs;
       lastBeepSecond = null;
-      $('#timer-announcer').textContent = `${phase}. ${timer.queue[timer.exerciseIndex]?.name || ''}`;
+      const announced=phase==='rest'&&timer.nextPosition?timer.queue[timer.nextPosition.exerciseIndex]:timer.queue[timer.exerciseIndex];
+      $('#timer-announcer').textContent = phase==='rest'?`Rest. Up next: ${announced?.name||''}`:`${phase}. ${announced?.name||''}`;
       if (cue) { beep(phase==='work'?880:620,.12); vibrate([70,40,70]); }
     }
 
@@ -1807,23 +2177,28 @@
         setTimerPhase('rest',current.restSec*1000,anchor,cue);
       } else if (timer.phase === 'rest') {
         const next = timer.nextPosition || nextPosition(timer);
+        if (!next) { finishTimer(automatic?anchor:Date.now(),cue); return; }
+        const changedExercise=next.exerciseIndex!==timer.exerciseIndex;
         timer.exerciseIndex = next.exerciseIndex;
         timer.setIndex = next.setIndex;
         timer.nextPosition = null;
         const exercise = timer.queue[timer.exerciseIndex];
-        setTimerPhase('work',exercise.workSec*1000,anchor,cue);
+        setTimerPhase(changedExercise?'prepare':'work',changedExercise?DEMO_PREP_MS:exercise.workSec*1000,anchor,cue);
       }
       saveState();
     }
 
     function nextTimerLabel(timer) {
-      if (timer.phase === 'prepare') return 'Next: work';
+      if (timer.phase === 'prepare') return `Next: work · ${timer.queue[timer.exerciseIndex]?.name||''}`;
       if (timer.phase === 'work') {
         const next = nextPosition(timer);
-        return next ? `Next: rest, then ${timer.queue[next.exerciseIndex].name} · set ${next.setIndex+1}` : 'Last interval';
+        if (!next) return 'Last interval';
+        const changedExercise=next.exerciseIndex!==timer.exerciseIndex;
+        return changedExercise?`Next: rest, then preview ${timer.queue[next.exerciseIndex].name}`:`Next: rest, then set ${next.setIndex+1}`;
       }
       const next = timer.nextPosition;
-      return next ? `Next: ${timer.queue[next.exerciseIndex].name} · set ${next.setIndex+1}` : '';
+      if (!next) return '';
+      return next.exerciseIndex!==timer.exerciseIndex?`Next: 7-second prep · ${timer.queue[next.exerciseIndex].name}`:`Next: ${timer.queue[next.exerciseIndex].name} · set ${next.setIndex+1}`;
     }
 
     function startTimer() {
@@ -1831,7 +2206,7 @@
       if (!queue.length) return;
       ensureAudio();
       const now = Date.now();
-      state.activeTimer = {id:uid('session'),queue,exerciseIndex:0,setIndex:0,phase:'prepare',phaseDurationMs:5000,phaseEnd:now+5000,remainingMs:5000,paused:false,pausedAt:null,pausedTotalMs:0,startedAt:new Date().toISOString(),nextPosition:null};
+      state.activeTimer = {id:uid('session'),queue,exerciseIndex:0,setIndex:0,phase:'prepare',phaseDurationMs:DEMO_PREP_MS,phaseEnd:now+DEMO_PREP_MS,remainingMs:DEMO_PREP_MS,paused:false,pausedAt:null,pausedTotalMs:0,startedAt:new Date().toISOString(),nextPosition:null};
       saveState('Timer started.'); requestWakeLock(); renderTimer(); window.scrollTo({top:0,behavior:'smooth'}); startTimerLoop();
     }
 
@@ -1880,11 +2255,14 @@
       const remaining = timerRemaining(timer);
       const seconds = Math.ceil(remaining/1000);
       if (!timer.paused && seconds<=3 && seconds>0 && seconds!==lastBeepSecond) { beep(520,.045); lastBeepSecond=seconds; }
-      const exercise = timer.queue[timer.exerciseIndex];
+      const context = timerDisplayContext(timer);
+      const exercise = context.exercise;
       const clock = $('#timer-clock'); if (clock) clock.textContent=formatCountdown(remaining);
-      const phase = $('#timer-phase'); if (phase) phase.textContent=timer.paused?'paused':timer.phase;
+      const phase = $('#timer-phase'); if (phase) phase.textContent=timerPhaseText(timer);
       const title = $('#timer-exercise'); if (title) title.textContent=exercise.name;
-      const meta = $('#timer-meta'); if (meta) meta.textContent=`Exercise ${timer.exerciseIndex+1}/${timer.queue.length} · Set ${timer.setIndex+1}/${exercise.sets}`;
+      const meta = $('#timer-meta'); if (meta) meta.textContent=timerMetaText(timer,context);
+      const activeDemo=$('#active-demo');
+      if (activeDemo&&activeDemo.dataset.demoKey!==context.key) activeDemo.outerHTML=activeDemoMarkup(timer);
       const fill = $('#timer-progress-fill'); if (fill) fill.style.width=`${clamp(100-(remaining/(timer.phaseDurationMs||1)*100),0,100)}%`;
       const next = $('#timer-next'); if (next) next.textContent=nextTimerLabel(timer);
       updateMiniTimer();
@@ -1898,18 +2276,18 @@
     function checkDateRollover() {
       const current=localDate();
       if (current===appToday) return;
-      if (state.selectedDate===appToday) state.selectedDate=current;
+      if (state.selectedDate===appToday) { state.selectedDate=current; todayCalendarMonth=startOfMonth(current); }
       appToday=current; saveState(); renderView();
     }
 
     function updateMiniTimer() {
       const el = $('#mini-timer');
       if (!state.activeTimer || state.currentView==='timer') { el.classList.remove('visible'); return; }
-      const timer=state.activeTimer, exercise=timer.queue[timer.exerciseIndex];
+      const timer=state.activeTimer, context=timerDisplayContext(timer), exercise=context.exercise;
       el.classList.add('visible');
       $('#mini-clock').textContent=formatCountdown(timerRemaining(timer));
       $('#mini-title').textContent=exercise.name;
-      $('#mini-phase').textContent=`${timer.paused?'Paused':timer.phase} · set ${timer.setIndex+1}/${exercise.sets}`;
+      $('#mini-phase').textContent=`${timerPhaseText(timer)} · set ${context.setIndex+1}/${exercise.sets}`;
     }
 
     function dateAtMinutes(dateValue,totalMinutes) {
@@ -2211,7 +2589,7 @@
         const url=new URL(target,location.href);
         const dateValue=url.searchParams.get('date');
         const taskId=url.searchParams.get('task')||'';
-        if (dateValue&&validLocalDate(dateValue)) state.selectedDate=dateValue;
+        if (dateValue&&validLocalDate(dateValue)) { state.selectedDate=dateValue; todayCalendarMonth=startOfMonth(dateValue); }
         pendingLaunchTask=taskId;
         state.currentView='today';
         if (initial) history.replaceState(null,'',`${location.pathname}#today`);
@@ -2246,15 +2624,23 @@
       const control = event.target.closest('[data-action]');
       if (!control) return;
       const action = control.dataset.action;
+      if (action === 'check-update') void checkForAppUpdate(true);
+      if (action === 'apply-update') applyAppUpdate();
       if (action === 'open-day-schedule') openScheduleDialog();
       if (action === 'open-task-schedule') openScheduleDialog(control.dataset.id);
       if (action === 'share-calendar') void shareScheduleCalendar();
       if (action === 'google-calendar') openGoogleCalendar();
       if (action === 'save-app-alerts') void saveScheduleAlerts().catch(error=>{console.warn('Could not save app alerts:',error);toast('Could not save app alerts. Calendar export still works.',true);});
       if (action === 'clear-app-alerts') clearScheduleAlerts();
-      if (action === 'date-prev') { state.selectedDate=addDays(state.selectedDate,-1); saveState(); renderToday(); }
-      if (action === 'date-next') { state.selectedDate=addDays(state.selectedDate,1); saveState(); renderToday(); }
-      if (action === 'date-today') { state.selectedDate=localDate(); saveState(); renderToday(); }
+      if (action === 'date-prev') selectTodayDate(addDays(state.selectedDate,-1),{focus:'top-day-prev'});
+      if (action === 'date-next') selectTodayDate(addDays(state.selectedDate,1),{focus:'top-day-next'});
+      if (action === 'date-today') selectTodayDate(localDate(),{focus:'top-day-today'});
+      if (action === 'calendar-week-prev') selectTodayDate(addDays(state.selectedDate,-7),{focus:'week-prev'});
+      if (action === 'calendar-week-next') selectTodayDate(addDays(state.selectedDate,7),{focus:'week-next'});
+      if (action === 'calendar-toggle-month') { todayCalendarExpanded=!todayCalendarExpanded; todayCalendarMonth=startOfMonth(state.selectedDate); todayCalendarFocus='month-toggle'; renderToday(); }
+      if (action === 'calendar-month-prev') { todayCalendarMonth=addMonths(todayCalendarMonth,-1); todayCalendarFocus='month-prev'; renderToday(); }
+      if (action === 'calendar-month-next') { todayCalendarMonth=addMonths(todayCalendarMonth,1); todayCalendarFocus='month-next'; renderToday(); }
+      if (action === 'calendar-select-date') selectTodayDate(control.dataset.date,{focus:`date-${control.dataset.date}`,closeMonth:Boolean(control.closest('.month-calendar'))});
       if (action === 'clear-day-override') { clearSessionChecks(state.selectedDate); delete state.overrides[state.selectedDate]; saveState('Planned day restored; session checks were cleared.'); renderToday(); }
       if (action === 'complete-task') handleTaskStatus(control.dataset.id,'done');
       if (action === 'skip-task') handleTaskStatus(control.dataset.id,'skipped');
@@ -2265,6 +2651,8 @@
       if (action === 'edit-plan-day') openPlanDay(control.dataset.week,control.dataset.index);
       if (action === 'add-exercise') openExercise();
       if (action === 'edit-exercise') openExercise(control.dataset.id);
+      if (action === 'preview-exercise') openExerciseDemo(control.dataset.id);
+      if (action === 'confirm-timer-start') confirmTimerStart();
       if (action === 'delete-exercise') deleteExercise(control.dataset.id);
       if (action === 'delete-session') requestDeleteSession(control.dataset.id);
       if (action === 'show-more-sessions') { historySessionLimit+=20; renderHistory(); }
@@ -2284,7 +2672,7 @@
       if (action === 'queue-up') moveQueue(Number(control.dataset.index),-1);
       if (action === 'queue-down') moveQueue(Number(control.dataset.index),1);
       if (action === 'queue-remove') { state.builderQueue.splice(Number(control.dataset.index),1); saveState(); renderTimer(); }
-      if (action === 'timer-start') startTimer();
+      if (action === 'timer-start') requestTimerStart();
       if (action === 'timer-pause' && state.activeTimer) {
         const timer=state.activeTimer;
         if (timer.paused) { timer.pausedTotalMs=(timer.pausedTotalMs||0)+Math.max(0,Date.now()-(timer.pausedAt||Date.now())); timer.pausedAt=null; timer.paused=false; timer.phaseEnd=Date.now()+timer.remainingMs; requestWakeLock(); }
@@ -2392,7 +2780,7 @@
       const form=event.currentTarget;
       if (!form.reportValidity()) return;
       const data=Object.fromEntries(new FormData(form));
-      const item={id:data.id||uid('exercise'),name:data.name.trim(),category:data.category,sets:Number(data.sets),workSec:Number(data.workSec),restSec:Number(data.restSec),instructions:data.instructions.trim()};
+      const item={id:data.id||uid('exercise'),name:data.name.trim(),category:data.category,demo:DEMO_IDS.includes(data.demo)?data.demo:'none',sets:Number(data.sets),workSec:Number(data.workSec),restSec:Number(data.restSec),instructions:data.instructions.trim()};
       const index=state.exercises.findIndex(e=>e.id===item.id);
       if (index>=0) state.exercises[index]=item; else state.exercises.push(item);
       saveState(index>=0?'Exercise updated.':'Exercise added.'); $('#exercise-dialog').close(); renderView();
@@ -2439,6 +2827,7 @@
     });
 
     const confirmationDialog=$('#confirm-dialog');
+    $('#demo-dialog').addEventListener('close',()=>{pendingTimerStart=false;});
     confirmationDialog.addEventListener('cancel',event=>{
       event.preventDefault();
       closeConfirmation();
@@ -2483,6 +2872,7 @@
         checkDateRollover();
         if (state.activeTimer&&!state.activeTimer.paused) { syncExpiredTimer(); requestWakeLock(); updateTimerDisplay(); }
         void processDueReminders();
+        void checkForAppUpdate();
       }
       if (document.visibilityState==='hidden'&&noteSaveTimer) { clearTimeout(noteSaveTimer); noteSaveTimer=null; saveState(); }
     });
@@ -2502,13 +2892,34 @@
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load',()=>{
-        navigator.serviceWorker.register('./service-worker.js')
-          .then(()=>processDueReminders())
-          .catch(error=>console.warn('Offline setup failed:',error));
+        navigator.serviceWorker.register('./service-worker.js',{updateViaCache:'none'})
+          .then(registration=>{
+            attachServiceWorkerRegistration(registration);
+            void processDueReminders();
+            void checkForAppUpdate();
+          })
+          .catch(error=>{console.warn('Offline setup failed:',error);setPwaUpdateStatus('offline setup unavailable; the open app still works');});
+      });
+      navigator.serviceWorker.addEventListener('controllerchange',()=>{
+        const shouldReload=updateActivationRequested||serviceWorkerControllerSeen;
+        serviceWorkerControllerSeen=true;
+        updateActivationRequested=false;
+        clearTimeout(updateActivationTimer);
+        waitingWorker=null;
+        $('#update-banner').hidden=true;
+        $$('[data-action="apply-update"]').forEach(button=>{button.disabled=false;button.hidden=true;});
+        if (shouldReload&&!updateReloading) { updateReloading=true; location.reload(); }
+        else setPwaUpdateStatus('offline app installed');
       });
       navigator.serviceWorker.addEventListener('message',event=>{
         if (event.data?.type==='OPEN_SCHEDULE_TARGET'&&event.data.target) openScheduleTarget(event.data.target);
       });
+      window.addEventListener('online',()=>void checkForAppUpdate());
+      window.addEventListener('offline',()=>setPwaUpdateStatus('offline; using the installed app'));
+      window.addEventListener('pageshow',event=>{if(event.persisted)void checkForAppUpdate();});
+      setInterval(()=>{if(document.visibilityState==='visible')void checkForAppUpdate();},3600000);
+    } else {
+      setPwaUpdateStatus('updates are not supported in this browser');
     }
   </script>
 </body>
