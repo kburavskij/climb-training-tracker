@@ -1,0 +1,26 @@
+{
+  "id": "./",
+  "name": "Crux Routine",
+  "short_name": "Crux",
+  "description": "An offline climbing, training, mobility and supplement tracker.",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "any",
+  "background_color": "#f4f2eb",
+  "theme_color": "#18382f",
+  "icons": [
+    {
+      "src": "./icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "./icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}
