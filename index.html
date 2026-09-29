@@ -63,17 +63,28 @@
 
     * { box-sizing: border-box; }
     [hidden] { display: none !important; }
-    html { scroll-behavior: smooth; max-width: 100%; overflow-x: hidden; }
+    html {
+      max-width: 100%;
+      overflow-x: hidden;
+      overflow-x: clip;
+      overscroll-behavior-x: none;
+      scroll-behavior: smooth;
+      scrollbar-gutter: stable;
+    }
     body {
       margin: 0;
       min-height: 100vh;
+      width: 100%;
       max-width: 100%;
       overflow-x: hidden;
+      overflow-x: clip;
+      overscroll-behavior-x: none;
       background: var(--paper);
       color: var(--ink);
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
       -webkit-font-smoothing: antialiased;
     }
+    body:has(dialog[open]) { overflow: hidden; }
     button, input, select, textarea { min-width: 0; font: inherit; color: inherit; }
     button { cursor: pointer; }
     a { color: var(--forest-2); text-underline-offset: 3px; }
@@ -178,34 +189,65 @@
     .chip.optional { border-style: dashed; }
 
     .heading-tools { flex: 0 0 auto; display: grid; justify-items: end; gap: 8px; }
-    .date-strip { display: flex; align-items: center; gap: 7px; }
-    .date-label { min-width: 174px; text-align: center; font-weight: 760; font-size: 14px; }
-    .date-nav { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); }
-    .today-calendar { max-width: 100%; margin: -8px 0 18px; padding: 11px; overflow-x: hidden; overflow-x: clip; overscroll-behavior-x: none; touch-action: pan-y pinch-zoom; }
-    .today-calendar-head { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; gap: 7px; align-items: center; }
-    .calendar-range { min-height: 42px; padding: 5px 12px; border: 0; border-radius: 11px; background: var(--surface-2); color: var(--ink); font-weight: 790; }
-    .calendar-range span { display: block; color: var(--muted); font-size: 10px; font-weight: 700; }
-    .week-strip, .month-grid { width: 100%; min-width: 0; display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 5px; overflow-x: hidden; overflow-x: clip; }
-    .week-strip { margin-top: 9px; }
-    .calendar-day { min-width: 0; min-height: 58px; display: grid; place-items: center; gap: 1px; padding: 5px 2px; border: 1px solid transparent; border-radius: 11px; background: transparent; color: var(--muted); }
+    .date-nav {
+      width: 44px; height: 44px; display: grid; flex: 0 0 44px; place-items: center; padding: 0;
+      border: 1px solid var(--line); border-radius: 11px; background: var(--surface); color: var(--ink);
+    }
+    .date-nav:hover { border-color: color-mix(in srgb, var(--moss) 45%, var(--line)); background: var(--surface-2); }
+    .today-calendar {
+      max-width: 100%; margin: -8px 0 18px; padding: 11px; overflow-x: hidden; overflow-x: clip;
+      overscroll-behavior-x: none; touch-action: pan-y pinch-zoom;
+    }
+    .calendar-toolbar { display: grid; grid-template-columns: minmax(0,1fr) auto auto; gap: 8px; align-items: center; }
+    .calendar-period-nav { min-width: 0; display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; gap: 7px; align-items: center; }
+    .calendar-period-label {
+      min-width: 0; min-height: 44px; display: grid; align-content: center; margin: 0; padding: 4px 10px;
+      border-radius: 11px; background: var(--surface-2); text-align: center;
+    }
+    .calendar-period-label strong { overflow: hidden; font: 740 17px/1.1 Georgia, serif; text-overflow: ellipsis; white-space: nowrap; }
+    .calendar-period-label span { margin-top: 3px; color: var(--muted); font-size: 10px; font-weight: 720; }
+    .calendar-modes { display: inline-grid; grid-template-columns: 1fr 1fr; padding: 3px; border: 1px solid var(--line); border-radius: 13px; background: var(--surface-2); }
+    .calendar-mode {
+      min-width: 66px; min-height: 38px; padding: 0 12px; border: 0; border-radius: 9px;
+      background: transparent; color: var(--muted); font-size: 12px; font-weight: 800;
+    }
+    .calendar-mode:hover { color: var(--ink); }
+    .calendar-mode[aria-pressed="true"] { background: var(--surface); color: var(--ink); box-shadow: 0 1px 4px rgba(24,56,47,.12); }
+    .calendar-today {
+      min-height: 44px; padding: 0 14px; border: 1px solid var(--line); border-radius: 11px;
+      background: var(--surface); color: var(--ink); font-size: 12px; font-weight: 800;
+    }
+    .calendar-today:hover { background: var(--surface-2); }
+    .calendar-today[aria-pressed="true"] { border-color: color-mix(in srgb, var(--amber) 70%, var(--line)); color: color-mix(in srgb, var(--amber) 70%, var(--ink)); }
+    .calendar-panel { margin-top: 9px; }
+    .week-strip, .month-weekdays, .month-grid {
+      width: 100%; min-width: 0; display: grid; grid-template-columns: repeat(7,minmax(0,1fr)); gap: 5px;
+      overflow-x: hidden; overflow-x: clip;
+    }
+    .calendar-day {
+      position: relative; min-width: 0; min-height: 58px; display: grid; place-items: center; gap: 1px;
+      padding: 5px 2px; border: 1px solid transparent; border-radius: 11px; background: transparent; color: var(--muted);
+    }
     .calendar-day:hover { background: var(--surface-2); color: var(--ink); }
     .calendar-day .weekday { font-size: 9px; font-weight: 850; letter-spacing: .08em; text-transform: uppercase; }
-    .calendar-day .day-number { font-size: 16px; font-weight: 850; line-height: 1; }
+    .calendar-day .day-number { position: relative; font-size: 16px; font-weight: 850; line-height: 1; }
     .calendar-day .type-dots { min-height: 9px; transform: scale(.72); }
-    .calendar-day.today { box-shadow: inset 0 0 0 2px var(--amber); color: var(--ink); }
-    .calendar-day.selected { border-color: var(--moss); background: var(--forest); color: #fff; }
+    .calendar-day.today:not(.selected) { border-color: color-mix(in srgb, var(--amber) 72%, var(--line)); background: color-mix(in srgb, var(--amber-soft) 58%, var(--surface)); color: var(--ink); }
+    .calendar-day.today .day-number::after { content: ""; position: absolute; right: -5px; top: -4px; width: 4px; height: 4px; border-radius: 50%; background: var(--amber); }
+    .calendar-day.selected { border-color: var(--forest); background: var(--forest); color: #fff; }
+    .calendar-day.selected.today { box-shadow: inset 0 0 0 2px var(--amber); }
     .calendar-day.selected.outside-month { background: var(--forest); color: #fff; }
     html[data-theme="dark"] .calendar-day.selected,
     html[data-theme="dark"] .calendar-day.selected.outside-month { background: var(--lime); color: #18382f; }
     .calendar-day.selected .type-dot.rest { background: rgba(255,255,255,.55); }
-    .month-calendar { margin-top: 10px; padding-top: 10px; border-top: 1px solid var(--line); }
-    .month-head { display: grid; grid-template-columns: 44px minmax(0,1fr) 44px; align-items: center; gap: 7px; margin-bottom: 7px; }
-    .month-head h3 { margin: 0; text-align: center; font: 720 18px/1 Georgia, serif; }
+    .month-calendar { min-width: 0; }
+    .month-weekdays { margin-bottom: 3px; }
     .month-weekday { padding: 5px 0; color: var(--faint); text-align: center; font-size: 9px; font-weight: 850; text-transform: uppercase; }
+    .month-grid .calendar-day .weekday { display: none; }
     .month-grid .calendar-day { min-height: 46px; }
     .calendar-day.outside-month { color: var(--muted); background: color-mix(in srgb,var(--surface-2) 40%,transparent); }
     .today-hero {
-      position: relative; overflow: hidden; display: grid; grid-template-columns: 1fr auto; gap: 20px; padding: 25px;
+      position: relative; overflow: hidden; display: block; padding: 25px;
       color: #f8fbf6; background: #18382f; border: 0; box-shadow: var(--shadow);
     }
     .today-hero::after {
@@ -215,9 +257,22 @@
     .today-hero .eyebrow { color: var(--lime); }
     .today-hero h3 { margin: 0; max-width: 640px; font: 750 clamp(25px, 3.6vw, 39px)/1.04 Georgia, serif; letter-spacing: -.035em; }
     .today-hero p { max-width: 630px; margin: 10px 0 0; color: rgba(255,255,255,.7); line-height: 1.5; }
-    .hero-controls { position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
-    .day-select { min-height: 43px; padding: 0 36px 0 13px; border: 1px solid rgba(255,255,255,.2); border-radius: 12px; background: rgba(255,255,255,.09); color: #fff; font-weight: 760; }
-    .day-select option { color: #18211e; }
+    .today-activity-summary { position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 16px; }
+    .today-activity-details { min-width: 0; display: grid; gap: 6px; }
+    .today-activity-types { display: flex; flex-wrap: wrap; gap: 6px; }
+    .today-activity-chip {
+      min-height: 28px; display: inline-flex; align-items: center; padding: 4px 9px;
+      border: 1px solid rgba(255,255,255,.18); border-radius: 999px; background: rgba(255,255,255,.08);
+      color: #fff; font-size: 11px; font-weight: 800;
+    }
+    .today-activity-meta { color: rgba(255,255,255,.68); font-size: 12px; font-weight: 700; }
+    .today-activity-actions { display: flex; flex-wrap: wrap; gap: 6px; margin-left: auto; }
+    .today-edit-day { min-height: 44px; border-color: rgba(255,255,255,.25); background: rgba(255,255,255,.1); color: #fff; }
+    .today-edit-day:hover { background: rgba(255,255,255,.17); }
+    .today-use-plan { min-height: 44px; border-color: transparent; background: transparent; color: #fff; }
+    .today-use-plan:hover { background: rgba(255,255,255,.1); }
+    html[data-theme="dark"] .today-edit-day, html[data-theme="dark"] .today-use-plan { color: #fff; }
+    .schedule-label-short { display: none; }
     .progress-row { position: relative; z-index: 1; display: flex; align-items: center; gap: 11px; margin-top: 19px; }
     .progress-track { width: min(360px, 60vw); height: 8px; overflow: hidden; border-radius: 99px; background: rgba(255,255,255,.13); }
     .progress-fill { height: 100%; border-radius: inherit; background: var(--lime); transition: width .3s ease; }
@@ -314,36 +369,44 @@
     .queue-item b { display: block; font-size: 13px; }
     .queue-item small { color: var(--muted); }
     .queue-actions { display: flex; gap: 3px; }
-    .queue-actions button { width: 31px; height: 31px; display: grid; place-items: center; border: 0; border-radius: 8px; background: transparent; color: var(--muted); }
-    .queue-actions button.queue-preview { width: auto; padding: 0 8px; font-size: 10px; font-weight: 800; }
+    .queue-actions button { width: 36px; height: 36px; display: grid; place-items: center; border: 0; border-radius: 9px; background: transparent; color: var(--muted); }
+    .queue-actions button:disabled { opacity: .3; cursor: default; }
     .queue-actions button:hover { background: var(--surface-2); color: var(--ink); }
 
     .demo-thumb { width: 84px; height: 62px; flex: 0 0 auto; }
     .queue-item.with-demo { grid-template-columns: auto 84px minmax(0,1fr) auto; }
-    .demo-visual { position: relative; width: 100%; aspect-ratio: 16/10; overflow: hidden; border: 1px solid var(--line); border-radius: 14px; background: #18382f; }
-    .demo-visual .demo-frame { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: contain; }
-    .demo-visual .demo-frame:first-child { position: relative; display: block; }
-    .demo-visual.is-animated .demo-frame:nth-child(1) { animation: demo-frame-1 5s step-end 1 forwards; }
-    .demo-visual.is-animated .demo-frame:nth-child(2) { animation: demo-frame-2 5s step-end 1 forwards; }
-    .demo-visual.is-animated .demo-frame:nth-child(3) { animation: demo-frame-3 5s step-end 1 forwards; }
+    .demo-visual { position: relative; width: 100%; aspect-ratio: 16/10; overflow: hidden; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: #edf2f0; color: var(--ink); }
+    button.demo-visual { display: block; text-align: left; }
+    button.demo-visual:hover { border-color: var(--moss); }
+    .demo-poster, .demo-animation { width: 100%; height: 100%; display: block; object-fit: cover; }
+    .demo-visual.external-media { width: min(180px,100%); aspect-ratio: 1; margin-inline: auto; background: #f4f4f4; }
+    .demo-play-badge, .demo-motion-toggle {
+      position: absolute; right: 9px; bottom: 9px; min-width: 44px; height: 44px; display: inline-flex;
+      align-items: center; justify-content: center; gap: 6px; padding: 0 11px; border: 1px solid rgba(255,255,255,.45);
+      border-radius: 12px; background: rgba(24,56,47,.9); color: #fff; box-shadow: 0 5px 16px rgba(0,0,0,.2);
+      font-size: 11px; font-weight: 800; backdrop-filter: blur(5px);
+    }
+    .demo-play-badge .icon, .demo-motion-toggle .icon { width: 18px; height: 18px; }
+    .demo-thumb .demo-play-badge { right: 4px; bottom: 4px; min-width: 32px; width: 32px; height: 32px; padding: 0; border-radius: 9px; }
+    .demo-thumb .demo-play-badge span { display: none; }
     .demo-placeholder { display: grid; place-items: center; align-content: center; gap: 8px; padding: 18px; color: rgba(255,255,255,.82); text-align: center; }
+    .demo-placeholder { background: #18382f; }
     .demo-placeholder svg { width: 26px; height: 26px; color: var(--lime); }
     .demo-placeholder strong { font-size: 12px; }
     .demo-placeholder small { max-width: 260px; color: rgba(255,255,255,.58); font-size: 10px; line-height: 1.4; }
     .exercise-card .demo-visual { margin-bottom: 13px; }
     .demo-note { margin: 9px 0 0; color: var(--muted); font-size: 11px; line-height: 1.45; }
     .demo-stage { width: min(430px,100%); margin: 0 auto 18px; }
-    .demo-credit { margin: 8px 0 0; color: var(--faint); font-size: 10px; text-align: center; }
-    .demo-credit a { color: inherit; }
-    .active-demo { width: min(360px,88%); margin: 17px auto 0; overflow: hidden; border: 1px solid rgba(255,255,255,.15); border-radius: 16px; background: #18382f; }
+    .demo-steps { margin-top: 14px; border-top: 1px solid var(--line); }
+    .demo-steps summary { min-height: 44px; display: flex; align-items: center; cursor: pointer; color: var(--ink); font-size: 12px; font-weight: 800; }
+    .demo-steps ol { margin: 0 0 4px; padding-left: 22px; color: var(--muted); font-size: 12px; line-height: 1.5; }
+    .demo-steps li + li { margin-top: 7px; }
+    .active-demo { width: min(430px,94%); margin: 17px auto 0; overflow: hidden; border: 1px solid rgba(255,255,255,.15); border-radius: 16px; background: #18382f; }
     .active-demo .demo-visual { border: 0; border-radius: 0; }
     .active-demo-copy { padding: 9px 12px; color: rgba(255,255,255,.72); background: rgba(0,0,0,.18); font-size: 11px; line-height: 1.4; }
 
-    @keyframes demo-frame-1 { 0%, 32.99% { opacity: 1; } 33%, 100% { opacity: 0; } }
-    @keyframes demo-frame-2 { 0%, 32.99%, 66%, 100% { opacity: 0; } 33%, 65.99% { opacity: 1; } }
-    @keyframes demo-frame-3 { 0%, 65.99% { opacity: 0; } 66%, 100% { opacity: 1; } }
-
-    .active-timer { padding: 28px; color: #f8fbf6; background: #18382f; border: 0; min-height: 476px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+    .active-timer { position: relative; padding: 28px; color: #f8fbf6; background: #18382f; border: 0; min-height: 476px; display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center; }
+    .workout-minimize { position: absolute; top: 14px; right: 14px; color: #fff; background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.18); }
     .phase-pill { padding: 7px 12px; border-radius: 99px; background: rgba(255,255,255,.09); color: var(--lime); font-size: 11px; font-weight: 850; letter-spacing: .12em; text-transform: uppercase; }
     .timer-clock { margin: 25px 0 13px; font: 800 clamp(70px, 10vw, 116px)/.8 ui-monospace, SFMono-Regular, Menlo, monospace; letter-spacing: -.09em; }
     .timer-exercise { font: 700 27px/1.1 Georgia, serif; }
@@ -353,6 +416,7 @@
     .timer-controls { display: flex; flex-wrap: wrap; justify-content: center; gap: 9px; margin-top: 28px; }
     .timer-controls .btn { color: #18382f; background: var(--lime); }
     .timer-controls .btn.secondary { color: #fff; background: rgba(255,255,255,.08); border-color: rgba(255,255,255,.16); }
+    .timer-controls .timer-end { color: #fff; background: color-mix(in srgb, var(--red) 72%, transparent); border-color: color-mix(in srgb, var(--red) 88%, #fff); }
     .timer-next { margin-top: 16px; color: rgba(255,255,255,.52); font-size: 12px; }
     .timer-finished { min-height: 460px; display: grid; place-items: center; text-align: center; padding: 30px; }
     .finish-mark { width: 74px; height: 74px; display: grid; place-items: center; margin: 0 auto 18px; border-radius: 24px; background: var(--lime); color: #18382f; font-size: 34px; }
@@ -364,7 +428,27 @@
     .exercise-card h3 { margin: 15px 0 7px; font-size: 17px; letter-spacing: -.02em; }
     .exercise-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
     .exercise-stats { display: flex; gap: 7px; margin-top: 13px; flex-wrap: wrap; }
+    .exercise-compact-stats { margin-top: 11px; color: var(--muted); font-size: 11px; font-weight: 720; }
     .exercise-actions { display: flex; flex-wrap: wrap; gap: 7px; margin-top: auto; padding-top: 16px; }
+
+    #catalog-dialog { width: min(920px,calc(100% - 28px)); }
+    .dialog-subtitle { margin: 5px 0 0; color: var(--muted); font-size: 12px; }
+    .catalog-body { min-height: min(560px,calc(100dvh - 190px)); }
+    .catalog-filters { display: grid; grid-template-columns: minmax(190px,1fr) repeat(3,minmax(135px,.55fr)); gap: 8px; margin-bottom: 12px; }
+    .catalog-filters .search { width: 100%; min-height: 44px; }
+    .catalog-summary { margin: 0 0 12px; color: var(--muted); font-size: 12px; }
+    .catalog-results { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 10px; }
+    .catalog-card { min-width: 0; display: grid; grid-template-columns: 112px minmax(0,1fr); gap: 11px; padding: 10px; border: 1px solid var(--line); border-radius: 15px; background: var(--surface); }
+    .catalog-media { align-self: start; padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 12px; background: #f4f4f4; }
+    .catalog-media img { width: 100%; height: auto; aspect-ratio: 1; display: block; object-fit: cover; }
+    .catalog-card-copy { min-width: 0; display: flex; flex-direction: column; }
+    .catalog-card h3 { margin: 3px 0 4px; font-size: 14px; line-height: 1.2; }
+    .catalog-card p { display: -webkit-box; overflow: hidden; margin: 5px 0 0; color: var(--muted); font-size: 11px; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+    .catalog-meta { color: var(--faint); font-size: 10px; font-weight: 720; text-transform: capitalize; }
+    .catalog-actions { display: flex; align-items: center; gap: 6px; margin-top: auto; padding-top: 8px; }
+    .catalog-actions .btn { min-height: 36px; }
+    .catalog-foot { justify-content: flex-end; }
+    .catalog-more { grid-column: 1 / -1; }
 
     .history-stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 11px; margin-bottom: 17px; }
     .stat-card { padding: 18px; }
@@ -426,12 +510,18 @@
     .mini-meta small { margin-top: 3px; color: rgba(255,255,255,.57); }
     .mini-timer button { width: 35px; height: 35px; display: grid; place-items: center; border: 0; border-radius: 10px; background: var(--lime); color: #18382f; }
 
-    dialog { width: min(570px, calc(100vw - 28px)); max-height: calc(100vh - 34px); padding: 0; overflow: hidden; border: 1px solid var(--line); border-radius: 21px; background: var(--surface); color: var(--ink); box-shadow: 0 24px 90px rgba(0,0,0,.28); }
+    dialog {
+      width: min(570px, calc(100% - 28px)); max-width: calc(100% - 28px); max-height: calc(100dvh - 34px);
+      padding: 0; overflow: hidden; overscroll-behavior: contain; border: 1px solid var(--line); border-radius: 21px;
+      background: var(--surface); color: var(--ink); box-shadow: 0 24px 90px rgba(0,0,0,.28);
+    }
     dialog::backdrop { background: rgba(10,18,15,.58); backdrop-filter: blur(3px); }
+    dialog > form { min-width: 0; max-width: 100%; }
     .dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 22px; border-bottom: 1px solid var(--line); }
     .dialog-head h2 { margin: 0; font: 720 23px/1 Georgia, serif; }
     .dialog-body {
-      max-height: calc(100vh - 180px);
+      max-width: 100%;
+      max-height: calc(100dvh - 180px);
       overflow-x: hidden;
       overflow-y: auto;
       overscroll-behavior-x: none;
@@ -489,6 +579,7 @@
     }
     @media (max-width: 700px) {
       :root { --sidebar: 0px; }
+      html { scrollbar-gutter: auto; }
       .sidebar { display: none; }
       .main { margin-left: 0; }
       .topbar {
@@ -504,7 +595,7 @@
       .topbar-title h1 { font-size: 18px; }
       .topbar-title p, .save-state { display: none; }
       .content {
-        padding-top: 25px;
+        padding-top: 18px;
         padding-right: calc(15px + env(safe-area-inset-right));
         padding-bottom: calc(100px + env(safe-area-inset-bottom));
         padding-left: calc(15px + env(safe-area-inset-left));
@@ -515,15 +606,43 @@
       .heading-actions .btn { flex: 1; }
       .heading-tools { width: 100%; justify-items: stretch; }
       .heading-tools > .btn { width: 100%; }
-      .date-strip { justify-content: space-between; }
-      .today-calendar { width: calc(100% + 16px); max-width: calc(100% + 16px); margin: -3px -8px 18px; padding: 9px 6px; }
-      .week-strip, .month-grid { gap: 2px; }
+      .today-heading { display: grid; grid-template-columns: minmax(0,1fr) auto; align-items: center; gap: 12px; margin-bottom: 14px; }
+      .today-heading h2 { font-size: 31px; }
+      .today-heading .eyebrow { margin-bottom: 4px; }
+      .today-heading p { margin-top: 6px; font-size: 12px; }
+      .today-heading .heading-tools { width: auto; }
+      .today-heading .heading-tools > .btn { width: auto; min-height: 44px; }
+      .schedule-label-short { display: inline; }
+      .schedule-label-long { display: none; }
+      .today-calendar {
+        width: auto; max-width: none;
+        margin: -3px calc(-15px - env(safe-area-inset-right)) 16px calc(-15px - env(safe-area-inset-left));
+        padding: 9px max(1px, env(safe-area-inset-right)) 10px max(1px, env(safe-area-inset-left));
+        border-right: 0; border-left: 0; border-radius: 0;
+      }
+      .calendar-toolbar { grid-template-columns: minmax(0,1fr) auto; gap: 7px; }
+      .calendar-period-nav { grid-column: 1 / -1; gap: 5px; padding: 0 7px; }
+      .calendar-modes { grid-column: 1; margin-left: 7px; }
+      .calendar-mode { min-width: 72px; min-height: 44px; }
+      .calendar-today { grid-column: 2; margin-right: 7px; }
+      .week-strip, .month-weekdays, .month-grid { gap: 0; }
+      .calendar-panel { margin-top: 8px; }
       .calendar-day { min-height: 54px; }
       .calendar-day .weekday { letter-spacing: 0; }
-      .today-hero { grid-template-columns: 1fr; padding: 21px; }
-      .hero-controls { align-items: flex-start; justify-content: flex-start; }
-      .day-select { flex: 1 1 135px; }
-      .date-label { min-width: 140px; }
+      .month-grid .calendar-day { min-height: 48px; border-radius: 9px; }
+      .today-hero { padding: 18px; }
+      .today-hero h3 { font-size: 26px; }
+      .today-hero p { font-size: 13px; line-height: 1.42; }
+      .today-hero-copy { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+      .today-activity-summary { gap: 7px; margin-top: 12px; }
+      .today-activity-details { min-width: 130px; flex: 1 1 130px; }
+      .today-activity-actions { display: grid; flex: 0 0 auto; margin-left: 0; }
+      .progress-row { margin-top: 14px; }
+      .progress-track { width: auto; min-width: 0; flex: 1; }
+      .btn.small { min-height: 44px; }
+      .skip-btn, .task-schedule { width: 44px; height: 44px; }
+      .check-btn { width: 44px; height: 44px; }
+      .day-checks span { min-height: 44px; }
       .task { grid-template-columns: minmax(0,1fr); align-items: start; }
       .task-time { grid-column: auto; text-align: left; margin-bottom: -7px; }
       .task-actions { width: 100%; align-self: auto; flex-wrap: nowrap; justify-content: flex-end; }
@@ -531,9 +650,31 @@
       .week-grid { grid-template-columns: repeat(7, 130px); }
       .cycle-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .exercise-grid { grid-template-columns: 1fr; }
+      .exercise-card {
+        min-height: 0; display: grid; grid-template-columns: 100px minmax(0,1fr); gap: 5px 13px;
+        padding: 12px;
+      }
+      .exercise-card .demo-visual { grid-column: 1; grid-row: 1 / span 5; align-self: start; margin: 0; }
+      .exercise-card > .chip, .exercise-card > h3, .exercise-card > p,
+      .exercise-card > .exercise-compact-stats, .exercise-card > .exercise-actions { grid-column: 2; }
+      .exercise-card > .chip { min-height: 24px; width: max-content; padding: 2px 8px; }
+      .exercise-card h3 { margin: 2px 0 0; font-size: 16px; }
+      .exercise-card > p { display: -webkit-box; overflow: hidden; -webkit-box-orient: vertical; -webkit-line-clamp: 2; }
+      .exercise-card .exercise-compact-stats { margin-top: 3px; }
+      .exercise-card .exercise-actions { flex-wrap: nowrap; margin-top: 2px; padding-top: 5px; }
+      .exercise-card .exercise-actions .btn { min-width: 44px; padding-inline: 10px; }
+      .exercise-card .exercise-actions .add-to-timer { flex: 1 1 auto; }
+      #catalog-dialog { width: 100%; max-width: 100%; }
+      .catalog-body { min-height: 0; }
+      .catalog-filters { grid-template-columns: 1fr 1fr; }
+      .catalog-filters #catalog-search { grid-column: 1 / -1; }
+      .catalog-results { grid-template-columns: 1fr; }
+      .catalog-card { grid-template-columns: 84px minmax(0,1fr); }
+      .catalog-actions .btn { min-height: 44px; }
       .queue-item.with-demo { grid-template-columns: auto 62px minmax(0,1fr); }
       .queue-item.with-demo .demo-thumb { width: 62px; height: 48px; }
       .queue-item.with-demo .queue-actions { grid-column: 2 / -1; justify-content: flex-end; }
+      .queue-actions button { width: 44px; height: 44px; }
       .history-stats { grid-template-columns: repeat(2, 1fr); }
       .log-row { grid-template-columns: minmax(0,1fr) auto; gap: 8px 12px; }
       .log-date { grid-column: 1 / -1; }
@@ -547,13 +688,27 @@
       .source-list { columns: 1; }
       .form-grid { grid-template-columns: 1fr; }
       .field.full { grid-column: auto; }
+      dialog {
+        inset: auto 0 0;
+        width: 100%; max-width: 100%; max-height: min(88dvh, 760px); margin: auto 0 0;
+        border-right: 0; border-bottom: 0; border-left: 0; border-radius: 22px 22px 0 0;
+      }
+      dialog[open] { display: flex; flex-direction: column; animation: sheet-in .2s ease-out; }
+      dialog > form { display: flex; min-height: 0; max-height: inherit; flex: 1; flex-direction: column; }
+      .dialog-head { flex: 0 0 auto; padding: 16px 17px 14px; }
+      .dialog-head h2 { font-size: 21px; }
+      .dialog-body { min-height: 0; max-height: none; flex: 1 1 auto; padding: 17px; }
+      .dialog-foot {
+        flex: 0 0 auto; flex-wrap: wrap; padding: 13px 17px calc(13px + env(safe-area-inset-bottom));
+      }
+      .dialog-foot .btn { min-height: 44px; }
       .bottom-nav {
         position: fixed; z-index: 45; inset: auto 0 0; display: grid; grid-template-columns: repeat(5, 1fr);
         padding: 6px max(8px, env(safe-area-inset-right)) calc(6px + env(safe-area-inset-bottom)) max(8px, env(safe-area-inset-left));
         background: color-mix(in srgb, var(--surface) 92%, transparent); border-top: 1px solid var(--line); backdrop-filter: blur(18px);
       }
       .update-banner { right: 15px; bottom: calc(84px + env(safe-area-inset-bottom)); }
-      .bottom-nav .nav-btn { min-height: 52px; display: grid; place-items: center; gap: 1px; padding: 4px 0; color: var(--muted); border-radius: 10px; font-size: 9px; }
+      .bottom-nav .nav-btn { min-height: 52px; display: grid; place-items: center; gap: 1px; padding: 4px 0; color: var(--muted); border-radius: 10px; font-size: 11px; }
       .bottom-nav .nav-btn span { display: block; }
       .bottom-nav .nav-btn .icon { width: 19px; height: 19px; }
       .bottom-nav .nav-btn.active { color: #18382f; }
@@ -564,11 +719,30 @@
         top: calc(10px + env(safe-area-inset-top));
       }
       .toast { max-width: none; }
+      body.workout-focus .topbar,
+      body.workout-focus .bottom-nav { display: none; }
+      body.workout-focus .content {
+        width: 100%; padding: 0; padding-bottom: 0;
+      }
+      body.workout-focus #view-timer > .page-heading { display: none; }
+      body.workout-focus .active-timer {
+        min-height: 100dvh; justify-content: flex-start; padding:
+          calc(18px + env(safe-area-inset-top))
+          calc(13px + env(safe-area-inset-right))
+          calc(18px + env(safe-area-inset-bottom))
+          calc(13px + env(safe-area-inset-left));
+        border-radius: 0;
+      }
+      body.workout-focus .phase-pill { margin-top: 2px; }
+      body.workout-focus .timer-clock { margin: 17px 0 8px; font-size: clamp(60px,23vw,86px); }
+      body.workout-focus .timer-exercise { font-size: 24px; }
+      body.workout-focus .active-demo { width: min(480px,100%); margin-top: 12px; }
+      body.workout-focus .timer-progress { width: 100%; margin-top: 15px; }
+      body.workout-focus .timer-controls { width: min(480px,100%); display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 16px; }
+      body.workout-focus .timer-controls .btn { min-height: 46px; }
+      body.workout-focus .timer-next { margin-top: 11px; }
     }
-    @media (prefers-reduced-motion: reduce) {
-      .demo-visual.is-animated { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); aspect-ratio: 16/6; }
-      .demo-visual.is-animated .demo-frame { position: static; width: 100%; height: 100%; animation: none !important; opacity: 1; object-fit: contain; }
-    }
+    @keyframes sheet-in { from { opacity: .7; transform: translateY(18px); } }
     @media (prefers-reduced-motion: reduce) {
       *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
     }
@@ -596,6 +770,9 @@
     <symbol id="i-edit" viewBox="0 0 24 24"><path d="m4 20 4.5-1 10-10-3.5-3.5-10 10zM13.8 6.7l3.5 3.5M14.8 5.7l1.4-1.4a2 2 0 0 1 2.8 0l.7.7a2 2 0 0 1 0 2.8l-1.4 1.4"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+    <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></symbol>
+    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
+    <symbol id="i-minimize" viewBox="0 0 24 24"><path d="M5 12h14M8 16h8"/></symbol>
     <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6"/></symbol>
     <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 19v2h16v-2"/></symbol>
     <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4m0 0 5 5m-5-5L7 9M4 19v2h16v-2"/></symbol>
@@ -676,10 +853,9 @@
           <div class="field full"><label class="check-line"><input type="checkbox" name="sound"> Sound at timer phase changes</label><label class="check-line"><input type="checkbox" name="vibration"> Vibration when supported</label></div>
           <section class="update-panel" aria-labelledby="update-panel-title">
             <strong id="update-panel-title">App update</strong>
-            <p id="pwa-update-status" role="status" aria-live="polite">Version 3.0 · checking when online…</p>
+            <p id="pwa-update-status" role="status" aria-live="polite">Version 4.0 · checking when online…</p>
             <div class="update-actions"><button class="btn secondary small" type="button" data-action="check-update">Check for updates</button><button class="btn small" type="button" data-action="apply-update" hidden>Update & reload</button></div>
           </section>
-          <p class="tiny muted" style="grid-column:1/-1;margin:0">Exercise illustrations: <a href="https://github.com/bryllim/workout-guide" target="_blank" rel="noopener">Workout Guide by Bryl Lim</a>, based on Everkinetic artwork, licensed <a href="https://creativecommons.org/licenses/by-sa/4.0/" target="_blank" rel="noopener">CC BY-SA 4.0</a>. Original SVG frames are shown unmodified.</p>
         </div>
         <div class="danger-zone">
           <p class="tiny muted">This file has no cloud account. Export a backup if browser data may be cleared.</p>
@@ -700,11 +876,26 @@
         <div class="field"><label for="exercise-sets">Sets</label><input id="exercise-sets" name="sets" type="number" min="1" max="20" value="3" required></div>
         <div class="field"><label for="exercise-work">Work (seconds)</label><input id="exercise-work" name="workSec" type="number" min="5" max="3600" value="40" required></div>
         <div class="field"><label for="exercise-rest">Rest (seconds)</label><input id="exercise-rest" name="restSec" type="number" min="0" max="3600" value="60" required></div>
-        <div class="field full"><label for="exercise-demo">Demonstration</label><select id="exercise-demo" name="demo"><option value="none">Instructions only</option><option value="warmup">Warm-up flow</option><option value="scapular-pull">Scapular pull-up</option><option value="pushup">Push-up</option><option value="split-squat">Split squat</option><option value="dead-bug">Dead bug</option><option value="shoulder-cars">Arm-circle overview</option><option value="finger-extensors">Finger extensor opens · instructions only</option><option value="forearm-mobility">Forearm mobility · instructions only</option></select><small>Choose an exact or closely related overview. Unsupported movements stay instruction-only rather than showing an inaccurate animation.</small></div>
-        <div class="field full"><label for="exercise-instructions">Instructions / reps</label><textarea id="exercise-instructions" name="instructions" maxlength="360" placeholder="Technique cues, reps, load or RPE target"></textarea></div>
+        <div class="field full"><label for="exercise-demo">Demonstration</label><select id="exercise-demo" name="demo"><option value="none">Instructions only</option><option value="dataset">Original catalog animation</option><option value="warmup">World greatest stretch</option><option value="scapular-pull">Scapular pull-up</option><option value="pushup">Push-up</option><option value="split-squat">Split squats</option><option value="dead-bug">Dead bug</option><option value="wrist-circles">Wrist circles</option><option value="forearm-mobility">Side wrist pull stretch</option><option value="shoulder-stretch">Chest & shoulder stretch</option></select><small>Catalog exercises keep their matching animation. Custom exercises can use instructions only or one closely related demonstration.</small></div>
+        <div class="field full"><label for="exercise-instructions">Instructions / reps</label><textarea id="exercise-instructions" name="instructions" maxlength="1200" placeholder="Technique cues, reps, load or RPE target"></textarea></div>
       </div></div>
       <div class="dialog-foot"><button class="btn secondary" type="button" data-close-dialog>Cancel</button><button class="btn" type="submit" value="save">Save exercise</button></div>
     </form>
+  </dialog>
+
+  <dialog id="catalog-dialog" aria-labelledby="catalog-dialog-title">
+    <div class="dialog-head"><div><h2 id="catalog-dialog-title">Exercise catalog</h2><p class="dialog-subtitle">Add only what you use. The timer stays uncluttered.</p></div><button class="icon-btn" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
+    <div class="dialog-body catalog-body">
+      <div class="catalog-filters">
+        <input class="search" id="catalog-search" type="search" data-action="catalog-search" placeholder="Search exercise catalog…" aria-label="Search exercise catalog">
+        <select class="search" id="catalog-focus" data-action="catalog-filter" aria-label="Filter catalog by focus"><option value="climbing">Climbing support</option><option value="bodyweight">Bodyweight</option><option value="mobility">Mobility & stretching</option><option value="finger-care">Forearm & grip</option><option value="all">All relevant</option></select>
+        <select class="search" id="catalog-body-part" data-action="catalog-filter" aria-label="Filter catalog by body part"><option value="all">All body parts</option></select>
+        <select class="search" id="catalog-equipment" data-action="catalog-filter" aria-label="Filter catalog by equipment"><option value="all">All equipment</option></select>
+      </div>
+      <p class="catalog-summary" id="catalog-summary" role="status" aria-live="polite">Loading English catalog…</p>
+      <div class="catalog-results" id="catalog-results"><div class="empty">Loading exercise catalog…</div></div>
+    </div>
+    <div class="dialog-foot catalog-foot"><button class="btn" type="button" data-close-dialog>Done</button></div>
   </dialog>
 
   <dialog id="routine-dialog" aria-labelledby="routine-dialog-title">
@@ -733,7 +924,7 @@
     <form method="dialog" id="plan-form">
       <div class="dialog-head"><h2 id="plan-dialog-title">Edit plan day</h2><button class="icon-btn" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
       <div class="dialog-body"><div class="form-grid">
-        <input type="hidden" name="week"><input type="hidden" name="dayIndex">
+        <input type="hidden" name="week"><input type="hidden" name="dayIndex"><input type="hidden" name="date">
         <div class="field full"><label for="plan-title">Session title</label><input id="plan-title" name="title" required maxlength="70"></div>
         <div class="field"><label for="plan-type">Primary activity</label><select id="plan-type" name="type"><option value="climb">Climb</option><option value="strength">Strength</option><option value="prehab">Prehab</option><option value="recovery">Recovery</option><option value="rest">Rest</option></select></div>
         <div class="field"><label for="plan-secondary-type">Also (optional)</label><select id="plan-secondary-type" name="secondaryType"><option value="">Nothing else</option><option value="climb">Climb</option><option value="strength">Strength</option><option value="prehab">Prehab</option><option value="recovery">Recovery</option></select><small>Use this for a combined day such as Strength + Prehab.</small></div>
@@ -774,9 +965,9 @@
     <div class="dialog-body">
       <div class="demo-stage" id="demo-dialog-stage"></div>
       <p id="demo-dialog-copy" class="muted" style="line-height:1.55;margin:0"></p>
+      <details class="demo-steps" id="demo-dialog-steps" hidden><summary id="demo-dialog-steps-summary">Step-by-step</summary><ol id="demo-dialog-steps-list"></ol></details>
       <div class="exercise-stats" id="demo-dialog-stats"></div>
       <p class="demo-note">Movement overview—not a prescribed tempo. Use a comfortable range and stop for sharp or increasing pain.</p>
-      <p class="demo-credit" id="demo-dialog-credit"></p>
     </div>
     <div class="dialog-foot"><button class="btn secondary" type="button" data-close-dialog>Back</button><button class="btn" id="demo-dialog-start" type="button" data-action="confirm-timer-start" hidden>Start 7-second prep</button></div>
   </dialog>
@@ -794,27 +985,41 @@
 
     const STORAGE_KEY = 'crux-routine-v1';
     const SCHEMA_VERSION = 3;
-    const APP_VERSION = '3.0';
+    const APP_VERSION = '4.0';
     const DEMO_PREP_MS = 7000;
+    const CATALOG_PAGE_SIZE = 24;
     const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const DAY_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
     const ACTIVITY_TYPES = ['climb','strength','prehab','recovery','rest'];
     const SECONDARY_ACTIVITY_TYPES = ['climb','strength','prehab','recovery'];
-    const DEMO_SOURCE_URL = 'https://github.com/bryllim/workout-guide';
+    const DATASET_SOURCE_COMMIT = '7455efae41b330c265e7cd4b78dfa848e7ce5ebd';
+    const DATASET_MEDIA_ROOT = `https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/${DATASET_SOURCE_COMMIT}/`;
     const DEMO_LIBRARY = Object.freeze({
-      warmup:{label:'Warm-up flow overview',slug:'worlds-greatest-stretch',frames:3,alt:'Three positions in a world’s-greatest-stretch warm-up sequence',note:'Representative warm-up movement. Continue with the wrist, shoulder and progressive climbing cues in the instructions.'},
-      'scapular-pull':{label:'Scapular pull-up',slug:'scapular-pull-up',frames:3,alt:'Three positions of a controlled scapular pull-up'},
-      pushup:{label:'Push-up',slug:'push-up',frames:3,alt:'Three positions of a push-up'},
-      'split-squat':{label:'Split squat',slug:'split-squat',frames:3,alt:'Three positions of a split squat',note:'The illustration includes dumbbells; using body weight is also valid when it matches your saved instructions.'},
-      'dead-bug':{label:'Dead bug',slug:'dead-bug',frames:3,alt:'Three positions of a dead bug exercise',note:'The illustration demonstrates the dead-bug option. If your saved exercise calls for a hollow hold, follow its written cues instead.'},
-      'shoulder-cars':{label:'Arm-circle overview',slug:'arm-circles',frames:3,alt:'Three positions of a standing arm circle',note:'Related shoulder-circle overview, not a prescribed shoulder-CAR path. Move slowly through your own comfortable range.'},
-      'finger-extensors':{label:'Finger extensor opens',frames:0,note:'No vetted matching illustration is bundled. Follow the written cue and use a light band.'},
-      'forearm-mobility':{label:'Gentle forearm mobility',frames:0,note:'No vetted matching illustration is bundled. Follow the written cue and stay in a comfortable range.'},
-      generic:{label:'Movement instructions',frames:0,note:'This custom movement has written instructions only.'},
-      none:{label:'Instructions only',frames:0,note:'This exercise uses written instructions only.'}
+      dataset:{label:'Catalog animation'},
+      warmup:{label:'World greatest stretch',sourceId:'1604'},
+      'scapular-pull':{label:'Scapular pull-up',sourceId:'0688'},
+      pushup:{label:'Push-up',sourceId:'0662'},
+      'split-squat':{label:'Split squats',sourceId:'2368'},
+      'dead-bug':{label:'Dead bug',sourceId:'0276'},
+      'wrist-circles':{label:'Wrist circles',sourceId:'1428'},
+      'forearm-mobility':{label:'Side wrist pull stretch',sourceId:'0721'},
+      'shoulder-stretch':{label:'Chest and front of shoulder stretch',sourceId:'1271'},
+      generic:{label:'Movement instructions',note:'This custom movement has written instructions only.'},
+      none:{label:'Instructions only',note:'This exercise uses written instructions only.'}
     });
     const DEMO_IDS = Object.keys(DEMO_LIBRARY);
-    const BUILT_IN_DEMOS = {'e-warm':'warmup','e-scap':'scapular-pull','e-push':'pushup','e-split':'split-squat','e-hollow':'dead-bug','e-extensor':'finger-extensors','e-forearm':'forearm-mobility','e-shoulder':'shoulder-cars'};
+    const BUILT_IN_DEMOS = {'e-warm':'warmup','e-scap':'scapular-pull','e-push':'pushup','e-split':'split-squat','e-hollow':'dead-bug','e-extensor':'wrist-circles','e-forearm':'forearm-mobility','e-shoulder':'shoulder-stretch'};
+    const BUILT_IN_CATALOG_IDS = {'e-warm':'1604','e-scap':'0688','e-push':'0662','e-split':'2368','e-hollow':'0276','e-extensor':'1428','e-forearm':'0721','e-shoulder':'1271'};
+    const STARTER_MEDIA = Object.freeze({
+      '1604':['World greatest stretch','images/1604-DFGXwZr.jpg','videos/1604-DFGXwZr.gif'],
+      '0688':['Scapular pull-up','images/0688-uTBt1HV.jpg','videos/0688-uTBt1HV.gif'],
+      '0662':['Push-up','images/0662-I4hDWkc.jpg','videos/0662-I4hDWkc.gif'],
+      '2368':['Split squats','images/2368-9E25EOx.jpg','videos/2368-9E25EOx.gif'],
+      '0276':['Dead bug','images/0276-iny3m5y.jpg','videos/0276-iny3m5y.gif'],
+      '1428':['Wrist circles','images/1428-2zNKRUB.jpg','videos/1428-2zNKRUB.gif'],
+      '0721':['Side wrist pull stretch','images/0721-UtmIqcI.jpg','videos/0721-UtmIqcI.gif'],
+      '1271':['Chest and front of shoulder stretch','images/1271-Uto7l43.jpg','videos/1271-Uto7l43.gif']
+    });
     const VIEW_META = {
       today: ['Today', 'Your plan, one useful action at a time.'],
       plan: ['Plan', 'A repeatable rhythm with room to recover.'],
@@ -890,14 +1095,14 @@
           {id:'r-monthly', title:'Monthly plan check', category:'recovery', time:'18:30', amount:'15 min', frequency:'monthly', weekdays:[], monthDay:1, detail:'Review the last block, deload if needed, and change only one main training variable.', optional:false, active:true}
         ],
         exercises: [
-          {id:'e-warm', name:'Climbing warm-up flow', category:'Warm-up', demo:'warmup', sets:2, workSec:180, restSec:30, instructions:'Pulse raiser, wrists/shoulders, easy hangs only if accustomed, then progressive easy climbs.'},
-          {id:'e-scap', name:'Scapular pull-up', category:'Strength', demo:'scapular-pull', sets:3, workSec:30, restSec:60, instructions:'5–8 controlled reps. Keep elbows straight and avoid shrugging.'},
-          {id:'e-push', name:'Push-up', category:'Antagonist', demo:'pushup', sets:3, workSec:40, restSec:60, instructions:'6–12 smooth reps, 2–3 reps in reserve. Elevate hands if needed.'},
-          {id:'e-split', name:'Split squat', category:'Strength', demo:'split-squat', sets:3, workSec:40, restSec:60, instructions:'6–10 reps per side with a steady knee and controlled depth.'},
-          {id:'e-hollow', name:'Dead bug / hollow hold', category:'Core', demo:'dead-bug', sets:3, workSec:35, restSec:40, instructions:'Keep ribs down and breathe; stop before the low back lifts.'},
-          {id:'e-extensor', name:'Finger extensor opens', category:'Finger care', demo:'finger-extensors', sets:3, workSec:30, restSec:30, instructions:'Open fingers against a light band for 15–25 controlled reps.'},
-          {id:'e-forearm', name:'Gentle forearm mobility', category:'Mobility', demo:'forearm-mobility', sets:2, workSec:45, restSec:15, instructions:'Comfortable flexor/extensor positions; never force finger joints.'},
-          {id:'e-shoulder', name:'Shoulder CARs', category:'Mobility', demo:'shoulder-cars', sets:2, workSec:60, restSec:20, instructions:'Slow controlled circles in a pain-free range; avoid rib flare.'}
+          {id:'e-warm', sourceId:'1604', name:'World greatest stretch', category:'Warm-up', demo:'warmup', sets:2, workSec:60, restSec:15, instructions:'Move through a lunge, hamstring position and comfortable torso rotation on both sides.'},
+          {id:'e-scap', sourceId:'0688', name:'Scapular pull-up', category:'Strength', demo:'scapular-pull', sets:3, workSec:30, restSec:60, instructions:'5–8 controlled reps. Keep elbows straight and draw the shoulder blades down and back.'},
+          {id:'e-push', sourceId:'0662', name:'Push-up', category:'Antagonist', demo:'pushup', sets:3, workSec:40, restSec:60, instructions:'6–12 smooth reps with a straight body line and 2–3 reps in reserve.'},
+          {id:'e-split', sourceId:'2368', name:'Split squats', category:'Strength', demo:'split-squat', sets:3, workSec:40, restSec:60, instructions:'6–10 reps per side with a steady front knee and controlled depth.'},
+          {id:'e-hollow', sourceId:'0276', name:'Dead bug', category:'Core', demo:'dead-bug', sets:3, workSec:35, restSec:40, instructions:'Alternate opposite arm and leg while keeping the low back gently pressed down.'},
+          {id:'e-extensor', sourceId:'1428', name:'Wrist circles', category:'Finger care', demo:'wrist-circles', sets:2, workSec:40, restSec:15, instructions:'Make slow circles in both directions through a comfortable range.'},
+          {id:'e-forearm', sourceId:'0721', name:'Side wrist pull stretch', category:'Finger care', demo:'forearm-mobility', sets:2, workSec:45, restSec:15, instructions:'Gently draw the hand toward the body for 15–30 seconds, then switch sides.'},
+          {id:'e-shoulder', sourceId:'1271', name:'Chest and front of shoulder stretch', category:'Mobility', demo:'shoulder-stretch', sets:2, workSec:45, restSec:15, instructions:'Use a comfortable chest and front-shoulder stretch; never force the joint.'}
         ],
         builderQueue: ['e-warm','e-scap','e-push','e-hollow'],
         activeTimer: null,
@@ -920,6 +1125,14 @@
     }
     function cleanInstant(value,fallback=new Date().toISOString()) {
       return typeof value==='string' && Number.isFinite(Date.parse(value)) ? new Date(value).toISOString() : fallback;
+    }
+    function cleanDatasetMediaUrl(value,extension) {
+      try {
+        const root=new URL(DATASET_MEDIA_ROOT);
+        const url=new URL(String(value||''),root);
+        if (url.origin===root.origin&&url.pathname.startsWith(root.pathname)&&url.pathname.toLowerCase().endsWith(extension)) return url.href;
+      } catch (_) {}
+      return '';
     }
     function cleanReminderTarget(value,dateValue,sourceId) {
       try {
@@ -945,15 +1158,28 @@
     }
     function normalizeExercise(value,index=0) {
       const id=cleanText(value?.id||`exercise-${index}-${Math.random().toString(36).slice(2,7)}`,100);
+      const sourceId=/^\d{4}$/.test(value?.sourceId||'')?value.sourceId:(BUILT_IN_CATALOG_IDS[id]||'');
       return {
         id,
+        sourceId,
         name:cleanText(value?.name||'Untitled exercise',70),
         category:cleanText(value?.category||'Custom',40),
         demo:value?.demo==='generic'?'none':(DEMO_IDS.includes(value?.demo)?value.demo:(BUILT_IN_DEMOS[id]||'none')),
         sets:cleanNumber(value?.sets,1,20,3),
         workSec:cleanNumber(value?.workSec,5,3600,40),
         restSec:cleanNumber(value?.restSec,0,3600,60),
-        instructions:cleanText(value?.instructions,360)
+        instructions:cleanText(value?.instructions,1200),
+        instructionSteps:(Array.isArray(value?.instructionSteps)?value.instructionSteps:[]).slice(0,12).map(step=>cleanText(step,300)).filter(Boolean),
+        bodyPart:cleanText(value?.bodyPart,40),
+        equipment:cleanText(value?.equipment,50),
+        target:cleanText(value?.target,50),
+        muscleGroup:cleanText(value?.muscleGroup,50),
+        secondaryMuscles:(Array.isArray(value?.secondaryMuscles)?value.secondaryMuscles:[]).slice(0,12).map(muscle=>cleanText(muscle,50)).filter(Boolean),
+        imageUrl:cleanDatasetMediaUrl(value?.imageUrl,'.jpg'),
+        gifUrl:cleanDatasetMediaUrl(value?.gifUrl,'.gif'),
+        attribution:cleanText(value?.attribution,120),
+        genderHint:['male','female','unspecified'].includes(value?.genderHint)?value.genderHint:'unspecified',
+        tags:(Array.isArray(value?.tags)?value.tags:[]).slice(0,16).map(tag=>cleanText(tag,40).toLowerCase()).filter(Boolean)
       };
     }
     function normalizeState(raw) {
@@ -1058,6 +1284,12 @@
     }
 
     let state = loadState();
+    let exerciseCatalog = [];
+    let catalogSource = null;
+    let catalogLoadPromise = null;
+    let catalogLoadError = '';
+    let catalogVisibleCount = CATALOG_PAGE_SIZE;
+    const catalogFilters = {query:'',focus:'climbing',bodyPart:'all',equipment:'all'};
     let timerInterval = null;
     let wakeLock = null;
     let lastBeepSecond = null;
@@ -1337,8 +1569,14 @@
     function completionKey(dateValue, taskId) { return `${dateValue}::${taskId}`; }
     function getCompletion(dateValue, taskId) { return state.completions[completionKey(dateValue, taskId)]; }
 
+    function syncActiveTimerBody() {
+      document.body.classList.toggle('workout-focus',Boolean(state.activeTimer&&state.currentView==='timer'));
+    }
+
     function setView(name, updateHistory = true) {
       if (!VIEW_META[name]) name = 'today';
+      const previousView=$('.view.active');
+      if (previousView) pauseDemoAnimations(previousView);
       state.currentView = name;
       $$('.view').forEach(v => v.classList.toggle('active', v.id === `view-${name}`));
       $$('[data-view]').forEach(b => {
@@ -1348,6 +1586,7 @@
       });
       $('#top-title').textContent = VIEW_META[name][0];
       $('#top-subtitle').textContent = VIEW_META[name][1];
+      syncActiveTimerBody();
       renderView(name);
       if (updateHistory) history.replaceState(null, '', `#${name}`);
       window.scrollTo({top:0,behavior:'smooth'});
@@ -1360,6 +1599,7 @@
       if (name === 'library') renderLibrary();
       if (name === 'history') renderHistory();
       if (name === 'guide') renderGuide();
+      syncActiveTimerBody();
       updateMiniTimer();
     }
 
@@ -1375,13 +1615,14 @@
       return [`${combinedDayLabel(planDay)} day`,`${primary[1]} The second activity is part of the same planned session, so adjust total load rather than treating both as maximum-effort work.`];
     }
 
-    function calendarDayButton(dateValue,{monthValue='',focusKey=''}={}) {
+    function calendarDayButton(dateValue,{monthValue='',focusKey='',tabbable=null}={}) {
       const planDay=getPlanDay(dateValue);
       const selected=dateValue===state.selectedDate;
       const today=dateValue===localDate();
       const outside=monthValue&&startOfMonth(dateValue)!==monthValue;
       const label=[formatDate(dateValue,{weekday:'long',month:'long',day:'numeric',year:'numeric'}),combinedDayLabel(planDay),`Week ${getWeekVariant(dateValue)}`,today?'today':'',selected?'selected':''].filter(Boolean).join(' · ');
-      return `<button class="calendar-day${selected?' selected':''}${today?' today':''}${outside?' outside-month':''}" type="button" data-action="calendar-select-date" data-date="${dateValue}" data-calendar-focus="${focusKey||`date-${dateValue}`}" aria-pressed="${selected}" ${today&&!monthValue?'aria-current="date"':''} aria-label="${esc(label)}"><span class="weekday">${esc(formatDate(dateValue,{weekday:'short'}))}</span><span class="day-number">${Number(dateValue.slice(-2))}</span><span class="type-dots" aria-hidden="true">${dayTypes(planDay).map(type=>`<span class="type-dot ${esc(type)}"></span>`).join('')}</span></button>`;
+      const canTab=tabbable===null?selected:Boolean(tabbable);
+      return `<button class="calendar-day${selected?' selected':''}${today?' today':''}${outside?' outside-month':''}" type="button" data-action="calendar-select-date" data-date="${dateValue}" data-calendar-focus="${focusKey||`date-${dateValue}`}" tabindex="${canTab?'0':'-1'}" aria-pressed="${selected}" ${today?'aria-current="date"':''} aria-label="${esc(label)}"><span class="weekday">${esc(formatDate(dateValue,{weekday:'short'}))}</span><span class="day-number">${Number(dateValue.slice(-2))}</span><span class="type-dots" aria-hidden="true">${dayTypes(planDay).map(type=>`<span class="type-dot ${esc(type)}"></span>`).join('')}</span></button>`;
     }
 
     function weekRangeLabel(weekStart) {
@@ -1396,18 +1637,32 @@
       const monthStart=startOfMonth(todayCalendarMonth);
       const monthGridStart=startOfWeek(monthStart);
       const monthDays=Array.from({length:42},(_,index)=>addDays(monthGridStart,index));
-      return `<section class="today-calendar card" aria-label="Choose a date">
-        <div class="today-calendar-head">
-          <button class="date-nav" type="button" data-action="calendar-week-prev" data-calendar-focus="week-prev" aria-label="Previous week">‹</button>
-          <button class="calendar-range" type="button" data-action="calendar-toggle-month" data-calendar-focus="month-toggle" aria-expanded="${todayCalendarExpanded}" ${todayCalendarExpanded?'aria-controls="today-month-calendar"':''}>${esc(weekRangeLabel(weekStart))}<span>${todayCalendarExpanded?'Hide month':'Open month calendar'}</span></button>
-          <button class="date-nav" type="button" data-action="calendar-week-next" data-calendar-focus="week-next" aria-label="Next week">›</button>
+      const monthMode=todayCalendarExpanded;
+      const selectedIsToday=state.selectedDate===localDate();
+      const periodLabel=monthMode?formatDate(monthStart,{month:'long',year:'numeric'}):weekRangeLabel(weekStart);
+      const periodContext=monthMode?'Month view':`${formatDate(weekStart,{year:'numeric'})} · Week ${getWeekVariant(state.selectedDate)}`;
+      const previousAction=monthMode?'calendar-month-prev':'calendar-week-prev';
+      const nextAction=monthMode?'calendar-month-next':'calendar-week-next';
+      const focusPrefix=monthMode?'month':'week';
+      const monthHasSelected=monthDays.includes(state.selectedDate);
+      return `<section class="today-calendar card" aria-labelledby="today-calendar-title">
+        <h3 class="sr-only" id="today-calendar-title">Choose a date</h3>
+        <div class="calendar-toolbar" aria-label="Calendar controls">
+          <div class="calendar-period-nav${monthMode?' month-head':''}">
+            <button class="date-nav" type="button" data-action="${previousAction}" data-calendar-focus="${focusPrefix}-prev" aria-label="Previous ${monthMode?'month':'week'}">‹</button>
+            <h3 class="calendar-period-label" aria-live="polite"><strong>${esc(periodLabel)}</strong><span>${esc(periodContext)}</span></h3>
+            <button class="date-nav" type="button" data-action="${nextAction}" data-calendar-focus="${focusPrefix}-next" aria-label="Next ${monthMode?'month':'week'}">›</button>
+          </div>
+          <div class="calendar-modes" role="group" aria-label="Calendar view">
+            <button class="calendar-mode" type="button" data-action="calendar-show-week" data-calendar-focus="week-toggle" aria-pressed="${!monthMode}">Week</button>
+            <button class="calendar-mode" type="button" data-action="calendar-toggle-month" data-calendar-focus="month-toggle" aria-pressed="${monthMode}">Month</button>
+          </div>
+          <button class="calendar-today" type="button" data-action="date-today" data-calendar-focus="calendar-today" aria-pressed="${selectedIsToday}">${selectedIsToday?'Today':'Go to today'}</button>
         </div>
-        <div class="week-strip">${weekDays.map(date=>calendarDayButton(date)).join('')}</div>
-        ${todayCalendarExpanded?`<div class="month-calendar" id="today-month-calendar">
-          <div class="month-head"><button class="date-nav" type="button" data-action="calendar-month-prev" data-calendar-focus="month-prev" aria-label="Previous month">‹</button><h3>${esc(formatDate(monthStart,{month:'long',year:'numeric'}))}</h3><button class="date-nav" type="button" data-action="calendar-month-next" data-calendar-focus="month-next" aria-label="Next month">›</button></div>
-          <div class="month-grid" aria-hidden="true">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(day=>`<span class="month-weekday">${day}</span>`).join('')}</div>
-          <div class="month-grid">${monthDays.map(date=>calendarDayButton(date,{monthValue:monthStart,focusKey:`month-${date}`})).join('')}</div>
-        </div>`:''}
+        ${monthMode?`<div class="month-calendar calendar-panel" id="today-month-calendar" role="region" aria-label="${esc(formatDate(monthStart,{month:'long',year:'numeric'}))}">
+          <div class="month-weekdays" aria-hidden="true">${['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(day=>`<span class="month-weekday">${day}</span>`).join('')}</div>
+          <div class="month-grid" role="group" aria-label="Choose a day in ${esc(formatDate(monthStart,{month:'long',year:'numeric'}))}">${monthDays.map((date,index)=>calendarDayButton(date,{monthValue:monthStart,focusKey:`month-${date}`,tabbable:date===state.selectedDate||(!monthHasSelected&&index===0)})).join('')}</div>
+        </div>`:`<div class="week-strip calendar-panel" id="today-week-calendar" role="group" aria-label="Choose a day in ${esc(weekRangeLabel(weekStart))}">${weekDays.map(date=>calendarDayButton(date,{tabbable:date===state.selectedDate})).join('')}</div>`}
       </section>`;
     }
 
@@ -1449,15 +1704,10 @@
       const overridden = Boolean(state.overrides[dateValue]);
 
       $('#view-today').innerHTML = `
-        <div class="page-heading">
+        <div class="page-heading today-heading">
           <div><p class="eyebrow">${isToday ? 'Right now' : 'Daily log'}</p><h2 id="today-heading">${esc(formatDate(dateValue,{weekday:'long'}))}</h2><p>${esc(formatDate(dateValue,{month:'long',day:'numeric',year:'numeric'}))} · Week ${actualWeek}${overridden ? ' · custom day' : ''}</p></div>
           <div class="heading-tools">
-            <button class="btn secondary small" data-action="open-day-schedule">${icon('calendar')} Calendar & alerts</button>
-            <div class="date-strip">
-              <button class="date-nav" data-action="date-prev" data-calendar-focus="top-day-prev" aria-label="Previous day">‹</button>
-              <button class="btn secondary small date-label" data-action="date-today" data-calendar-focus="top-day-today">${isToday ? 'Today' : 'Back to today'}</button>
-              <button class="date-nav" data-action="date-next" data-calendar-focus="top-day-next" aria-label="Next day">›</button>
-            </div>
+            <button class="btn secondary small" type="button" data-action="open-day-schedule" aria-label="Calendar and alerts for ${esc(formatDate(dateValue,{weekday:'long',month:'long',day:'numeric'}))}">${icon('calendar')}<span class="schedule-label-long">Calendar & alerts</span><span class="schedule-label-short">Alerts</span></button>
           </div>
         </div>
         ${renderTodayCalendar()}
@@ -1466,24 +1716,18 @@
             <div>
               <p class="eyebrow">${esc(dayCopy[0])}</p>
               <h3>${esc(planDay.title)}</h3>
-              <p>${esc(dayCopy[1])}</p>
+              <p class="today-hero-copy">${esc(dayCopy[1])}</p>
+              <div class="today-activity-summary" aria-label="Planned activity summary">
+                <div class="today-activity-details">
+                  <div class="today-activity-types">${dayTypes(planDay).map(type=>`<span class="today-activity-chip">${esc(activityTypeLabel(type))}</span>`).join('')}</div>
+                  <span class="today-activity-meta">${esc(formatTime(planDay.time||'18:00'))}${planDay.duration?` · ${Number(planDay.duration)} min`:''}</span>
+                </div>
+                <div class="today-activity-actions">
+                  <button class="btn small today-edit-day" type="button" data-action="edit-today-day">${icon('edit')} Edit day</button>
+                  ${overridden ? `<button class="btn small today-use-plan" type="button" data-action="clear-day-override">Use plan</button>` : ''}
+                </div>
+              </div>
               <div class="progress-row"><div class="progress-track"><div class="progress-fill" style="width:${pct}%"></div></div><span class="progress-text">${doneCount} of ${required.length} planned</span></div>
-            </div>
-            <div class="hero-controls">
-              <label class="sr-only" for="today-day-type">Day type</label>
-              <select class="day-select" id="today-day-type" data-action="change-day-type">
-                <option value="climb" ${planDay.type==='climb'?'selected':''}>Climb day</option>
-                <option value="strength" ${planDay.type==='strength'?'selected':''}>Strength day</option>
-                <option value="prehab" ${planDay.type==='prehab'?'selected':''}>Prehab day</option>
-                <option value="recovery" ${planDay.type==='recovery'?'selected':''}>Recovery day</option>
-                <option value="rest" ${planDay.type==='rest'?'selected':''}>Rest day</option>
-              </select>
-              <label class="sr-only" for="today-secondary-type">Second activity</label>
-              <select class="day-select" id="today-secondary-type" data-action="change-day-secondary" ${planDay.type==='rest'?'disabled':''}>
-                <option value="">No second activity</option>
-                ${SECONDARY_ACTIVITY_TYPES.filter(type=>type!==planDay.type).map(type=>`<option value="${type}" ${planDay.secondaryType===type?'selected':''}>+ ${activityTypeLabel(type)}</option>`).join('')}
-              </select>
-              ${overridden ? `<button class="btn ghost small" data-action="clear-day-override" style="color:#fff">Use plan</button>` : ''}
             </div>
           </section>
 
@@ -1606,20 +1850,296 @@
     }
 
     function demoDefinition(exercise) {
-      return DEMO_LIBRARY[exercise?.demo] || DEMO_LIBRARY.none;
+      const fallback=DEMO_LIBRARY[exercise?.demo]||DEMO_LIBRARY.none;
+      const sourceId=exercise?.sourceId||fallback.sourceId||BUILT_IN_CATALOG_IDS[exercise?.id]||'';
+      const starter=STARTER_MEDIA[sourceId];
+      const image=exercise?.imageUrl||(starter?new URL(starter[1],DATASET_MEDIA_ROOT).href:'');
+      const gif=exercise?.gifUrl||(starter?new URL(starter[2],DATASET_MEDIA_ROOT).href:'');
+      return {
+        ...fallback,
+        sourceId,
+        label:exercise?.name||starter?.[0]||fallback.label,
+        image,
+        gif,
+        alt:`Animated demonstration of ${exercise?.name||starter?.[0]||fallback.label}`
+      };
     }
 
-    function demoVisualMarkup(exercise,{compact=false,eager=false}={}) {
+    function demoVisualMarkup(exercise,{compact=false,animated=false,autoplay=true,eager=false}={}) {
       const demo=demoDefinition(exercise);
-      if (!demo.frames || !demo.slug) {
-        return `<div class="demo-visual demo-placeholder${compact?' demo-thumb':''}" role="img" aria-label="${esc(`${demo.label}: instructions only`)}">${icon('exercise')}<strong>${esc(compact?'Instructions':demo.label)}</strong>${compact?'':`<small>${esc(demo.note||'Use the written movement cues.')}</small>`}</div>`;
+      const hasExercise=Boolean(exercise?.id);
+      if (!demo.image||!demo.gif) {
+        if (!animated&&hasExercise) return `<button class="demo-visual demo-placeholder${compact?' demo-thumb':''}" type="button" data-action="preview-exercise" data-id="${esc(exercise.id)}" aria-label="Open instructions for ${esc(exercise.name)}">${icon('exercise')}<strong>${esc(compact?'Cues':demo.label)}</strong></button>`;
+        return `<div class="demo-visual demo-placeholder${compact?' demo-thumb':''}" role="img" aria-label="${esc(`${demo.label}: instructions only`)}">${icon('exercise')}<strong>${esc(compact?'Cues':demo.label)}</strong>${compact?'':`<small>${esc(demo.note||'Use the written movement cues.')}</small>`}</div>`;
       }
-      const frames=Array.from({length:demo.frames},(_,index)=>`<img class="demo-frame" src="./demos/workout-guide/${esc(demo.slug)}/frame-${index+1}.svg" alt="" aria-hidden="true" ${eager?'':'loading="lazy"'} decoding="async">`).join('');
-      return `<div class="demo-visual is-animated${compact?' demo-thumb':''}" role="img" aria-label="${esc(demo.alt||demo.label)}">${frames}</div>`;
+      if (!animated) {
+        return `<button class="demo-visual external-media is-poster${compact?' demo-thumb':''}" type="button" data-action="preview-exercise" data-id="${esc(exercise.id)}" aria-label="Play ${esc(demo.label)} demonstration"><img class="demo-poster" src="${esc(demo.image)}" alt="" ${eager?'':'loading="lazy"'} decoding="async" width="180" height="180"><span class="demo-play-badge" aria-hidden="true">${icon('play')}<span>Play</span></span></button>`;
+      }
+      const wantsAutoplay=autoplay&&!matchMedia('(prefers-reduced-motion: reduce)').matches;
+      return `<div class="demo-visual external-media is-animated${compact?' demo-thumb':''}" role="group" aria-label="${esc(demo.alt)}"><img class="demo-animation" data-demo-animation data-playing="${wantsAutoplay}" data-poster="${esc(demo.image)}" data-animation="${esc(demo.gif)}" src="${esc(wantsAutoplay?demo.gif:demo.image)}" alt="${esc(demo.alt)}" decoding="async" width="180" height="180"><button class="demo-motion-toggle" type="button" data-action="toggle-demo-motion" aria-label="${wantsAutoplay?'Pause':'Play'} ${esc(demo.label)} animation">${icon(wantsAutoplay?'pause':'play')}<span>${wantsAutoplay?'Pause':'Play'}</span></button></div>`;
     }
 
-    function demoCreditMarkup(exercise) {
-      return demoDefinition(exercise).frames ? `Illustration: <a href="${DEMO_SOURCE_URL}" target="_blank" rel="noopener">Workout Guide / Everkinetic · CC BY-SA 4.0</a>` : '';
+    function updateDemoMotionControl(animation) {
+      const control=animation.closest('.demo-visual')?.querySelector('[data-action="toggle-demo-motion"]');
+      if (!control) return;
+      const playing=animation.dataset.playing==='true';
+      const label=playing?'Pause':'Play';
+      control.innerHTML=`${icon(playing?'pause':'play')}<span>${label}</span>`;
+      control.setAttribute('aria-label',`${label} animation`);
+    }
+
+    function setupDemoAnimations(root=document) {
+      $$('img[data-demo-animation]',root).forEach(animation=>{
+        if (animation.dataset.ready==='true') return;
+        animation.dataset.ready='true';
+        animation.addEventListener('error',()=>{
+          if (animation.dataset.playing==='true') {
+            animation.dataset.playing='false';
+            animation.src=animation.dataset.poster;
+            updateDemoMotionControl(animation);
+          }
+        });
+        updateDemoMotionControl(animation);
+      });
+    }
+
+    function pauseDemoAnimations(root=document) {
+      $$('img[data-demo-animation]',root).forEach(animation=>{
+        animation.dataset.playing='false';
+        if (animation.dataset.poster) animation.src=animation.dataset.poster;
+        updateDemoMotionControl(animation);
+      });
+    }
+
+    function toggleDemoMotion(control) {
+      const animation=control.closest('.demo-visual')?.querySelector('img[data-demo-animation]');
+      if (!animation) return;
+      const playing=animation.dataset.playing==='true';
+      animation.dataset.playing=String(!playing);
+      animation.src=playing?animation.dataset.poster:animation.dataset.animation;
+      updateDemoMotionControl(animation);
+    }
+
+    function displayExerciseName(value) {
+      const name=cleanText(value,70).trim();
+      return name ? name.charAt(0).toUpperCase()+name.slice(1) : 'Untitled exercise';
+    }
+
+    function catalogLabel(value) {
+      return String(value||'').replaceAll('-', ' ').replace(/\b\w/g,letter=>letter.toUpperCase());
+    }
+
+    function normalizeCatalogRecord(value) {
+      const id=/^\d{4}$/.test(value?.id||'')?value.id:'';
+      const name=cleanText(value?.name,70).trim();
+      const imageUrl=cleanDatasetMediaUrl(value?.image,'.jpg');
+      const gifUrl=cleanDatasetMediaUrl(value?.gif,'.gif');
+      if (!id||!name||!imageUrl||!gifUrl) return null;
+      return {
+        id,name,
+        bodyPart:cleanText(value?.bodyPart,40),
+        equipment:cleanText(value?.equipment,50),
+        target:cleanText(value?.target,50),
+        muscleGroup:cleanText(value?.muscleGroup,50),
+        secondaryMuscles:(Array.isArray(value?.secondaryMuscles)?value.secondaryMuscles:[]).slice(0,12).map(muscle=>cleanText(muscle,50)).filter(Boolean),
+        instructions:cleanText(value?.instructions,1200),
+        instructionSteps:(Array.isArray(value?.steps)?value.steps:[]).slice(0,12).map(step=>cleanText(step,300)).filter(Boolean),
+        imageUrl,gifUrl,
+        attribution:cleanText(value?.attribution,120),
+        genderHint:['male','female','unspecified'].includes(value?.genderHint)?value.genderHint:'unspecified',
+        tags:(Array.isArray(value?.tags)?value.tags:[]).slice(0,16).map(tag=>cleanText(tag,40).toLowerCase()).filter(Boolean)
+      };
+    }
+
+    function hydrateLibraryCatalogMetadata() {
+      if (!exerciseCatalog.length) return;
+      const byId=new Map(exerciseCatalog.map(record=>[record.id,record]));
+      state.exercises.forEach(exercise=>{
+        const record=byId.get(exercise.sourceId);
+        if (!record) return;
+        if (!exercise.instructionSteps?.length) exercise.instructionSteps=[...record.instructionSteps];
+        if (!exercise.bodyPart) exercise.bodyPart=record.bodyPart;
+        if (!exercise.equipment) exercise.equipment=record.equipment;
+        if (!exercise.target) exercise.target=record.target;
+        if (!exercise.muscleGroup) exercise.muscleGroup=record.muscleGroup;
+        if (!exercise.secondaryMuscles?.length) exercise.secondaryMuscles=[...record.secondaryMuscles];
+        if (!exercise.imageUrl) exercise.imageUrl=record.imageUrl;
+        if (!exercise.gifUrl) exercise.gifUrl=record.gifUrl;
+        if (!exercise.attribution) exercise.attribution=record.attribution;
+        if (!exercise.tags?.length) exercise.tags=[...record.tags];
+        if (!exercise.genderHint||exercise.genderHint==='unspecified') exercise.genderHint=record.genderHint;
+      });
+    }
+
+    async function loadExerciseCatalog({force=false}={}) {
+      if (exerciseCatalog.length&&!force) return exerciseCatalog;
+      if (catalogLoadPromise&&!force) return catalogLoadPromise;
+      if (force) { catalogLoadPromise=null; catalogLoadError=''; }
+      catalogLoadPromise=(async()=>{
+        const response=await fetch(new URL('exercise-catalog.json',location.href),{credentials:'same-origin'});
+        if (!response.ok) throw new Error(`catalog request failed (${response.status})`);
+        const payload=await response.json();
+        if (!Array.isArray(payload?.exercises)||payload.source?.commit!==DATASET_SOURCE_COMMIT) throw new Error('catalog data is incompatible');
+        const ids=new Set();
+        const records=[];
+        payload.exercises.forEach(value=>{
+          const record=normalizeCatalogRecord(value);
+          if (!record||ids.has(record.id)) return;
+          ids.add(record.id);
+          records.push(record);
+        });
+        if (!records.length) throw new Error('catalog is empty');
+        exerciseCatalog=records;
+        catalogSource=payload.source;
+        catalogLoadError='';
+        hydrateLibraryCatalogMetadata();
+        populateCatalogFilterOptions();
+        return exerciseCatalog;
+      })().catch(error=>{
+        catalogLoadError=error instanceof Error?error.message:'catalog could not be loaded';
+        catalogLoadPromise=null;
+        throw error;
+      });
+      return catalogLoadPromise;
+    }
+
+    function populateCatalogFilterOptions() {
+      const populate=(select,values,allLabel,current)=>{
+        if (!select) return;
+        select.innerHTML=`<option value="all">${esc(allLabel)}</option>${values.map(value=>`<option value="${esc(value)}">${esc(catalogLabel(value))}</option>`).join('')}`;
+        select.value=values.includes(current)?current:'all';
+      };
+      populate($('#catalog-body-part'),[...new Set(exerciseCatalog.map(record=>record.bodyPart).filter(Boolean))].sort(),'All body parts',catalogFilters.bodyPart);
+      populate($('#catalog-equipment'),[...new Set(exerciseCatalog.map(record=>record.equipment).filter(Boolean))].sort(),'All equipment',catalogFilters.equipment);
+      const search=$('#catalog-search');
+      if (search) search.placeholder=`Search ${exerciseCatalog.length} exercises…`;
+    }
+
+    function catalogCategory(record) {
+      const tags=new Set(record?.tags||[]);
+      if (tags.has('conditioning')) return 'Conditioning';
+      if (tags.has('finger-care')) return 'Finger care';
+      if (tags.has('mobility')) return 'Mobility';
+      if (tags.has('core')) return 'Core';
+      if (tags.has('antagonist')) return 'Antagonist';
+      return 'Strength';
+    }
+
+    function catalogTimerDefaults(record) {
+      const category=catalogCategory(record);
+      if (category==='Mobility'||category==='Finger care') return {sets:2,workSec:45,restSec:15};
+      if (category==='Conditioning') return {sets:3,workSec:30,restSec:30};
+      if (category==='Core') return {sets:3,workSec:40,restSec:40};
+      return {sets:3,workSec:40,restSec:60};
+    }
+
+    function localIdForCatalogRecord(sourceId) {
+      const builtIn=Object.entries(BUILT_IN_CATALOG_IDS).find(([,id])=>id===sourceId)?.[0];
+      return builtIn||`catalog-${sourceId}`;
+    }
+
+    function catalogRecordToExercise(record,{previewOnly=false}={}) {
+      const defaults=catalogTimerDefaults(record);
+      return {
+        id:localIdForCatalogRecord(record.id),sourceId:record.id,
+        name:displayExerciseName(record.name),category:catalogCategory(record),demo:'dataset',
+        ...defaults,
+        instructions:record.instructions,instructionSteps:[...record.instructionSteps],
+        bodyPart:record.bodyPart,equipment:record.equipment,target:record.target,muscleGroup:record.muscleGroup,
+        secondaryMuscles:[...record.secondaryMuscles],imageUrl:record.imageUrl,gifUrl:record.gifUrl,
+        attribution:record.attribution,genderHint:record.genderHint,tags:[...record.tags],catalogPreview:previewOnly
+      };
+    }
+
+    function libraryExerciseForSource(sourceId) {
+      return state.exercises.find(exercise=>exercise.sourceId===sourceId);
+    }
+
+    function filteredCatalogRecords() {
+      const query=catalogFilters.query.trim().toLowerCase();
+      return exerciseCatalog.filter(record=>{
+        if (catalogFilters.focus!=='all'&&!record.tags.includes(catalogFilters.focus)) return false;
+        if (catalogFilters.bodyPart!=='all'&&record.bodyPart!==catalogFilters.bodyPart) return false;
+        if (catalogFilters.equipment!=='all'&&record.equipment!==catalogFilters.equipment) return false;
+        if (!query) return true;
+        const haystack=[record.name,record.instructions,record.bodyPart,record.equipment,record.target,record.muscleGroup,...record.secondaryMuscles,...record.tags].join(' ').toLowerCase();
+        return haystack.includes(query);
+      });
+    }
+
+    function renderCatalog() {
+      const summary=$('#catalog-summary');
+      const results=$('#catalog-results');
+      if (!summary||!results) return;
+      if (!exerciseCatalog.length) {
+        summary.textContent=catalogLoadError?'The exercise catalog is unavailable.':'Loading English catalog…';
+        results.innerHTML=catalogLoadError?`<div class="empty" style="grid-column:1/-1">Could not load the catalog. <button class="btn secondary small" type="button" data-action="catalog-retry">Try again</button></div>`:'<div class="empty" style="grid-column:1/-1">Loading exercise catalog…</div>';
+        return;
+      }
+      const matches=filteredCatalogRecords();
+      const shown=matches.slice(0,catalogVisibleCount);
+      const addedCount=matches.filter(record=>libraryExerciseForSource(record.id)).length;
+      summary.textContent=`Showing ${Math.min(shown.length,matches.length)} of ${matches.length} matches · ${addedCount} already in your exercises`;
+      if (!matches.length) {
+        results.innerHTML='<div class="empty" style="grid-column:1/-1">No catalog exercises match these filters.</div>';
+        return;
+      }
+      results.innerHTML=shown.map(record=>{
+        const existing=libraryExerciseForSource(record.id);
+        const name=displayExerciseName(record.name);
+        return `<article class="catalog-card">
+          <div><button class="catalog-media" type="button" data-action="catalog-preview" data-source-id="${esc(record.id)}" aria-label="Preview ${esc(name)}"><img src="${esc(record.imageUrl)}" alt="" loading="lazy" decoding="async" width="180" height="180"></button></div>
+          <div class="catalog-card-copy"><span class="catalog-meta">${esc(record.bodyPart)} · ${esc(record.equipment)} · ${esc(record.target)}</span><h3>${esc(name)}</h3><p>${esc(record.instructions)}</p>
+          <div class="catalog-actions"><button class="btn small" type="button" data-action="catalog-add" data-source-id="${esc(record.id)}" ${existing?'disabled':''}>${existing?'Added':`${icon('plus')} Add`}</button></div></div>
+        </article>`;
+      }).join('')+(shown.length<matches.length?`<button class="btn secondary catalog-more" type="button" data-action="catalog-more">Show ${Math.min(CATALOG_PAGE_SIZE,matches.length-shown.length)} more</button>`:'');
+    }
+
+    async function openExerciseCatalog() {
+      const dialog=$('#catalog-dialog');
+      if (!dialog.open) dialog.showModal();
+      $('#catalog-search').value=catalogFilters.query;
+      $('#catalog-focus').value=catalogFilters.focus;
+      catalogVisibleCount=CATALOG_PAGE_SIZE;
+      renderCatalog();
+      try {
+        await loadExerciseCatalog();
+        renderCatalog();
+      } catch (error) {
+        console.warn('Could not load exercise catalog:',error);
+        renderCatalog();
+      }
+      setTimeout(()=>$('#catalog-search')?.focus(),0);
+    }
+
+    async function retryExerciseCatalog() {
+      catalogLoadError='';
+      renderCatalog();
+      try { await loadExerciseCatalog({force:true}); }
+      catch (error) { console.warn('Could not reload exercise catalog:',error); }
+      renderCatalog();
+    }
+
+    function addCatalogExercise(sourceId) {
+      const record=exerciseCatalog.find(item=>item.id===sourceId);
+      if (!record) { toast('That catalog exercise is unavailable.',true); return; }
+      const existing=libraryExerciseForSource(sourceId);
+      if (existing) { toast(`${existing.name} is already in your exercises.`); return; }
+      if (state.exercises.length>=500) { toast('Your exercise library has reached its 500-item limit.',true); return; }
+      const exercise=normalizeExercise(catalogRecordToExercise(record),state.exercises.length);
+      if (state.exercises.some(item=>item.id===exercise.id)) exercise.id=uid('exercise');
+      state.exercises.push(exercise);
+      saveState(`${exercise.name} added to your exercises.`);
+      renderCatalog();
+      if (state.currentView==='library') renderLibrary();
+      if (state.currentView==='timer') renderTimer();
+    }
+
+    function previewCatalogExercise(sourceId) {
+      const record=exerciseCatalog.find(item=>item.id===sourceId);
+      if (!record) { toast('That catalog exercise is unavailable.',true); return; }
+      const exercise=libraryExerciseForSource(sourceId)||catalogRecordToExercise(record,{previewOnly:true});
+      openExerciseDemoRecord(exercise);
     }
 
     function estimateQueueSeconds(queue) {
@@ -1666,7 +2186,8 @@
 
     function activeDemoMarkup(timer) {
       const context=timerDisplayContext(timer);
-      return `<div class="active-demo" id="active-demo" data-demo-key="${esc(context.key)}">${demoVisualMarkup(context.exercise,{eager:true})}<div class="active-demo-copy">${esc(context.caption)}</div></div>`;
+      const autoplay=timer.phase!=='work'&&!timer.paused;
+      return `<div class="active-demo" id="active-demo" data-demo-key="${esc(context.key)}">${demoVisualMarkup(context.exercise,{animated:true,autoplay,eager:true})}<div class="active-demo-copy">${esc(context.caption)}</div></div>`;
     }
 
     function renderTimer() {
@@ -1681,6 +2202,7 @@
         const next = nextTimerLabel(timer);
         root.innerHTML = `<div class="page-heading"><div><p class="eyebrow">Session in progress</p><h2 id="timer-heading">Stay with the set</h2></div></div>
           <section class="active-timer card">
+            <button class="btn secondary small workout-minimize" type="button" data-action="timer-minimize" aria-label="Minimize active timer">Minimize</button>
             <div class="phase-pill" id="timer-phase">${esc(timerPhaseText(timer))}</div>
             <div class="timer-clock" id="timer-clock">${formatCountdown(remaining)}</div>
             <div class="timer-exercise" id="timer-exercise">${esc(exercise?.name || 'Complete')}</div>
@@ -1691,10 +2213,12 @@
               <button class="btn" data-action="timer-pause">${timer.paused ? 'Resume' : 'Pause'}</button>
               <button class="btn secondary" data-action="timer-add">+15 sec</button>
               <button class="btn secondary" data-action="timer-skip">Skip phase</button>
-              <button class="btn secondary" data-action="timer-end">End</button>
+              <button class="btn secondary timer-end" data-action="timer-end">End</button>
             </div>
             <div class="timer-next" id="timer-next">${esc(next)}</div>
           </section>`;
+        syncActiveTimerBody();
+        setupDemoAnimations(root);
         return;
       }
       const queue = state.builderQueue.filter(id => state.exercises.some(e => e.id === id));
@@ -1712,20 +2236,21 @@
             </section>
             <section class="card card-pad"><div class="section-title"><div><h3>Add an exercise</h3><p>Use your editable library.</p></div></div>
               <div class="field"><label for="timer-exercise-select">Exercise</label><div style="display:flex;gap:8px"><select id="timer-exercise-select" style="flex:1"><option value="">Choose…</option>${state.exercises.filter(e=>!queuedIds.has(e.id)).map(e=>`<option value="${esc(e.id)}">${esc(e.name)}</option>`).join('')}</select><button class="btn" data-action="timer-add-exercise">Add</button></div></div>
-              <button class="btn secondary small" style="margin-top:12px" data-action="add-exercise">${icon('plus')} New exercise</button>
+              <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px"><button class="btn secondary small" data-action="open-catalog">Browse catalog</button><button class="btn secondary small" data-action="add-exercise">${icon('plus')} New exercise</button></div>
             </section>
           </div>
           <section class="card card-pad">
             <div class="section-title"><div><h3>Session queue</h3><p>${queue.length} exercises · about ${humanDuration(estimateQueueSeconds(queue))}</p></div>${queue.length?'<button class="btn ghost small" data-action="timer-clear">Clear</button>':''}</div>
             <div class="queue">${queue.length ? queue.map((id,index) => {
               const e = state.exercises.find(x=>x.id===id);
-              return `<div class="queue-item with-demo"><span class="queue-num">${index+1}</span>${demoVisualMarkup(e,{compact:true})}<div><b>${esc(e.name)}</b><small>${e.sets} × ${formatCountdown(e.workSec*1000)} work · ${formatCountdown(e.restSec*1000)} rest</small></div><div class="queue-actions"><button class="queue-preview" data-action="preview-exercise" data-id="${esc(e.id)}" aria-label="Preview ${esc(e.name)}">Preview</button><button data-action="queue-up" data-index="${index}" aria-label="Move up">↑</button><button data-action="queue-down" data-index="${index}" aria-label="Move down">↓</button><button data-action="queue-remove" data-index="${index}" aria-label="Remove">×</button></div></div>`;
+              return `<div class="queue-item with-demo"><span class="queue-num">${index+1}</span>${demoVisualMarkup(e,{compact:true})}<div><b>${esc(e.name)}</b><small>${e.sets} sets · ${e.workSec}s / ${e.restSec}s</small></div><div class="queue-actions"><button data-action="queue-up" data-index="${index}" aria-label="Move ${esc(e.name)} up" ${index===0?'disabled':''}>↑</button><button data-action="queue-down" data-index="${index}" aria-label="Move ${esc(e.name)} down" ${index===queue.length-1?'disabled':''}>↓</button><button data-action="queue-remove" data-index="${index}" aria-label="Remove ${esc(e.name)}">×</button></div></div>`;
             }).join('') : '<div class="empty">Choose a preset or add an exercise.</div>'}</div>
             <button class="btn" style="width:100%;margin-top:17px" data-action="timer-start" ${queue.length?'':'disabled'}>${icon('timer')} Preview & start</button>
             <p class="tiny muted" style="margin:11px 0 0">A seven-second movement preview runs before each new exercise, not between sets.</p>
             <p class="tiny muted" style="margin:11px 0 0">The timer uses timestamps, so it stays accurate when the tab is in the background. Keep this page open for cues.</p>
           </section>
         </div>`;
+      syncActiveTimerBody();
     }
 
     function renderLibrary() {
@@ -1733,13 +2258,14 @@
       const categories = ['All',...new Set(state.exercises.map(e=>e.category))];
       const query = filter.query.toLowerCase();
       const exercises = state.exercises.filter(e => (filter.category==='All'||e.category===filter.category) && (!query||`${e.name} ${e.instructions}`.toLowerCase().includes(query)));
+      const queuedIds=new Set(state.builderQueue);
       $('#view-library').innerHTML = `
-        <div class="page-heading"><div><p class="eyebrow">Editable movement library</p><h2 id="library-heading">Your exercises</h2><p>Save the work/rest values you actually use, then add movements to the interval timer in one tap.</p></div><div class="heading-actions"><button class="btn" data-action="add-exercise">${icon('plus')} New exercise</button></div></div>
+        <div class="page-heading"><div><p class="eyebrow">Editable movement library</p><h2 id="library-heading">Your exercises</h2><p>Keep this list focused. Browse the full catalog only when you want to add another movement.</p></div><div class="heading-actions"><button class="btn secondary" data-action="open-catalog">Browse catalog</button><button class="btn" data-action="add-exercise">${icon('plus')} New exercise</button></div></div>
         <div class="filter-row"><input class="search" type="search" data-action="library-search" value="${esc(filter.query)}" placeholder="Search exercises…" aria-label="Search exercises"><select class="search" style="flex:0 1 180px" data-action="library-category" aria-label="Filter by category">${categories.map(c=>`<option ${c===filter.category?'selected':''}>${esc(c)}</option>`).join('')}</select></div>
         <div class="exercise-grid">${exercises.length ? exercises.map(e=>`<article class="exercise-card">
           ${demoVisualMarkup(e)}<span class="chip accent" style="align-self:flex-start">${esc(e.category)}</span><h3>${esc(e.name)}</h3><p>${esc(e.instructions || 'No instructions yet.')}</p>
-          <div class="exercise-stats"><span class="chip">${e.sets} sets</span><span class="chip">${e.workSec}s work</span><span class="chip">${e.restSec}s rest</span></div>
-          <div class="exercise-actions"><button class="btn secondary small" data-action="preview-exercise" data-id="${esc(e.id)}">Preview</button><button class="btn small" data-action="library-add-timer" data-id="${esc(e.id)}">${icon('plus')} Timer</button><button class="btn secondary small" data-action="edit-exercise" data-id="${esc(e.id)}">${icon('edit')} Edit</button><button class="btn ghost small" data-action="delete-exercise" data-id="${esc(e.id)}" aria-label="Delete ${esc(e.name)}">${icon('trash')}</button></div>
+          <div class="exercise-compact-stats">${e.sets} sets · ${e.workSec}s / ${e.restSec}s</div>
+          <div class="exercise-actions"><button class="btn small add-to-timer" data-action="library-add-timer" data-id="${esc(e.id)}" ${queuedIds.has(e.id)?'disabled':''}>${queuedIds.has(e.id)?'In timer':`${icon('plus')} Timer`}</button><button class="btn secondary small" data-action="edit-exercise" data-id="${esc(e.id)}" aria-label="Edit ${esc(e.name)}">${icon('edit')}</button><button class="btn ghost small" data-action="delete-exercise" data-id="${esc(e.id)}" aria-label="Remove ${esc(e.name)}">${icon('trash')}</button></div>
         </article>`).join('') : '<div class="empty" style="grid-column:1/-1">No exercises match that filter.</div>'}</div>`;
     }
 
@@ -1960,36 +2486,57 @@
       form.elements.workSec.value = 40;
       form.elements.restSec.value = 60;
       form.elements.demo.value = 'none';
+      form.elements.demo.disabled = false;
       const exercise = state.exercises.find(e=>e.id===id);
       $('#exercise-dialog-title').textContent = exercise ? 'Edit exercise' : 'Add exercise';
-      if (exercise) Object.entries(exercise).forEach(([key,value]) => { if (form.elements[key]) form.elements[key].value = value; });
-      else form.elements.id.value = '';
+      if (exercise) {
+        ['id','name','category','demo','sets','workSec','restSec','instructions'].forEach(key=>{if(form.elements[key])form.elements[key].value=exercise[key]??'';});
+        if (exercise.sourceId) { form.elements.demo.value='dataset'; form.elements.demo.disabled=true; }
+      } else form.elements.id.value = '';
       $('#exercise-dialog').showModal();
       setTimeout(()=>form.elements.name.focus(),0);
     }
 
-    function openExerciseDemo(id,{startSession=false}={}) {
-      const exercise=state.exercises.find(item=>item.id===id);
-      if (!exercise) { toast('That exercise is no longer available.',true); return; }
+    function openExerciseDemoRecord(exercise,{startSession=false}={}) {
       pendingTimerStart=startSession;
       const demo=demoDefinition(exercise);
       $('#demo-dialog-title').textContent=startSession?`Ready for ${exercise.name}?`:exercise.name;
-      $('#demo-dialog-stage').innerHTML=demoVisualMarkup(exercise,{eager:true});
+      $('#demo-dialog-stage').innerHTML=demoVisualMarkup(exercise,{animated:true,autoplay:true,eager:true});
       $('#demo-dialog-copy').textContent=[exercise.instructions||'No movement cues saved.',demo.note||''].filter(Boolean).join(' ');
-      $('#demo-dialog-stats').innerHTML=`<span class="chip">${exercise.sets} sets</span><span class="chip">${exercise.workSec}s work</span><span class="chip">${exercise.restSec}s rest</span>`;
-      $('#demo-dialog-credit').innerHTML=demoCreditMarkup(exercise);
+      const steps=(exercise.instructionSteps||[]).filter(Boolean);
+      const stepsDetails=$('#demo-dialog-steps');
+      $('#demo-dialog-steps-summary').textContent=`Step-by-step${steps.length?` (${steps.length})`:''}`;
+      $('#demo-dialog-steps-list').innerHTML=steps.map(step=>`<li>${esc(step)}</li>`).join('');
+      stepsDetails.hidden=!steps.length;
+      stepsDetails.open=false;
+      const metadata=[exercise.bodyPart,exercise.equipment,exercise.target].filter(Boolean);
+      const timerStats=exercise.catalogPreview?[]:[`${exercise.sets} sets`,`${exercise.workSec}s work`,`${exercise.restSec}s rest`];
+      $('#demo-dialog-stats').innerHTML=[...metadata,...timerStats].map(value=>`<span class="chip">${esc(value)}</span>`).join('');
       const startButton=$('#demo-dialog-start');
       startButton.hidden=!startSession;
       startButton.textContent=`Start ${Math.round(DEMO_PREP_MS/1000)}-second prep`;
       const dialog=$('#demo-dialog');
-      dialog.showModal();
+      if (!dialog.open) dialog.showModal();
+      setupDemoAnimations(dialog);
       setTimeout(()=>(startSession?startButton:dialog.querySelector('[data-close-dialog]'))?.focus(),0);
+    }
+
+    async function openExerciseDemo(id,{startSession=false}={}) {
+      let exercise=state.exercises.find(item=>item.id===id);
+      if (!exercise) { toast('That exercise is no longer available.',true); return; }
+      if (exercise.sourceId&&!exercise.instructionSteps?.length&&!exerciseCatalog.length) {
+        try {
+          await loadExerciseCatalog();
+          exercise=state.exercises.find(item=>item.id===id)||exercise;
+        } catch (_) {}
+      }
+      openExerciseDemoRecord(exercise,{startSession});
     }
 
     function requestTimerStart() {
       const firstId=state.builderQueue.find(id=>state.exercises.some(exercise=>exercise.id===id));
       if (!firstId) return;
-      openExerciseDemo(firstId,{startSession:true});
+      void openExerciseDemo(firstId,{startSession:true});
     }
 
     function confirmTimerStart() {
@@ -2052,6 +2599,7 @@
       const item = state.plan[week][Number(index)];
       form.elements.week.value = week;
       form.elements.dayIndex.value = index;
+      form.elements.date.value = '';
       form.elements.title.value = item.title;
       form.elements.type.value = item.type;
       form.elements.secondaryType.value = item.secondaryType||'';
@@ -2062,6 +2610,26 @@
       form.dataset.lastSecondary=item.secondaryType||'';
       syncPlanTypeFields(false);
       $('#plan-dialog-title').textContent = `Edit ${DAY_NAMES[(Number(index)+1)%7]} · Week ${week}`;
+      $('#plan-dialog').showModal();
+    }
+
+    function openTodayDay() {
+      const form=$('#plan-form');
+      const dateValue=state.selectedDate;
+      const item=getPlanDay(dateValue);
+      form.elements.week.value='';
+      form.elements.dayIndex.value='';
+      form.elements.date.value=dateValue;
+      form.elements.title.value=item.title;
+      form.elements.type.value=item.type;
+      form.elements.secondaryType.value=item.secondaryType||'';
+      form.elements.time.value=item.time||'18:00';
+      form.elements.duration.value=item.duration;
+      form.elements.focus.value=item.focus;
+      form.dataset.lastPrimary=item.type;
+      form.dataset.lastSecondary=item.secondaryType||'';
+      syncPlanTypeFields(false);
+      $('#plan-dialog-title').textContent=`Edit ${formatDate(dateValue,{weekday:'long',month:'short',day:'numeric'})}`;
       $('#plan-dialog').showModal();
     }
 
@@ -2077,9 +2645,10 @@
     function deleteExercise(id) {
       const exercise = state.exercises.find(e=>e.id===id);
       if (!exercise) return;
+      const fromCatalog=Boolean(exercise.sourceId);
       askConfirmation({
-        title:'Delete exercise?', message:`Delete “${exercise.name}”? Completed session history will stay.`, confirmLabel:'Delete exercise',
-        onConfirm:()=>{ state.exercises=state.exercises.filter(e=>e.id!==id); state.builderQueue=state.builderQueue.filter(x=>x!==id); saveState('Exercise deleted.'); renderView(); }
+        title:fromCatalog?'Remove exercise?':'Delete exercise?', message:`${fromCatalog?'Remove':'Delete'} “${exercise.name}”? Completed session history will stay${fromCatalog?' and you can add it again from the catalog.':'.'}`, confirmLabel:fromCatalog?'Remove exercise':'Delete exercise',
+        onConfirm:()=>{ state.exercises=state.exercises.filter(e=>e.id!==id); state.builderQueue=state.builderQueue.filter(x=>x!==id); saveState(fromCatalog?'Exercise removed from your library.':'Exercise deleted.'); renderView(); }
       });
     }
 
@@ -2252,6 +2821,8 @@
       syncExpiredTimer();
       const timer = state.activeTimer;
       if (!timer) return;
+      syncActiveTimerBody();
+      if (state.currentView!=='timer') { updateMiniTimer(); return; }
       const remaining = timerRemaining(timer);
       const seconds = Math.ceil(remaining/1000);
       if (!timer.paused && seconds<=3 && seconds>0 && seconds!==lastBeepSecond) { beep(520,.045); lastBeepSecond=seconds; }
@@ -2262,7 +2833,10 @@
       const title = $('#timer-exercise'); if (title) title.textContent=exercise.name;
       const meta = $('#timer-meta'); if (meta) meta.textContent=timerMetaText(timer,context);
       const activeDemo=$('#active-demo');
-      if (activeDemo&&activeDemo.dataset.demoKey!==context.key) activeDemo.outerHTML=activeDemoMarkup(timer);
+      if (activeDemo&&activeDemo.dataset.demoKey!==context.key) {
+        activeDemo.outerHTML=activeDemoMarkup(timer);
+        setupDemoAnimations($('#active-demo'));
+      }
       const fill = $('#timer-progress-fill'); if (fill) fill.style.width=`${clamp(100-(remaining/(timer.phaseDurationMs||1)*100),0,100)}%`;
       const next = $('#timer-next'); if (next) next.textContent=nextTimerLabel(timer);
       updateMiniTimer();
@@ -2617,7 +3191,12 @@
 
     document.addEventListener('click', event => {
       const closeDialogButton = event.target.closest('[data-close-dialog]');
-      if (closeDialogButton) { closeDialogButton.closest('dialog')?.close(); return; }
+      if (closeDialogButton) {
+        const dialog=closeDialogButton.closest('dialog');
+        if (dialog) pauseDemoAnimations(dialog);
+        dialog?.close();
+        return;
+      }
       const viewButton = event.target.closest('[data-view]');
       if (viewButton) { setView(viewButton.dataset.view); return; }
       if (event.target.closest('[data-open-settings]')) { openSettings(); return; }
@@ -2634,13 +3213,18 @@
       if (action === 'clear-app-alerts') clearScheduleAlerts();
       if (action === 'date-prev') selectTodayDate(addDays(state.selectedDate,-1),{focus:'top-day-prev'});
       if (action === 'date-next') selectTodayDate(addDays(state.selectedDate,1),{focus:'top-day-next'});
-      if (action === 'date-today') selectTodayDate(localDate(),{focus:'top-day-today'});
+      if (action === 'date-today') selectTodayDate(localDate(),{focus:'calendar-today'});
       if (action === 'calendar-week-prev') selectTodayDate(addDays(state.selectedDate,-7),{focus:'week-prev'});
       if (action === 'calendar-week-next') selectTodayDate(addDays(state.selectedDate,7),{focus:'week-next'});
-      if (action === 'calendar-toggle-month') { todayCalendarExpanded=!todayCalendarExpanded; todayCalendarMonth=startOfMonth(state.selectedDate); todayCalendarFocus='month-toggle'; renderToday(); }
+      if (action === 'calendar-show-week') { todayCalendarExpanded=false; todayCalendarFocus='week-toggle'; renderToday(); }
+      if (action === 'calendar-toggle-month') { todayCalendarExpanded=true; todayCalendarMonth=startOfMonth(state.selectedDate); todayCalendarFocus='month-toggle'; renderToday(); }
       if (action === 'calendar-month-prev') { todayCalendarMonth=addMonths(todayCalendarMonth,-1); todayCalendarFocus='month-prev'; renderToday(); }
       if (action === 'calendar-month-next') { todayCalendarMonth=addMonths(todayCalendarMonth,1); todayCalendarFocus='month-next'; renderToday(); }
-      if (action === 'calendar-select-date') selectTodayDate(control.dataset.date,{focus:`date-${control.dataset.date}`,closeMonth:Boolean(control.closest('.month-calendar'))});
+      if (action === 'calendar-select-date') {
+        const fromMonth=Boolean(control.closest('.month-calendar'));
+        selectTodayDate(control.dataset.date,{focus:`date-${control.dataset.date}`,closeMonth:fromMonth});
+      }
+      if (action === 'edit-today-day') openTodayDay();
       if (action === 'clear-day-override') { clearSessionChecks(state.selectedDate); delete state.overrides[state.selectedDate]; saveState('Planned day restored; session checks were cleared.'); renderToday(); }
       if (action === 'complete-task') handleTaskStatus(control.dataset.id,'done');
       if (action === 'skip-task') handleTaskStatus(control.dataset.id,'skipped');
@@ -2649,9 +3233,15 @@
       if (action === 'delete-routine') deleteRoutine(control.dataset.id);
       if (action === 'select-plan-week') { state.selectedPlanWeek=control.dataset.week; saveState(); renderPlan(); }
       if (action === 'edit-plan-day') openPlanDay(control.dataset.week,control.dataset.index);
+      if (action === 'open-catalog') void openExerciseCatalog();
+      if (action === 'catalog-preview') previewCatalogExercise(control.dataset.sourceId);
+      if (action === 'catalog-add') addCatalogExercise(control.dataset.sourceId);
+      if (action === 'catalog-more') { catalogVisibleCount+=CATALOG_PAGE_SIZE; renderCatalog(); }
+      if (action === 'catalog-retry') void retryExerciseCatalog();
       if (action === 'add-exercise') openExercise();
       if (action === 'edit-exercise') openExercise(control.dataset.id);
-      if (action === 'preview-exercise') openExerciseDemo(control.dataset.id);
+      if (action === 'preview-exercise') void openExerciseDemo(control.dataset.id);
+      if (action === 'toggle-demo-motion') toggleDemoMotion(control);
       if (action === 'confirm-timer-start') confirmTimerStart();
       if (action === 'delete-exercise') deleteExercise(control.dataset.id);
       if (action === 'delete-session') requestDeleteSession(control.dataset.id);
@@ -2673,6 +3263,7 @@
       if (action === 'queue-down') moveQueue(Number(control.dataset.index),1);
       if (action === 'queue-remove') { state.builderQueue.splice(Number(control.dataset.index),1); saveState(); renderTimer(); }
       if (action === 'timer-start') requestTimerStart();
+      if (action === 'timer-minimize') setView('today');
       if (action === 'timer-pause' && state.activeTimer) {
         const timer=state.activeTimer;
         if (timer.paused) { timer.pausedTotalMs=(timer.pausedTotalMs||0)+Math.max(0,Date.now()-(timer.pausedAt||Date.now())); timer.pausedAt=null; timer.paused=false; timer.phaseEnd=Date.now()+timer.remainingMs; requestWakeLock(); }
@@ -2689,6 +3280,26 @@
       if (action === 'export-csv') exportCSV();
       if (action === 'import-json') $('#import-input').click();
       if (action === 'print-guide') { renderGuide(); setTimeout(()=>window.print(),0); }
+    });
+
+    document.addEventListener('keydown',event=>{
+      const day=event.target.closest?.('.calendar-day');
+      if (!day||event.altKey||event.ctrlKey||event.metaKey) return;
+      const key=event.key;
+      if (!['ArrowLeft','ArrowRight','ArrowUp','ArrowDown','Home','End','PageUp','PageDown'].includes(key)) return;
+      event.preventDefault();
+      const dateValue=day.dataset.date;
+      const monthMode=Boolean(day.closest('.month-calendar'));
+      let nextDate=dateValue;
+      if (key==='ArrowLeft') nextDate=addDays(dateValue,-1);
+      if (key==='ArrowRight') nextDate=addDays(dateValue,1);
+      if (key==='ArrowUp') nextDate=addDays(dateValue,-7);
+      if (key==='ArrowDown') nextDate=addDays(dateValue,7);
+      if (key==='Home') nextDate=startOfWeek(dateValue);
+      if (key==='End') nextDate=addDays(startOfWeek(dateValue),6);
+      if (key==='PageUp') nextDate=monthMode?addMonths(dateValue,-1):addDays(dateValue,-7);
+      if (key==='PageDown') nextDate=monthMode?addMonths(dateValue,1):addDays(dateValue,7);
+      selectTodayDate(nextDate,{focus:`${monthMode?'month':'date'}-${nextDate}`});
     });
 
     document.addEventListener('change', event => {
@@ -2728,6 +3339,13 @@
       }
       if (action === 'library-search') { state.libraryFilter.query=control.value; renderLibrary(); }
       if (action === 'library-category') { state.libraryFilter.category=control.value; renderLibrary(); }
+      if (action === 'catalog-filter') {
+        catalogFilters.focus=$('#catalog-focus').value;
+        catalogFilters.bodyPart=$('#catalog-body-part').value;
+        catalogFilters.equipment=$('#catalog-equipment').value;
+        catalogVisibleCount=CATALOG_PAGE_SIZE;
+        renderCatalog();
+      }
       if (action === 'daily-note') {
         state.daily[state.selectedDate] ||= {energy:3,soreness:2,sleep:3,note:''};
         state.daily[state.selectedDate].note=control.value;
@@ -2738,6 +3356,11 @@
 
     document.addEventListener('input', event => {
       const control=event.target;
+      if (control.dataset.action === 'catalog-search') {
+        catalogFilters.query=control.value;
+        catalogVisibleCount=CATALOG_PAGE_SIZE;
+        renderCatalog();
+      }
       if (control.dataset.action === 'readiness') {
         state.daily[state.selectedDate] ||= {energy:3,soreness:2,sleep:3,note:''};
         state.daily[state.selectedDate][control.dataset.key]=Number(control.value);
@@ -2780,8 +3403,15 @@
       const form=event.currentTarget;
       if (!form.reportValidity()) return;
       const data=Object.fromEntries(new FormData(form));
-      const item={id:data.id||uid('exercise'),name:data.name.trim(),category:data.category,demo:DEMO_IDS.includes(data.demo)?data.demo:'none',sets:Number(data.sets),workSec:Number(data.workSec),restSec:Number(data.restSec),instructions:data.instructions.trim()};
-      const index=state.exercises.findIndex(e=>e.id===item.id);
+      const id=data.id||uid('exercise');
+      const index=state.exercises.findIndex(e=>e.id===id);
+      const existing=index>=0?state.exercises[index]:null;
+      const item=normalizeExercise({
+        ...(existing||{}),id,
+        name:data.name.trim(),category:data.category,
+        demo:existing?.sourceId?'dataset':(DEMO_IDS.includes(data.demo)?data.demo:'none'),
+        sets:Number(data.sets),workSec:Number(data.workSec),restSec:Number(data.restSec),instructions:data.instructions.trim()
+      },state.exercises.length);
       if (index>=0) state.exercises[index]=item; else state.exercises.push(item);
       saveState(index>=0?'Exercise updated.':'Exercise added.'); $('#exercise-dialog').close(); renderView();
     });
@@ -2814,11 +3444,23 @@
       const form=event.currentTarget;
       if (!form.reportValidity()) return;
       const data=Object.fromEntries(new FormData(form));
+      const secondaryType=data.type==='rest'||data.secondaryType===data.type?'':data.secondaryType;
+      const newDay={title:data.title.trim(),type:data.type,secondaryType,time:data.time||'18:00',duration:Number(data.duration||0),focus:data.focus.trim()};
+      if (validLocalDate(data.date)) {
+        const oldDay=getPlanDay(data.date);
+        const changed=oldDay.title!==newDay.title||oldDay.type!==newDay.type||(oldDay.secondaryType||'')!==newDay.secondaryType||(oldDay.time||'18:00')!==newDay.time||Number(oldDay.duration||0)!==newDay.duration||oldDay.focus!==newDay.focus;
+        if (changed) {
+          state.overrides[data.date]=newDay;
+          clearSessionChecks(data.date);
+          saveState('Day updated; session checks were cleared.');
+        }
+        $('#plan-dialog').close();
+        renderToday();
+        return;
+      }
       const today=localDate();
       const todayIndex=(parseLocalDate(today).getDay()+6)%7;
       const oldDay=state.plan[data.week][Number(data.dayIndex)];
-      const secondaryType=data.type==='rest'||data.secondaryType===data.type?'':data.secondaryType;
-      const newDay={title:data.title.trim(),type:data.type,secondaryType,time:data.time||'18:00',duration:Number(data.duration||0),focus:data.focus.trim()};
       const changed=oldDay.title!==newDay.title||oldDay.type!==newDay.type||(oldDay.secondaryType||'')!==newDay.secondaryType||(oldDay.time||'18:00')!==newDay.time||Number(oldDay.duration||0)!==newDay.duration||oldDay.focus!==newDay.focus;
       const affectsToday=changed&&data.week===getWeekVariant(today)&&Number(data.dayIndex)===todayIndex&&!state.overrides[today];
       state.plan[data.week][Number(data.dayIndex)]=newDay;
@@ -2827,7 +3469,7 @@
     });
 
     const confirmationDialog=$('#confirm-dialog');
-    $('#demo-dialog').addEventListener('close',()=>{pendingTimerStart=false;});
+    $('#demo-dialog').addEventListener('close',event=>{pauseDemoAnimations(event.currentTarget);pendingTimerStart=false;});
     confirmationDialog.addEventListener('cancel',event=>{
       event.preventDefault();
       closeConfirmation();
@@ -2874,6 +3516,7 @@
         void processDueReminders();
         void checkForAppUpdate();
       }
+      if (document.visibilityState==='hidden') pauseDemoAnimations(document);
       if (document.visibilityState==='hidden'&&noteSaveTimer) { clearTimeout(noteSaveTimer); noteSaveTimer=null; saveState(); }
     });
     window.addEventListener('pagehide',()=>{ if(noteSaveTimer){clearTimeout(noteSaveTimer);noteSaveTimer=null;saveState();} });

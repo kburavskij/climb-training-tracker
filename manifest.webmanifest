@@ -2,7 +2,7 @@
   "id": "./",
   "name": "Crux Routine",
   "short_name": "Crux",
-  "description": "An offline climbing, training, mobility and supplement tracker.",
+  "description": "An offline-capable climbing, training, exercise and supplement tracker.",
   "start_url": "./",
   "scope": "./",
   "display": "standalone",

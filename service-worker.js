@@ -1,28 +1,59 @@
 'use strict';
 
 const CACHE_PREFIX = 'crux-routine-';
-const WORKER_VERSION = 'v3';
+const WORKER_VERSION = 'v4';
 const CACHE_NAME = `${CACHE_PREFIX}${WORKER_VERSION}`;
+const MEDIA_CACHE_PREFIX = 'crux-exercise-media-';
+const DATASET_COMMIT = '7455efae41b330c265e7cd4b78dfa848e7ce5ebd';
+const MEDIA_CACHE_NAME = `${MEDIA_CACHE_PREFIX}${DATASET_COMMIT.slice(0, 12)}`;
+const MEDIA_CACHE_MAX_ENTRIES = 48;
 const ROOT_URL = new URL('./', self.location.href).href;
 const INDEX_URL = new URL('index.html', ROOT_URL).href;
-const DEMO_ASSETS = [
-  'worlds-greatest-stretch',
-  'scapular-pull-up',
-  'push-up',
-  'split-squat',
-  'dead-bug',
-  'arm-circles'
-].flatMap(slug => [1, 2, 3].map(frame => `demos/workout-guide/${slug}/frame-${frame}.svg`));
+const DATASET_MEDIA_ORIGIN = 'https://raw.githubusercontent.com';
+const DATASET_MEDIA_PREFIX = `/hasaneyldrm/exercises-dataset/${DATASET_COMMIT}/`;
 const APP_SHELL = [
   ROOT_URL,
   INDEX_URL,
   new URL('manifest.webmanifest', ROOT_URL).href,
+  new URL('exercise-catalog.json', ROOT_URL).href,
   new URL('icons/icon-192.png', ROOT_URL).href,
   new URL('icons/icon-512.png', ROOT_URL).href,
-  new URL('icons/apple-touch-icon.png', ROOT_URL).href,
-  ...DEMO_ASSETS.map(path => new URL(path, ROOT_URL).href)
+  new URL('icons/apple-touch-icon.png', ROOT_URL).href
 ];
 const SHELL_URLS = new Set(APP_SHELL);
+
+function isDatasetMediaUrl(url) {
+  return url.origin === DATASET_MEDIA_ORIGIN
+    && url.pathname.startsWith(DATASET_MEDIA_PREFIX)
+    && /\.(?:gif|jpe?g|png|webp)$/i.test(url.pathname);
+}
+
+async function trimMediaCache(cache) {
+  const keys = await cache.keys();
+  const overflow = keys.length - MEDIA_CACHE_MAX_ENTRIES;
+  if (overflow > 0) await Promise.all(keys.slice(0, overflow).map(key => cache.delete(key)));
+}
+
+async function handleDatasetMediaRequest(request) {
+  const cache = await caches.open(MEDIA_CACHE_NAME);
+  const cached = await cache.match(request, {ignoreVary: true});
+  if (cached) return cached;
+
+  try {
+    const response = await fetch(request);
+    if (response.ok || response.type === 'opaque') {
+      try {
+        await cache.put(request, response.clone());
+        await trimMediaCache(cache);
+      } catch (error) {
+        console.warn('Could not cache exercise media:', new URL(request.url).pathname, error);
+      }
+    }
+    return response;
+  } catch (error) {
+    return Response.error();
+  }
+}
 
 self.addEventListener('install', event => {
   event.waitUntil(
@@ -37,7 +68,10 @@ self.addEventListener('activate', event => {
     caches.keys()
       .then(keys => Promise.all(
         keys
-          .filter(key => key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+          .filter(key => (
+            (key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+            || (key.startsWith(MEDIA_CACHE_PREFIX) && key !== MEDIA_CACHE_NAME)
+          ))
           .map(key => caches.delete(key))
       ))
       .then(() => self.clients.claim())
@@ -52,7 +86,14 @@ self.addEventListener('fetch', event => {
   const request = event.request;
   const url = new URL(request.url);
 
-  if (request.method !== 'GET' || url.origin !== self.location.origin) return;
+  if (request.method !== 'GET') return;
+
+  if (isDatasetMediaUrl(url)) {
+    event.respondWith(handleDatasetMediaRequest(request));
+    return;
+  }
+
+  if (url.origin !== self.location.origin) return;
 
   event.respondWith((async () => {
     const cache = await caches.open(CACHE_NAME);
