@@ -30,6 +30,14 @@ All asset paths are relative, so the app works both on an account site and at `h
 
 Open the installed app online once so its offline shell is cached. If an old icon remains after an update, remove the Home Screen app and add it again; iOS caches icons aggressively.
 
+## Calendar and alerts
+
+Open **Calendar & alerts** on Today to share a day overview, the main session, or every route item as a calendar file. The small calendar button beside an item shares only that item. `.ics` files work with Apple Calendar, Outlook and other calendar apps; one event can also be opened directly in Google Calendar.
+
+The selected alert time is embedded in calendar files and used for app alerts. A Google Calendar draft uses the reminder defaults configured in your Google account; adjust them in Google Calendar before saving if needed. Google Calendar on desktop can import a multi-event `.ics` file, but its iPhone app cannot directly import one; on iPhone, share the file to Apple Calendar/Files or use the direct Google button for a single event.
+
+App alerts are opt-in and deep-link back to the matching day/item. They can fire while Crux is open and can catch a currently due reminder when the app resumes. A static GitHub Pages app cannot reliably wake a suspended iPhone at a future time, so use calendar alerts when background delivery matters. Reliable Web Push would require a private server-side scheduler and would change the app's local-only privacy model.
+
 ## Data and timer limitations
 
 - Data does not sync between devices or browser profiles. Export JSON backups regularly, especially before clearing site data or removing the app.

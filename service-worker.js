@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'crux-routine-';
-const CACHE_NAME = `${CACHE_PREFIX}v1`;
+const CACHE_NAME = `${CACHE_PREFIX}v2`;
 const ROOT_URL = new URL('./', self.location.href).href;
 const INDEX_URL = new URL('index.html', ROOT_URL).href;
 const APP_SHELL = [
@@ -57,5 +57,26 @@ self.addEventListener('fetch', event => {
 
       return Response.error();
     }
+  })());
+});
+
+self.addEventListener('notificationclick', event => {
+  event.notification.close();
+  const fallback = new URL('./#today', self.registration.scope);
+  const scope = new URL(self.registration.scope);
+  let target = fallback;
+  try {
+    const candidate = new URL(event.notification.data?.target || fallback.href, scope);
+    if (candidate.origin === scope.origin && candidate.pathname.startsWith(scope.pathname)) target = candidate;
+  } catch (_) {}
+
+  event.waitUntil((async () => {
+    const windows = await clients.matchAll({type: 'window', includeUncontrolled: true});
+    const existing = windows.find(client => client.url.startsWith(self.registration.scope));
+    if (existing) {
+      existing.postMessage({type: 'OPEN_SCHEDULE_TARGET', target: target.href});
+      return existing.focus();
+    }
+    return clients.openWindow(target.href);
   })());
 });

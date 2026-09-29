@@ -176,6 +176,7 @@
     .chip.warn { background: var(--amber-soft); border-color: transparent; color: color-mix(in srgb, var(--amber) 72%, var(--ink)); }
     .chip.optional { border-style: dashed; }
 
+    .heading-tools { flex: 0 0 auto; display: grid; justify-items: end; gap: 8px; }
     .date-strip { display: flex; align-items: center; gap: 7px; }
     .date-label { min-width: 174px; text-align: center; font-weight: 760; font-size: 14px; }
     .date-nav { width: 39px; height: 39px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 11px; background: var(--surface); }
@@ -190,7 +191,7 @@
     .today-hero .eyebrow { color: var(--lime); }
     .today-hero h3 { margin: 0; max-width: 640px; font: 750 clamp(25px, 3.6vw, 39px)/1.04 Georgia, serif; letter-spacing: -.035em; }
     .today-hero p { max-width: 630px; margin: 10px 0 0; color: rgba(255,255,255,.7); line-height: 1.5; }
-    .hero-controls { position: relative; z-index: 1; display: flex; align-items: center; }
+    .hero-controls { position: relative; z-index: 1; display: flex; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px; }
     .day-select { min-height: 43px; padding: 0 36px 0 13px; border: 1px solid rgba(255,255,255,.2); border-radius: 12px; background: rgba(255,255,255,.09); color: #fff; font-weight: 760; }
     .day-select option { color: #18211e; }
     .progress-row { position: relative; z-index: 1; display: flex; align-items: center; gap: 11px; margin-top: 19px; }
@@ -210,6 +211,7 @@
     .task.done .task-detail, .task.done .task-time { color: var(--muted); }
     .task.skipped { border-style: dashed; background: var(--surface-2); }
     .task.skipped .task-title { text-decoration: line-through; }
+    .task.launch-target { border-color: var(--amber); box-shadow: 0 0 0 3px color-mix(in srgb, var(--amber) 28%, transparent); }
     .task-time { color: var(--faint); font-size: 11px; font-weight: 800; text-align: center; letter-spacing: .03em; }
     .task-icon { width: 38px; height: 38px; display: none; place-items: center; border-radius: 11px; background: var(--surface-2); }
     .task-title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 7px; }
@@ -224,6 +226,8 @@
     .check-btn:hover, .task.done .check-btn { border-color: var(--moss); background: var(--moss); color: #fff; }
     .skip-btn { width: 35px; height: 35px; display: grid; place-items: center; border: 0; background: transparent; color: var(--faint); border-radius: 9px; }
     .skip-btn:hover { background: var(--surface-2); color: var(--ink); }
+    .task-schedule { width: 35px; height: 35px; border-radius: 9px; color: var(--faint); }
+    .task-schedule.active { border-color: var(--moss); background: color-mix(in srgb, var(--moss) 12%, var(--surface)); color: var(--moss); }
     .empty { padding: 34px 22px; border: 1px dashed var(--line); border-radius: 15px; color: var(--muted); text-align: center; }
 
     .readiness { display: grid; gap: 14px; }
@@ -246,8 +250,10 @@
     .day-card h4 { margin: 22px 0 7px; font-size: 17px; letter-spacing: -.02em; }
     .day-card p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
     .day-card .btn { margin-top: auto; align-self: flex-start; }
+    .type-dots { display: inline-flex; align-items: center; gap: 4px; }
     .type-dot { width: 9px; height: 9px; border-radius: 50%; background: var(--moss); }
     .type-dot.strength { background: var(--amber); }
+    .type-dot.prehab { background: #a987c3; }
     .type-dot.recovery { background: #77a8ba; }
     .type-dot.rest { background: var(--surface-3); }
     .type-dot.climb { background: var(--moss); }
@@ -324,8 +330,21 @@
     .log-row { display: grid; grid-template-columns: 82px minmax(0,1fr) auto; gap: 12px; align-items: center; padding: 12px 14px; border-bottom: 1px solid var(--line); }
     .log-row:last-child { border-bottom: 0; }
     .log-date { font-size: 11px; color: var(--muted); }
-    .log-row b { font-size: 13px; }
-    .log-row p { margin: 3px 0 0; color: var(--muted); font-size: 11px; }
+    .log-row > div:nth-child(2) { min-width: 0; }
+    .log-row b { font-size: 13px; overflow-wrap: anywhere; }
+    .log-row p { margin: 3px 0 0; color: var(--muted); font-size: 11px; overflow-wrap: anywhere; }
+    .log-actions { display: flex; align-items: center; justify-content: flex-end; gap: 6px; }
+    .log-delete { color: var(--red); }
+    .saved-session-list { display: grid; }
+    .saved-session-list .log-row:last-child { border-bottom: 0; }
+
+    .schedule-choice { display: grid; gap: 6px; padding: 14px; border: 1px solid var(--line); border-radius: 14px; background: var(--surface-2); }
+    .schedule-choice strong { font-size: 13px; }
+    .schedule-choice p { margin: 0; color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .schedule-actions { display: grid; grid-template-columns: 1fr 1fr; gap: 9px; }
+    .schedule-actions .btn { width: 100%; }
+    .schedule-status { min-height: 44px; padding: 11px 13px; border-radius: 12px; background: var(--surface-2); color: var(--muted); font-size: 12px; line-height: 1.45; }
+    .schedule-status strong { color: var(--ink); }
 
     .guide-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; }
     .guide-card { padding: 22px; }
@@ -424,17 +443,24 @@
       .page-heading h2 { font-size: 37px; }
       .heading-actions { width: 100%; }
       .heading-actions .btn { flex: 1; }
+      .heading-tools { width: 100%; justify-items: stretch; }
+      .heading-tools > .btn { width: 100%; }
+      .date-strip { justify-content: space-between; }
       .today-hero { grid-template-columns: 1fr; padding: 21px; }
-      .hero-controls { align-items: flex-start; }
+      .hero-controls { align-items: flex-start; justify-content: flex-start; }
+      .day-select { flex: 1 1 135px; }
       .date-label { min-width: 140px; }
-      .task { grid-template-columns: minmax(0,1fr) auto; }
-      .task-time { grid-column: 1 / -1; text-align: left; margin-bottom: -7px; }
-      .task-actions { align-self: end; flex-wrap: wrap; justify-content: flex-end; }
-      .dose-input { width: 78px; }
+      .task { grid-template-columns: minmax(0,1fr); align-items: start; }
+      .task-time { grid-column: auto; text-align: left; margin-bottom: -7px; }
+      .task-actions { width: 100%; align-self: auto; flex-wrap: nowrap; justify-content: flex-end; }
+      .dose-input { width: auto; min-width: 0; flex: 1 1 auto; }
       .week-grid { grid-template-columns: repeat(7, 130px); }
       .cycle-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .exercise-grid { grid-template-columns: 1fr; }
       .history-stats { grid-template-columns: repeat(2, 1fr); }
+      .log-row { grid-template-columns: minmax(0,1fr) auto; gap: 8px 12px; }
+      .log-date { grid-column: 1 / -1; }
+      .schedule-actions { grid-template-columns: 1fr; }
       .history-bars { grid-template-columns: repeat(14, 24px); gap: 4px; overflow-x: auto; }
       .bar-day { min-width: 18px; }
       .guide-grid { grid-template-columns: 1fr; }
@@ -491,6 +517,8 @@
     <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6"/></symbol>
     <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 19v2h16v-2"/></symbol>
     <symbol id="i-upload" viewBox="0 0 24 24"><path d="M12 16V4m0 0 5 5m-5-5L7 9M4 19v2h16v-2"/></symbol>
+    <symbol id="i-calendar" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M16 3v4M8 3v4M3 10h18M8 14h3M8 18h7"/></symbol>
+    <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9M10 21h4"/></symbol>
   </svg>
 
   <div class="shell">
@@ -613,12 +641,37 @@
       <div class="dialog-body"><div class="form-grid">
         <input type="hidden" name="week"><input type="hidden" name="dayIndex">
         <div class="field full"><label for="plan-title">Session title</label><input id="plan-title" name="title" required maxlength="70"></div>
-        <div class="field"><label for="plan-type">Day type</label><select id="plan-type" name="type"><option value="climb">Climb</option><option value="strength">Strength</option><option value="recovery">Recovery</option><option value="rest">Rest</option></select></div>
+        <div class="field"><label for="plan-type">Primary activity</label><select id="plan-type" name="type"><option value="climb">Climb</option><option value="strength">Strength</option><option value="prehab">Prehab</option><option value="recovery">Recovery</option><option value="rest">Rest</option></select></div>
+        <div class="field"><label for="plan-secondary-type">Also (optional)</label><select id="plan-secondary-type" name="secondaryType"><option value="">Nothing else</option><option value="climb">Climb</option><option value="strength">Strength</option><option value="prehab">Prehab</option><option value="recovery">Recovery</option></select><small>Use this for a combined day such as Strength + Prehab.</small></div>
         <div class="field"><label for="plan-time">Start time</label><input id="plan-time" name="time" type="time" value="18:00"></div>
         <div class="field"><label for="plan-duration">Target minutes</label><input id="plan-duration" name="duration" type="number" min="0" max="360" step="5"></div>
         <div class="field full"><label for="plan-focus">Focus</label><textarea id="plan-focus" name="focus" maxlength="320"></textarea></div>
       </div></div>
       <div class="dialog-foot"><button class="btn secondary" type="button" data-close-dialog>Cancel</button><button class="btn" type="submit" value="save">Save day</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="schedule-dialog" aria-labelledby="schedule-dialog-title">
+    <form method="dialog" id="schedule-form">
+      <div class="dialog-head"><h2 id="schedule-dialog-title">Calendar & alerts</h2><button class="icon-btn" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
+      <div class="dialog-body"><div class="stack">
+        <input type="hidden" name="date"><input type="hidden" name="taskId">
+        <div class="field"><label for="schedule-scope">What to add</label><select id="schedule-scope" name="scope"></select></div>
+        <div class="schedule-choice"><strong id="schedule-selection-title">Day overview</strong><p id="schedule-selection-copy">One event summarizing the selected day.</p></div>
+        <div class="form-grid">
+          <div class="field" id="schedule-lead-field"><label for="schedule-lead">Calendar file / app reminder</label><select id="schedule-lead" name="leadMinutes"><option value="0">At start</option><option value="10">10 minutes before</option><option value="30">30 minutes before</option><option value="60">1 hour before</option></select><small>Google Calendar uses your Google account’s reminder defaults.</small></div>
+          <div class="field" id="schedule-day-time-field"><label for="schedule-day-time">Day overview alert time</label><input id="schedule-day-time" name="dayTime" type="time" value="08:00"></div>
+        </div>
+        <div class="schedule-actions">
+          <button class="btn" type="button" data-action="share-calendar"><svg class="icon" aria-hidden="true"><use href="#i-calendar"/></svg> Share / Apple / other</button>
+          <button class="btn secondary" type="button" data-action="google-calendar">Google Calendar</button>
+          <button class="btn secondary" type="button" data-action="save-app-alerts"><svg class="icon" aria-hidden="true"><use href="#i-bell"/></svg> Save app alert</button>
+          <button class="btn ghost" type="button" data-action="clear-app-alerts">Clear saved alert</button>
+        </div>
+        <div class="schedule-status" id="schedule-status" aria-live="polite"></div>
+        <div class="callout"><strong>Calendar is the reliable iPhone reminder</strong>App alerts can fire while Crux is open and catch currently due items when you return. A static GitHub Pages app cannot wake a suspended iPhone in the background; guaranteed Web Push would require a private server-side scheduler.</div>
+      </div></div>
+      <div class="dialog-foot"><button class="btn" type="button" data-close-dialog>Done</button></div>
     </form>
   </dialog>
 
@@ -634,9 +687,11 @@
     'use strict';
 
     const STORAGE_KEY = 'crux-routine-v1';
-    const SCHEMA_VERSION = 1;
+    const SCHEMA_VERSION = 2;
     const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
     const DAY_SHORT = ['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+    const ACTIVITY_TYPES = ['climb','strength','prehab','recovery','rest'];
+    const SECONDARY_ACTIVITY_TYPES = ['climb','strength','prehab','recovery'];
     const VIEW_META = {
       today: ['Today', 'Your plan, one useful action at a time.'],
       plan: ['Plan', 'A repeatable rhythm with room to recover.'],
@@ -673,8 +728,8 @@
     function defaultState() {
       const monday = startOfWeek(localDate());
       return {
-        meta: { schemaVersion: SCHEMA_VERSION, createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
-        settings: { theme: 'system', units: 'metric', weightKg: '', weekAnchor: monday, sound: true, vibration: true },
+        meta: { schemaVersion: SCHEMA_VERSION, installationId: crypto.randomUUID?.()||uid('install'), createdAt: new Date().toISOString(), updatedAt: new Date().toISOString() },
+        settings: { theme: 'system', units: 'metric', weightKg: '', weekAnchor: monday, sound: true, vibration: true, reminderLeadMinutes: 10, dayReminderTime: '08:00' },
         selectedDate: localDate(),
         selectedPlanWeek: 'A',
         currentView: 'today',
@@ -682,7 +737,7 @@
           A: [
             {type:'climb', title:'Technique → power bouldering', duration:90, focus:'New/returning: stay submaximal. Experienced and pain-free: a few quality hard attempts, stopping before finger power falls sharply.'},
             {type:'recovery', title:'Active recovery', duration:25, focus:'Easy walk or cycle, plus comfortable mobility.'},
-            {type:'strength', title:'Strength + prehab', duration:55, focus:'Pull, push, legs and core. Leave 2–3 reps in reserve.'},
+            {type:'strength', secondaryType:'prehab', title:'Strength + prehab', duration:55, focus:'Pull, push, legs and core. Leave 2–3 reps in reserve.'},
             {type:'rest', title:'Full rest', duration:0, focus:'Normal movement is fine. Protect sleep and eat normally.'},
             {type:'climb', title:'Technique + volume', duration:90, focus:'Submaximal movement quality; avoid repeated failure.'},
             {type:'recovery', title:'Easy aerobic + mobility', duration:35, focus:'Conversational pace. Optional easy climbing only if fresh.'},
@@ -724,6 +779,7 @@
         completions: {},
         daySnapshots: {},
         sessions: [],
+        reminders: [],
         daily: {},
         libraryFilter: {query:'', category:'All'}
       };
@@ -740,10 +796,22 @@
     function cleanInstant(value,fallback=new Date().toISOString()) {
       return typeof value==='string' && Number.isFinite(Date.parse(value)) ? new Date(value).toISOString() : fallback;
     }
-    function normalizePlanDay(value,fallback) {
-      const allowed=['climb','strength','recovery','rest'];
+    function cleanReminderTarget(value,dateValue,sourceId) {
+      try {
+        const scope=new URL('./',location.href);
+        const target=new URL(value,scope);
+        if (target.origin===scope.origin&&target.pathname.startsWith(scope.pathname)) return target.href;
+      } catch (_) {}
+      return scheduleTargetUrl(dateValue,sourceId==='day-overview'?'':sourceId);
+    }
+    function normalizePlanDay(value,fallback,legacyBuiltIn=false) {
+      const type=ACTIVITY_TYPES.includes(value?.type)?value.type:fallback.type;
+      const hasStoredDay=value&&typeof value==='object';
+      let secondaryType=hasStoredDay?(SECONDARY_ACTIVITY_TYPES.includes(value.secondaryType)?value.secondaryType:''):(fallback.secondaryType||'');
+      if (legacyBuiltIn && type==='strength' && value?.title==='Strength + prehab' && !Object.prototype.hasOwnProperty.call(value||{},'secondaryType')) secondaryType='prehab';
+      if (type==='rest' || secondaryType===type) secondaryType='';
       return {
-        type:allowed.includes(value?.type)?value.type:fallback.type,
+        type,secondaryType,
         title:cleanText(value?.title||fallback.title,70),
         time:/^([01]\d|2[0-3]):[0-5]\d$/.test(value?.time)?value.time:(fallback.time||'18:00'),
         duration:cleanNumber(value?.duration,0,360,fallback.duration),
@@ -764,6 +832,7 @@
     function normalizeState(raw) {
       const base=defaultState();
       const source=raw&&typeof raw==='object'?raw:{};
+      const sourceSchema=cleanNumber(source.meta?.schemaVersion,1,SCHEMA_VERSION,1);
       const exerciseIds=new Set();
       const exerciseSource=Array.isArray(source.exercises)?source.exercises.slice(0,500):base.exercises;
       const exercises=exerciseSource.map((item,index)=>{
@@ -795,7 +864,7 @@
         };
       });
       const plan={A:[],B:[]};
-      for (const week of ['A','B']) for (let index=0;index<7;index++) plan[week].push(normalizePlanDay(source.plan?.[week]?.[index],base.plan[week][index]));
+      for (const week of ['A','B']) for (let index=0;index<7;index++) plan[week].push(normalizePlanDay(source.plan?.[week]?.[index],base.plan[week][index],sourceSchema<2));
       const overrides={};
       Object.entries(source.overrides||{}).slice(0,2000).forEach(([date,item])=>{if(validLocalDate(date))overrides[date]=normalizePlanDay(item,defaultForDayType('recovery'));});
       const completions={};
@@ -811,13 +880,31 @@
         if (!validLocalDate(date)||!Array.isArray(snapshot?.items)) return;
         daySnapshots[date]={date,items:snapshot.items.slice(0,200).map(item=>({id:cleanText(item?.id,120),title:cleanText(item?.title,100),category:cleanText(item?.category,40)})).filter(item=>item.id),createdAt:cleanInstant(snapshot.createdAt),updatedAt:cleanInstant(snapshot.updatedAt)};
       });
-      const sessions=(Array.isArray(source.sessions)?source.sessions:[]).slice(-5000).map((item,index)=>({
-        id:cleanText(item?.id||`session-${index}`,100),title:cleanText(item?.title||'Interval session',500),
-        startedAt:cleanInstant(item?.startedAt),endedAt:item?.endedAt?cleanInstant(item.endedAt):'',
-        status:['complete','ended early'].includes(item?.status)?item.status:'ended early',
-        durationSec:cleanNumber(item?.durationSec,0,604800,0),
-        exercises:(Array.isArray(item?.exercises)?item.exercises:[]).slice(0,100).map(e=>({id:cleanText(e?.id,100),name:cleanText(e?.name,70),sets:cleanNumber(e?.sets,1,20,1)}))
-      }));
+      const sessionIds=new Set();
+      const sessions=(Array.isArray(source.sessions)?source.sessions:[]).slice(-5000).map((item,index)=>{
+        let id=cleanText(item?.id||`session-${index}`,100);
+        if (!id||sessionIds.has(id)) do { id=uid('session'); } while (sessionIds.has(id));
+        sessionIds.add(id);
+        return {
+          id,title:cleanText(item?.title||'Interval session',500),
+          startedAt:cleanInstant(item?.startedAt),endedAt:item?.endedAt?cleanInstant(item.endedAt):'',
+          status:['complete','ended early'].includes(item?.status)?item.status:'ended early',
+          durationSec:cleanNumber(item?.durationSec,0,604800,0),
+          exercises:(Array.isArray(item?.exercises)?item.exercises:[]).slice(0,100).map(e=>({id:cleanText(e?.id,100),name:cleanText(e?.name,70),sets:cleanNumber(e?.sets,1,20,1)}))
+        };
+      });
+      const reminderIds=new Set();
+      const reminders=(Array.isArray(source.reminders)?source.reminders:[]).slice(-1000).map((item,index)=>{
+        const trigger=typeof item?.triggerAt==='string'&&Number.isFinite(Date.parse(item.triggerAt))?new Date(item.triggerAt).toISOString():'';
+        const expires=typeof item?.expiresAt==='string'&&Number.isFinite(Date.parse(item.expiresAt))?new Date(item.expiresAt).toISOString():'';
+        if (!trigger||!expires) return null;
+        const date=validLocalDate(item.date)?item.date:localDate(trigger);
+        const sourceId=cleanText(item.sourceId,120);
+        const id=cleanText(item.id||`reminder-${index}`,160);
+        if (!id||reminderIds.has(id)) return null;
+        reminderIds.add(id);
+        return {id,date,sourceId,title:cleanText(item.title||'Crux Routine reminder',120),body:cleanText(item.body,240),triggerAt:trigger,expiresAt:expires,target:cleanReminderTarget(item.target,date,sourceId),leadMinutes:[0,10,30,60].includes(Number(item.leadMinutes))?Number(item.leadMinutes):10,dayTime:/^([01]\d|2[0-3]):[0-5]\d$/.test(item.dayTime)?item.dayTime:'08:00',notifiedAt:typeof item.notifiedAt==='string'?cleanText(item.notifiedAt,40):''};
+      }).filter(Boolean);
       const daily={};
       Object.entries(source.daily||{}).slice(0,5000).forEach(([date,item])=>{if(validLocalDate(date))daily[date]={energy:cleanNumber(item?.energy,1,5,3),soreness:cleanNumber(item?.soreness,1,5,2),sleep:cleanNumber(item?.sleep,1,5,3),note:cleanText(item?.note,2000)};});
       let activeTimer=null;
@@ -827,17 +914,19 @@
         const setIndex=cleanNumber(source.activeTimer.setIndex,0,queue[exerciseIndex].sets-1,0);
         const next=source.activeTimer.nextPosition;
         const paused=Boolean(source.activeTimer.paused);
-        activeTimer={id:cleanText(source.activeTimer.id||uid('session'),100),queue,exerciseIndex,setIndex,phase:['prepare','work','rest'].includes(source.activeTimer.phase)?source.activeTimer.phase:'prepare',phaseDurationMs:cleanNumber(source.activeTimer.phaseDurationMs,0,86400000,5000),phaseEnd:Number.isFinite(Number(source.activeTimer.phaseEnd))?Number(source.activeTimer.phaseEnd):Date.now()+5000,remainingMs:cleanNumber(source.activeTimer.remainingMs,0,86400000,5000),paused,pausedAt:paused?(Number.isFinite(Number(source.activeTimer.pausedAt))?Number(source.activeTimer.pausedAt):Date.now()):null,pausedTotalMs:cleanNumber(source.activeTimer.pausedTotalMs,0,604800000,0),startedAt:cleanInstant(source.activeTimer.startedAt),nextPosition:next&&Number.isInteger(Number(next.exerciseIndex))?{exerciseIndex:cleanNumber(next.exerciseIndex,0,queue.length-1,0),setIndex:cleanNumber(next.setIndex,0,20,0)}:null};
+        let timerId=cleanText(source.activeTimer.id,100);
+        if (!timerId||sessionIds.has(timerId)) do { timerId=uid('session'); } while (sessionIds.has(timerId));
+        activeTimer={id:timerId,queue,exerciseIndex,setIndex,phase:['prepare','work','rest'].includes(source.activeTimer.phase)?source.activeTimer.phase:'prepare',phaseDurationMs:cleanNumber(source.activeTimer.phaseDurationMs,0,86400000,5000),phaseEnd:Number.isFinite(Number(source.activeTimer.phaseEnd))?Number(source.activeTimer.phaseEnd):Date.now()+5000,remainingMs:cleanNumber(source.activeTimer.remainingMs,0,86400000,5000),paused,pausedAt:paused?(Number.isFinite(Number(source.activeTimer.pausedAt))?Number(source.activeTimer.pausedAt):Date.now()):null,pausedTotalMs:cleanNumber(source.activeTimer.pausedTotalMs,0,604800000,0),startedAt:cleanInstant(source.activeTimer.startedAt),nextPosition:next&&Number.isInteger(Number(next.exerciseIndex))?{exerciseIndex:cleanNumber(next.exerciseIndex,0,queue.length-1,0),setIndex:cleanNumber(next.setIndex,0,20,0)}:null};
       }
       const selectedDate=localDate();
       const weekAnchor=validLocalDate(source.settings?.weekAnchor)?startOfWeek(source.settings.weekAnchor):base.settings.weekAnchor;
       const weight=Number(source.settings?.weightKg);
       return {
-        meta:{schemaVersion:SCHEMA_VERSION,createdAt:cleanInstant(source.meta?.createdAt),updatedAt:cleanInstant(source.meta?.updatedAt)},
-        settings:{theme:['system','light','dark'].includes(source.settings?.theme)?source.settings.theme:'system',units:'metric',weightKg:Number.isFinite(weight)&&weight>=30&&weight<=250?weight:'',weekAnchor,sound:source.settings?.sound!==false,vibration:source.settings?.vibration!==false},
+        meta:{schemaVersion:SCHEMA_VERSION,installationId:cleanText(source.meta?.installationId||base.meta.installationId,100),createdAt:cleanInstant(source.meta?.createdAt),updatedAt:cleanInstant(source.meta?.updatedAt)},
+        settings:{theme:['system','light','dark'].includes(source.settings?.theme)?source.settings.theme:'system',units:'metric',weightKg:Number.isFinite(weight)&&weight>=30&&weight<=250?weight:'',weekAnchor,sound:source.settings?.sound!==false,vibration:source.settings?.vibration!==false,reminderLeadMinutes:[0,10,30,60].includes(Number(source.settings?.reminderLeadMinutes))?Number(source.settings.reminderLeadMinutes):10,dayReminderTime:/^([01]\d|2[0-3]):[0-5]\d$/.test(source.settings?.dayReminderTime)?source.settings.dayReminderTime:'08:00'},
         selectedDate,selectedPlanWeek:source.selectedPlanWeek==='B'?'B':'A',currentView:VIEW_META[source.currentView]?source.currentView:'today',
         plan,overrides,routines,exercises,builderQueue:(Array.isArray(source.builderQueue)?source.builderQueue:base.builderQueue).map(id=>cleanText(id,100)).filter(id=>exerciseIds.has(id)).slice(0,100),
-        activeTimer,completions,daySnapshots,sessions,daily,libraryFilter:{query:'',category:'All'}
+        activeTimer,completions,daySnapshots,sessions,reminders,daily,libraryFilter:{query:'',category:'All'}
       };
     }
 
@@ -848,6 +937,11 @@
     let appToday = localDate();
     let noteSaveTimer = null;
     let pendingConfirmation = null;
+    let confirmationOpener = null;
+    let reminderInterval = null;
+    let processingReminders = false;
+    let pendingLaunchTask = '';
+    let historySessionLimit = 20;
 
     function loadState() {
       try {
@@ -886,14 +980,18 @@
 
     function closeConfirmation() {
       pendingConfirmation = null;
+      const restore=confirmationOpener;
+      confirmationOpener=null;
       const dialog=$('#confirm-dialog');
       if (typeof dialog.close === 'function' && dialog.open) dialog.close();
       else dialog.removeAttribute('open');
+      if (restore?.isConnected) setTimeout(()=>restore.focus(),0);
     }
 
     function acceptConfirmation() {
       const action = pendingConfirmation;
       pendingConfirmation = null;
+      confirmationOpener=null;
       const dialog=$('#confirm-dialog');
       if (typeof dialog.close === 'function' && dialog.open) dialog.close();
       else dialog.removeAttribute('open');
@@ -903,6 +1001,7 @@
     function askConfirmation({title='Confirm action',message,confirmLabel='Confirm',danger=true,onConfirm}) {
       const dialog=$('#confirm-dialog');
       if (dialog.open || dialog.hasAttribute('open')) return false;
+      confirmationOpener=document.activeElement;
       pendingConfirmation=typeof onConfirm === 'function' ? onConfirm : null;
       $('#confirm-dialog-title').textContent=title;
       $('#confirm-dialog-message').textContent=message;
@@ -910,7 +1009,8 @@
       accept.textContent=confirmLabel;
       accept.className=`btn${danger?' danger':''}`;
       if (typeof dialog.showModal==='function') dialog.showModal(); else dialog.setAttribute('open','');
-      setTimeout(()=>accept.focus(),0);
+      const initial=danger?$$('[data-confirm-cancel]',dialog).at(-1):accept;
+      setTimeout(()=>initial?.focus(),0);
       return true;
     }
 
@@ -937,13 +1037,21 @@
       return {...state.plan[variant][index], variant, index};
     }
 
+    function activityTypeLabel(type) {
+      return ({climb:'Climb',strength:'Strength',prehab:'Prehab',recovery:'Recovery',rest:'Rest'})[type]||'Activity';
+    }
+    function dayTypes(planDay) { return [planDay.type,planDay.secondaryType].filter((type,index,list)=>ACTIVITY_TYPES.includes(type)&&list.indexOf(type)===index); }
+    function hasDayType(planDay,type) { return dayTypes(planDay).includes(type); }
+    function isSessionDay(planDay) { return dayTypes(planDay).some(type=>['climb','strength','prehab'].includes(type)); }
+    function combinedDayLabel(planDay) { return dayTypes(planDay).map(activityTypeLabel).join(' + '); }
+
     function routineOccurs(routine, dateValue, planDay) {
       if (!routine.active) return false;
       const date = parseLocalDate(dateValue);
       const weekday = date.getDay();
       if (routine.frequency === 'daily') return true;
-      if (routine.frequency === 'session') return ['climb','strength'].includes(planDay.type);
-      if (routine.frequency === 'climb') return planDay.type === 'climb';
+      if (routine.frequency === 'session') return isSessionDay(planDay);
+      if (routine.frequency === 'climb') return hasDayType(planDay,'climb');
       if (routine.frequency === 'weekly') return routine.weekdays.includes(weekday);
       if (routine.frequency === 'biweekly') return routine.weekdays.includes(weekday) && getWeekVariant(dateValue) === 'A';
       if (routine.frequency === 'monthly') {
@@ -954,7 +1062,7 @@
     }
 
     function planTask(dateValue, planDay) {
-      if (planDay.type === 'rest') return {
+      if (hasDayType(planDay,'rest')) return {
         id:'planned-session', title:planDay.title, category:'recovery', time:planDay.time||'18:00', sortMinute:timeMinutes(planDay.time||'18:00'), amount:'',
         detail:planDay.focus, optional:false, source:'plan'
       };
@@ -965,19 +1073,19 @@
     }
 
     function warmupTask(planDay) {
-      if (!['climb','strength'].includes(planDay.type)) return null;
+      if (!isSessionDay(planDay)) return null;
       return {id:'session-warmup', title:'Dynamic warm-up', category:'mobility', time:shiftTime(planDay.time||'18:00',-15), sortMinute:timeMinutes(planDay.time||'18:00')-15, amount:'8–15 min', optional:false, source:'system', detail:'Raise temperature, move shoulders/wrists, then progress from easy to session-specific work. Save long static holds for later.'};
     }
 
     function recoveryTask(planDay) {
-      if (!['climb','strength'].includes(planDay.type)) return null;
+      if (!dayTypes(planDay).some(type=>['climb','strength'].includes(type))) return null;
       return {id:'post-session', title:'Refuel + session note', category:'nutrition', time:shiftTime(planDay.time||'18:00',(planDay.duration||60)+30), sortMinute:timeMinutes(planDay.time||'18:00')+(planDay.duration||60)+30, amount:'meal + 2 min', optional:false, source:'system', detail:'Eat a normal meal with protein and carbohydrate, rehydrate to thirst, and record RPE or pain while it is fresh.'};
     }
 
     function tasksForDate(dateValue) {
       const planDay = getPlanDay(dateValue);
       const list = state.routines.filter(r => routineOccurs(r, dateValue, planDay)).map(r => {
-        if (r.relativeMinutes!==null&&r.relativeMinutes!==undefined&&['climb','strength'].includes(planDay.type)) {
+        if (r.relativeMinutes!==null&&r.relativeMinutes!==undefined&&isSessionDay(planDay)) {
           const start=timeMinutes(planDay.time||'18:00');
           return {...r,time:shiftTime(planDay.time||'18:00',r.relativeMinutes),sortMinute:start+r.relativeMinutes,source:'routine'};
         }
@@ -1020,13 +1128,16 @@
       updateMiniTimer();
     }
 
-    function dayTypeCopy(type) {
-      return {
+    function dayTypeCopy(planDay) {
+      const primary={
         climb: ['Climb day', 'Keep the hard work high-quality. Fingers and connective tissue recover more slowly than motivation.'],
         strength: ['Strength day', 'Build capacity without turning every set into a test. Finish with clean reps still available.'],
+        prehab: ['Prehab day', 'Build controlled capacity around fingers, elbows and shoulders without chasing fatigue or pain.'],
         recovery: ['Recovery day', 'Easy movement can help you feel better; it should not quietly become another hard session.'],
         rest: ['Rest day', 'Adaptation is training too. Normal walking and comfortable mobility are enough today.']
-      }[type] || ['Your day', 'Use the plan as a guide and adjust when recovery says otherwise.'];
+      }[planDay.type] || ['Your day', 'Use the plan as a guide and adjust when recovery says otherwise.'];
+      if (!planDay.secondaryType) return primary;
+      return [`${combinedDayLabel(planDay)} day`,`${primary[1]} The second activity is part of the same planned session, so adjust total load rather than treating both as maximum-effort work.`];
     }
 
     function categoryMark(category) {
@@ -1041,7 +1152,7 @@
       const required = tasks.filter(t => !t.optional);
       const doneCount = required.filter(t => getCompletion(dateValue,t.id)?.status === 'done').length;
       const pct = required.length ? Math.round(doneCount / required.length * 100) : 0;
-      const dayCopy = dayTypeCopy(planDay.type);
+      const dayCopy = dayTypeCopy(planDay);
       const daily = state.daily[dateValue] || {energy:3,soreness:2,sleep:3,note:''};
       const isToday = dateValue === localDate();
       const weight = Number(state.settings.weightKg);
@@ -1052,10 +1163,13 @@
       $('#view-today').innerHTML = `
         <div class="page-heading">
           <div><p class="eyebrow">${isToday ? 'Right now' : 'Daily log'}</p><h2 id="today-heading">${esc(formatDate(dateValue,{weekday:'long'}))}</h2><p>${esc(formatDate(dateValue,{month:'long',day:'numeric',year:'numeric'}))} · Week ${actualWeek}${overridden ? ' · custom day' : ''}</p></div>
-          <div class="date-strip">
-            <button class="date-nav" data-action="date-prev" aria-label="Previous day">‹</button>
-            <button class="btn secondary small date-label" data-action="date-today">${isToday ? 'Today' : 'Back to today'}</button>
-            <button class="date-nav" data-action="date-next" aria-label="Next day">›</button>
+          <div class="heading-tools">
+            <button class="btn secondary small" data-action="open-day-schedule">${icon('calendar')} Calendar & alerts</button>
+            <div class="date-strip">
+              <button class="date-nav" data-action="date-prev" aria-label="Previous day">‹</button>
+              <button class="btn secondary small date-label" data-action="date-today">${isToday ? 'Today' : 'Back to today'}</button>
+              <button class="date-nav" data-action="date-next" aria-label="Next day">›</button>
+            </div>
           </div>
         </div>
         <div class="stack">
@@ -1071,8 +1185,14 @@
               <select class="day-select" id="today-day-type" data-action="change-day-type">
                 <option value="climb" ${planDay.type==='climb'?'selected':''}>Climb day</option>
                 <option value="strength" ${planDay.type==='strength'?'selected':''}>Strength day</option>
+                <option value="prehab" ${planDay.type==='prehab'?'selected':''}>Prehab day</option>
                 <option value="recovery" ${planDay.type==='recovery'?'selected':''}>Recovery day</option>
                 <option value="rest" ${planDay.type==='rest'?'selected':''}>Rest day</option>
+              </select>
+              <label class="sr-only" for="today-secondary-type">Second activity</label>
+              <select class="day-select" id="today-secondary-type" data-action="change-day-secondary" ${planDay.type==='rest'?'disabled':''}>
+                <option value="">No second activity</option>
+                ${SECONDARY_ACTIVITY_TYPES.filter(type=>type!==planDay.type).map(type=>`<option value="${type}" ${planDay.secondaryType===type?'selected':''}>+ ${activityTypeLabel(type)}</option>`).join('')}
               </select>
               ${overridden ? `<button class="btn ghost small" data-action="clear-day-override" style="color:#fff">Use plan</button>` : ''}
             </div>
@@ -1106,6 +1226,7 @@
             </aside>
           </div>
         </div>`;
+      focusLaunchTarget();
     }
 
     function readinessLine(key, label, value) {
@@ -1124,6 +1245,7 @@
         </div>
         <div class="task-actions">
           ${task.amount ? `<label class="sr-only" for="dose-${esc(task.id)}">Actual result</label><input class="dose-input" id="dose-${esc(task.id)}" data-dose-for="${esc(task.id)}" value="${esc(amount)}" placeholder="${esc(task.amount)}" aria-label="Actual result; target ${esc(task.amount)}">` : ''}
+          <button class="icon-btn task-schedule ${hasPendingReminder(dateValue,task.id)?'active':''}" data-action="open-task-schedule" data-id="${esc(task.id)}" title="Calendar and alert" aria-label="Calendar and alert for ${esc(task.title)}">${icon(hasPendingReminder(dateValue,task.id)?'bell':'calendar')}</button>
           <button class="skip-btn" data-action="skip-task" data-id="${esc(task.id)}" title="${status==='skipped'?'Undo skip':'Skip'}" aria-label="${status==='skipped'?'Undo skip':'Skip '+esc(task.title)}">${icon('x')}</button>
           <button class="check-btn" data-action="complete-task" data-id="${esc(task.id)}" title="${status==='done'?'Undo':'Mark done'}" aria-label="${status==='done'?'Undo':'Complete '+esc(task.title)}">${icon('check')}</button>
         </div>
@@ -1132,7 +1254,7 @@
 
     function frequencyLabel(routine) {
       if (routine.frequency === 'daily') return 'Every day';
-      if (routine.frequency === 'session') return 'Climb + strength days';
+      if (routine.frequency === 'session') return 'Climb, strength + prehab days';
       if (routine.frequency === 'climb') return 'Climb days';
       if (routine.frequency === 'weekly') return routine.weekdays.map(d => DAY_SHORT[d]).join(', ') || 'Weekly';
       if (routine.frequency === 'biweekly') return `Every 2 weeks from Week A · ${routine.weekdays.map(d => DAY_SHORT[d]).join(', ')}`;
@@ -1169,9 +1291,9 @@
             </div>
             <div class="week-grid">
               ${state.plan[selected].map((day,index) => `<article class="day-card ${selected===currentVariant&&index===todayIndex?'current':''}">
-                <div class="day-top"><span class="day-name">${DAY_SHORT[(index+1)%7]}</span><span class="type-dot ${esc(day.type)}" title="${esc(day.type)}"></span></div>
+                <div class="day-top"><span class="day-name">${DAY_SHORT[(index+1)%7]}</span><span class="type-dots" title="${esc(combinedDayLabel(day))}">${dayTypes(day).map(type=>`<span class="type-dot ${esc(type)}"></span>`).join('')}</span></div>
                 <h4>${esc(day.title)}</h4><p>${esc(day.focus)}</p>
-                <div class="exercise-stats"><span class="chip">${esc(day.type)}</span><span class="chip">${esc(formatTime(day.time||'18:00'))}</span>${day.duration ? `<span class="chip">${day.duration} min</span>` : ''}</div>
+                <div class="exercise-stats">${dayTypes(day).map(type=>`<span class="chip">${esc(activityTypeLabel(type))}</span>`).join('')}<span class="chip">${esc(formatTime(day.time||'18:00'))}</span>${day.duration ? `<span class="chip">${day.duration} min</span>` : ''}</div>
                 <button class="btn secondary small" data-action="edit-plan-day" data-week="${selected}" data-index="${index}">${icon('edit')} Edit</button>
               </article>`).join('')}
             </div>
@@ -1203,6 +1325,14 @@
     function humanDuration(seconds) {
       const min = Math.round(seconds / 60);
       return min < 60 ? `${min} min` : `${Math.floor(min/60)}h ${min%60}m`;
+    }
+
+    function sessionDurationSec(session) {
+      const saved=Number(session?.durationSec);
+      if (Number.isFinite(saved)&&saved>0) return Math.round(saved);
+      const started=Date.parse(session?.startedAt);
+      const ended=Date.parse(session?.endedAt);
+      return Number.isFinite(started)&&Number.isFinite(ended)?Math.max(0,Math.round((ended-started)/1000)):0;
     }
 
     function renderTimer() {
@@ -1304,6 +1434,11 @@
       return {done,total:ids.length,pct:ids.length ? Math.round(done/ids.length*100) : 0};
     }
 
+    function renderHistoryLogRow(item,allowDelete=false) {
+      const actual=item.actual||(item.status==='done'&&item.plannedTarget?`Target checked: ${item.plannedTarget}`:item.category||'');
+      return `<div class="log-row"><span class="log-date">${esc(formatDate(item.date,{month:'short',day:'numeric'}))}</span><div><b>${esc(item.title)}</b><p>${esc(actual)}${item.status==='skipped'?' · skipped':''}</p></div><div class="log-actions"><span class="chip ${item.status==='done'||item.status==='complete'?'accent':''}">${esc(item.status)}</span>${allowDelete?`<button class="icon-btn log-delete" data-action="delete-session" data-id="${esc(item.id)}" aria-label="Delete saved workout ${esc(item.title)} from ${esc(formatDate(item.date))}" title="Delete saved workout">${icon('trash')}</button>`:''}</div></div>`;
+    }
+
     function renderHistory() {
       const today = localDate();
       const dates = Array.from({length:14},(_,i)=>addDays(today,i-13));
@@ -1313,11 +1448,12 @@
       const adherence = totals.total ? Math.round(totals.done/totals.total*100) : 0;
       const plannedDone = weekDates.filter(d=>getCompletion(d,'planned-session')?.status==='done').length;
       const mobilityDays = weekDates.filter(d => Object.values(state.completions).some(c=>c.date===d&&c.status==='done'&&c.category==='mobility')).length;
-      const timerSessions = state.sessions.filter(s=>s.status==='complete' && s.endedAt && localDate(s.endedAt)>=weekDates[0]).length;
+      const timerSessions = state.sessions.filter(s=>{const date=localDate(s.startedAt);return date>=weekDates[0]&&date<=today;}).length;
       const cutoff=addDays(today,-13);
+      const savedSessions=[...state.sessions].sort((a,b)=>String(b.endedAt||b.startedAt).localeCompare(String(a.endedAt||a.startedAt)));
       const recentLogs = [
         ...Object.values(state.completions).map(c=>({...c,sortAt:c.completedAt||`${c.date}T12:00:00`})),
-        ...state.sessions.map(s=>({kind:'session',title:s.title||'Interval session',date:localDate(s.startedAt),status:s.status,actual:humanDuration(s.durationSec||Math.round((new Date(s.endedAt||Date.now())-new Date(s.startedAt))/1000)),sortAt:s.endedAt||s.startedAt})),
+        ...state.sessions.map(s=>({kind:'session',id:s.id,title:s.title||'Interval session',date:localDate(s.startedAt),status:s.status,actual:humanDuration(sessionDurationSec(s)),sortAt:s.endedAt||s.startedAt})),
         ...Object.entries(state.daily).map(([date,item])=>({kind:'readiness',title:'Readiness + note',date,status:'logged',category:'recovery',actual:`Energy ${item.energy}/5 · soreness ${item.soreness}/5 · sleep ${item.sleep}/5${item.note?` · ${item.note}`:''}`,sortAt:`${date}T23:59:00`}))
       ].filter(item=>item.date>=cutoff&&item.date<=today).sort((a,b)=>String(b.sortAt).localeCompare(String(a.sortAt))).slice(0,20);
       $('#view-history').innerHTML = `
@@ -1325,12 +1461,13 @@
         <div class="history-stats">
           <div class="stat-card card"><strong>${adherence}%</strong><span>LOGGED PLAN THIS WEEK</span></div>
           <div class="stat-card card"><strong>${plannedDone}</strong><span>PLANNED DAYS DONE</span></div>
-          <div class="stat-card card"><strong>${timerSessions}</strong><span>TIMER SESSIONS</span></div>
+          <div class="stat-card card"><strong>${timerSessions}</strong><span>SAVED TIMER WORKOUTS</span></div>
           <div class="stat-card card"><strong>${mobilityDays}</strong><span>MOBILITY DAYS</span></div>
         </div>
         <div class="stack">
           <section class="card card-pad"><div class="section-title"><div><h3>Daily completion</h3><p>Non-optional scheduled items completed.</p></div></div><div class="history-bars">${dates.map(d=>{const s=dayStats(d);return `<div class="bar-day ${d===today?'today':''}" role="img" title="${esc(formatDate(d))}: ${s.done}/${s.total}" aria-label="${esc(formatDate(d))}: ${s.done} of ${s.total} completed"><div class="bar-track"><div class="bar-fill" style="height:${s.pct}%"></div></div><small>${esc(formatDate(d,{weekday:'narrow',day:'numeric'}))}</small></div>`}).join('')}</div></section>
-          <section class="card"><div class="card-pad" style="padding-bottom:8px"><div class="section-title"><div><h3>Recent log</h3><p>Actual entries and targets are distinct; later edits will not rewrite logs.</p></div></div></div><div class="log-list">${recentLogs.length ? recentLogs.map(item=>`<div class="log-row"><span class="log-date">${esc(formatDate(item.date,{month:'short',day:'numeric'}))}</span><div><b>${esc(item.title)}</b><p>${esc(item.actual||(item.status==='done'&&item.plannedTarget?`Target checked: ${item.plannedTarget}`:item.category||''))}${item.status==='skipped'?' · skipped':''}</p></div><span class="chip ${item.status==='done'||item.status==='complete'?'accent':''}">${esc(item.status)}</span></div>`).join('') : '<div class="empty" style="margin:0 16px 16px">Complete an item to begin your history.</div>'}</div></section>
+          <section class="card"><div class="card-pad" style="padding-bottom:8px"><div class="section-title"><div><h3>Recent log</h3><p>Actual entries and targets are distinct; later edits will not rewrite logs.</p></div></div></div><div class="log-list">${recentLogs.length ? recentLogs.map(item=>renderHistoryLogRow(item)).join('') : '<div class="empty" style="margin:0 16px 16px">Complete an item to begin your history.</div>'}</div></section>
+          <section class="card"><div class="card-pad" style="padding-bottom:8px"><div class="section-title"><div><h3 id="saved-workouts-heading" tabindex="-1">Saved timer workouts</h3><p>Completed and ended-early sessions are both workouts. Remove any accidental or unwanted entry here.</p></div></div></div><div class="saved-session-list">${savedSessions.length?savedSessions.slice(0,historySessionLimit).map(session=>renderHistoryLogRow({kind:'session',id:session.id,title:session.title||'Interval session',date:localDate(session.startedAt),status:session.status,actual:humanDuration(sessionDurationSec(session))},true)).join(''):'<div class="empty" style="margin:0 16px 16px">No saved timer workouts yet.</div>'}</div>${savedSessions.length>historySessionLimit?`<div class="card-pad" style="padding-top:8px"><button class="btn secondary small" data-action="show-more-sessions">Show older workouts</button></div>`:''}</section>
           <section class="card card-pad"><div class="section-title"><div><h3>Your data</h3><p>Stored only in this browser’s local storage.</p></div></div><div style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn secondary" data-action="import-json">${icon('upload')} Import backup</button><button class="btn secondary" data-action="print-guide">Print guide</button></div></section>
         </div>`;
     }
@@ -1436,10 +1573,11 @@
 
     function defaultForDayType(type) {
       return {
-        climb:{type:'climb',title:'Climbing session',time:'18:00',duration:90,focus:'Choose power, technique or endurance as today’s main focus; keep the goal specific.'},
-        strength:{type:'strength',title:'Strength session',time:'18:00',duration:50,focus:'General strength and prehab with 2–3 good reps left in reserve.'},
-        recovery:{type:'recovery',title:'Active recovery',time:'18:00',duration:25,focus:'Easy conversational movement and comfortable mobility.'},
-        rest:{type:'rest',title:'Full rest',time:'18:00',duration:0,focus:'Normal walking is fine. Prioritize sleep and normal meals.'}
+        climb:{type:'climb',secondaryType:'',title:'Climbing session',time:'18:00',duration:90,focus:'Choose power, technique or endurance as today’s main focus; keep the goal specific.'},
+        strength:{type:'strength',secondaryType:'',title:'Strength session',time:'18:00',duration:50,focus:'General strength with 2–3 good reps left in reserve.'},
+        prehab:{type:'prehab',secondaryType:'',title:'Prehab session',time:'18:00',duration:30,focus:'Controlled finger, elbow and shoulder capacity work in a comfortable range.'},
+        recovery:{type:'recovery',secondaryType:'',title:'Active recovery',time:'18:00',duration:25,focus:'Easy conversational movement and comfortable mobility.'},
+        rest:{type:'rest',secondaryType:'',title:'Full rest',time:'18:00',duration:0,focus:'Normal walking is fine. Prioritize sleep and normal meals.'}
       }[type];
     }
 
@@ -1519,6 +1657,27 @@
       setTimeout(()=>form.elements.title.focus(),0);
     }
 
+    function syncPlanTypeFields(updateTitle=false) {
+      const form=$('#plan-form');
+      const primary=form.elements.type.value;
+      const secondary=form.elements.secondaryType;
+      const previousPrimary=form.dataset.lastPrimary||primary;
+      const previousSecondary=form.dataset.lastSecondary||'';
+      [...secondary.options].forEach(option=>option.disabled=Boolean(option.value&&(option.value===primary||primary==='rest')));
+      if (primary==='rest'||secondary.value===primary) secondary.value='';
+      secondary.disabled=primary==='rest';
+      if (updateTitle) {
+        const oldDefault=defaultForDayType(previousPrimary)?.title;
+        const oldCombined=previousSecondary?`${activityTypeLabel(previousPrimary)} + ${activityTypeLabel(previousSecondary)} session`:oldDefault;
+        if (form.elements.title.value===oldDefault||form.elements.title.value===oldCombined||form.elements.title.value==='Strength + prehab') {
+          const shape={type:primary,secondaryType:secondary.value};
+          form.elements.title.value=secondary.value?`${combinedDayLabel(shape)} session`:defaultForDayType(primary).title;
+        }
+      }
+      form.dataset.lastPrimary=primary;
+      form.dataset.lastSecondary=secondary.value;
+    }
+
     function openPlanDay(week,index) {
       const form = $('#plan-form');
       const item = state.plan[week][Number(index)];
@@ -1526,9 +1685,13 @@
       form.elements.dayIndex.value = index;
       form.elements.title.value = item.title;
       form.elements.type.value = item.type;
+      form.elements.secondaryType.value = item.secondaryType||'';
       form.elements.time.value = item.time||'18:00';
       form.elements.duration.value = item.duration;
       form.elements.focus.value = item.focus;
+      form.dataset.lastPrimary=item.type;
+      form.dataset.lastSecondary=item.secondaryType||'';
+      syncPlanTypeFields(false);
       $('#plan-dialog-title').textContent = `Edit ${DAY_NAMES[(Number(index)+1)%7]} · Week ${week}`;
       $('#plan-dialog').showModal();
     }
@@ -1548,6 +1711,26 @@
       askConfirmation({
         title:'Delete exercise?', message:`Delete “${exercise.name}”? Completed session history will stay.`, confirmLabel:'Delete exercise',
         onConfirm:()=>{ state.exercises=state.exercises.filter(e=>e.id!==id); state.builderQueue=state.builderQueue.filter(x=>x!==id); saveState('Exercise deleted.'); renderView(); }
+      });
+    }
+
+    function requestDeleteSession(id) {
+      const session=state.sessions.find(item=>item.id===id);
+      if (!session) { toast('That saved workout no longer exists.',true); return; }
+      const date=formatDate(localDate(session.startedAt),{month:'short',day:'numeric',year:'numeric'});
+      const duration=humanDuration(sessionDurationSec(session));
+      askConfirmation({
+        title:'Delete saved workout?',
+        message:`Delete “${session.title||'Interval session'}” from ${date} (${duration}, ${session.status})? This removes it from History and future exports.`,
+        confirmLabel:'Delete workout',
+        onConfirm:()=>{
+          const index=state.sessions.findIndex(item=>item.id===id);
+          if (index<0) { toast('That saved workout was already removed.',true); return; }
+          state.sessions.splice(index,1);
+          saveState('Saved workout deleted.');
+          renderHistory();
+          setTimeout(()=>$('#saved-workouts-heading')?.focus(),0);
+        }
       });
     }
 
@@ -1729,6 +1912,313 @@
       $('#mini-phase').textContent=`${timer.paused?'Paused':timer.phase} · set ${timer.setIndex+1}/${exercise.sets}`;
     }
 
+    function dateAtMinutes(dateValue,totalMinutes) {
+      const dayOffset=Math.floor(totalMinutes/1440);
+      const minute=((totalMinutes%1440)+1440)%1440;
+      const date=parseLocalDate(addDays(dateValue,dayOffset));
+      date.setHours(Math.floor(minute/60),minute%60,0,0);
+      return date;
+    }
+
+    function scheduleTargetUrl(dateValue,taskId='') {
+      const url=new URL('./',location.href);
+      url.searchParams.set('date',dateValue);
+      if (taskId) url.searchParams.set('task',taskId);
+      url.hash='today';
+      return url.href;
+    }
+
+    function taskDurationMinutes(task,planDay) {
+      if (task.id==='planned-session') return Math.max(10,Number(planDay.duration)||30);
+      if (task.id==='session-warmup') return 15;
+      if (task.id==='post-session') return 10;
+      const match=String(task.amount||'').match(/(\d+)(?:[–-](\d+))?\s*min/i);
+      if (match) return clamp(Number(match[2]||match[1]),5,240);
+      if (task.category==='supplement'||task.category==='nutrition') return 5;
+      return 15;
+    }
+
+    function taskScheduleEvent(dateValue,task) {
+      const planDay=getPlanDay(dateValue);
+      const sortMinute=Number.isFinite(Number(task.sortMinute))?Number(task.sortMinute):timeMinutes(task.time);
+      const start=dateAtMinutes(dateValue,sortMinute);
+      const end=new Date(start.getTime()+taskDurationMinutes(task,planDay)*60000);
+      const target=scheduleTargetUrl(dateValue,task.id);
+      const details=[task.detail||'',task.amount?`Target: ${task.amount}`:'',task.route==='oral'?'Route: oral':''].filter(Boolean).join('\n');
+      return {key:`${dateValue}::${task.id}`,sourceId:task.id,date:dateValue,title:task.title,category:task.category||'custom',details,start,end,allDay:false,transparent:task.id!=='planned-session',target};
+    }
+
+    function dayOverviewEvent(dateValue) {
+      const planDay=getPlanDay(dateValue);
+      const route=tasksForDate(dateValue).map(task=>`${formatTaskTime(task)} — ${task.title}${task.amount?` (${task.amount})`:''}`).join('\n');
+      return {key:`${dateValue}::day-overview`,sourceId:'day-overview',date:dateValue,title:`Crux day · ${planDay.title}`,category:'plan',details:[`${combinedDayLabel(planDay)} · ${planDay.focus||''}`,route].filter(Boolean).join('\n\n'),allDay:true,startDate:dateValue,endDate:addDays(dateValue,1),transparent:true,target:scheduleTargetUrl(dateValue)};
+    }
+
+    function eventsForSchedule(scope,dateValue,taskId='') {
+      const tasks=tasksForDate(dateValue);
+      if (scope==='day') return [dayOverviewEvent(dateValue)];
+      if (scope==='main') {
+        const task=tasks.find(item=>item.id==='planned-session');
+        return task?[taskScheduleEvent(dateValue,task)]:[];
+      }
+      if (scope==='item') {
+        const task=tasks.find(item=>item.id===taskId);
+        return task?[taskScheduleEvent(dateValue,task)]:[];
+      }
+      if (scope==='all') return tasks.map(task=>taskScheduleEvent(dateValue,task));
+      return [];
+    }
+
+    function selectedScheduleEvents() {
+      const form=$('#schedule-form');
+      return eventsForSchedule(form.elements.scope.value,form.elements.date.value,form.elements.taskId.value);
+    }
+
+    function matchingReminderStats(events) {
+      const ids=new Set(events.map(event=>event.key));
+      const matching=state.reminders.filter(reminder=>ids.has(reminder.id));
+      return {total:matching.length,pending:matching.filter(reminder=>!reminder.notifiedAt&&Date.parse(reminder.expiresAt)>Date.now()).length};
+    }
+
+    function hasPendingReminder(dateValue,taskId) {
+      return state.reminders.some(reminder=>reminder.id===`${dateValue}::${taskId}`&&!reminder.notifiedAt&&Date.parse(reminder.expiresAt)>Date.now());
+    }
+
+    function openScheduleDialog(taskId='') {
+      const form=$('#schedule-form');
+      const dateValue=state.selectedDate;
+      const task=taskId?tasksForDate(dateValue).find(item=>item.id===taskId):null;
+      form.elements.date.value=dateValue;
+      form.elements.taskId.value=task?.id||'';
+      form.elements.scope.innerHTML=`${task?'<option value="item">This item only</option>':''}<option value="day">Day overview · one event</option><option value="main">Main session only</option><option value="all">Everything · separate events</option>`;
+      form.elements.scope.value=task?'item':'day';
+      form.elements.leadMinutes.value=String(state.settings.reminderLeadMinutes??10);
+      form.elements.dayTime.value=state.settings.dayReminderTime||'08:00';
+      updateScheduleDialog();
+      $('#schedule-dialog').showModal();
+    }
+
+    function updateScheduleDialog() {
+      const form=$('#schedule-form');
+      const scope=form.elements.scope.value;
+      const events=selectedScheduleEvents();
+      const copy={
+        item:['This item',events[0]?`${formatDate(events[0].date)} · ${events[0].title}`:'The item is no longer on this day.'],
+        day:['Day overview',`One non-blocking calendar event listing the full route for ${formatDate(form.elements.date.value)}.`],
+        main:['Main session',events[0]?`${events[0].title} as one timed event.`:'No main session is available.'],
+        all:['Everything separately',`${events.length} route items will be added as separate calendar events or app alerts.`]
+      }[scope]||['Schedule',''];
+      $('#schedule-selection-title').textContent=copy[0];
+      $('#schedule-selection-copy').textContent=copy[1];
+      $('#schedule-day-time-field').style.display=scope==='day'?'grid':'none';
+      $('#schedule-lead-field').style.display=scope==='day'?'none':'grid';
+      const google=$('[data-action="google-calendar"]',$('#schedule-dialog'));
+      google.disabled=events.length!==1;
+      google.title=events.length===1?'Open this event in Google Calendar':'Google mobile cannot directly import multiple events; share the calendar file to Apple Calendar/Files or import it with Google Calendar on desktop';
+      const reminderStats=matchingReminderStats(events);
+      const permission='Notification' in window?Notification.permission:'unsupported';
+      $('#schedule-status').innerHTML=`<strong>${reminderStats.pending?`${reminderStats.pending} pending app alert${reminderStats.pending===1?'':'s'} saved`:reminderStats.total?'The saved alert already fired or expired':'No app alerts saved for this selection'}</strong><br>Notification permission: ${esc(permission)}. Calendar files carry the reminder chosen above. Google drafts use your Google defaults; import multi-event files to Google Calendar on desktop.`;
+      $('[data-action="clear-app-alerts"]',$('#schedule-dialog')).disabled=reminderStats.total===0;
+      $('[data-action="save-app-alerts"]',$('#schedule-dialog')).disabled=events.length===0;
+      $('[data-action="save-app-alerts"]',$('#schedule-dialog')).lastChild.textContent=` Save ${events.length===1?'app alert':`${events.length} app alerts`}`;
+    }
+
+    function icsEscape(value) { return String(value??'').replaceAll('\\','\\\\').replace(/\r\n|\r|\n/g,'\\n').replaceAll(',','\\,').replaceAll(';','\\;'); }
+    function icsUtc(date) { return new Date(date).toISOString().replace(/[-:]/g,'').replace(/\.\d{3}Z$/,'Z'); }
+    function icsDate(value) { return value.replaceAll('-',''); }
+    function foldIcsLine(line) {
+      const encoder=new TextEncoder();
+      const parts=[];
+      let current='';
+      let bytes=0;
+      for (const character of line) {
+        const size=encoder.encode(character).length;
+        if (bytes+size>75&&current) { parts.push(current); current=` ${character}`; bytes=1+size; }
+        else { current+=character; bytes+=size; }
+      }
+      if (current) parts.push(current);
+      return parts.join('\r\n');
+    }
+
+    function buildCalendarFile(events,leadMinutes,dayTime) {
+      const lines=['BEGIN:VCALENDAR','VERSION:2.0','PRODID:-//Crux Routine//Training Planner//EN','CALSCALE:GREGORIAN','METHOD:PUBLISH'];
+      for (const event of events) {
+        const eventId=event.key.replace(/[^a-zA-Z0-9._-]/g,'-');
+        const installationId=state.meta.installationId.replace(/[^a-zA-Z0-9._-]/g,'-');
+        lines.push('BEGIN:VEVENT',`UID:${eventId}-${installationId}@kburavskij.github.io`,`DTSTAMP:${icsUtc(new Date())}`);
+        if (event.allDay) lines.push(`DTSTART;VALUE=DATE:${icsDate(event.startDate)}`,`DTEND;VALUE=DATE:${icsDate(event.endDate)}`);
+        else lines.push(`DTSTART:${icsUtc(event.start)}`,`DTEND:${icsUtc(event.end)}`);
+        lines.push(`SUMMARY:${icsEscape(event.title)}`,`DESCRIPTION:${icsEscape(`${event.details}\n\nOpen in Crux Routine: ${event.target}`)}`,`URL:${event.target}`,`TRANSP:${event.transparent?'TRANSPARENT':'OPAQUE'}`);
+        lines.push('BEGIN:VALARM','ACTION:DISPLAY');
+        if (event.allDay) {
+          const trigger=dateAtMinutes(event.date,timeMinutes(dayTime||'08:00'));
+          lines.push(`TRIGGER;VALUE=DATE-TIME:${icsUtc(trigger)}`);
+        } else lines.push(`TRIGGER:${Number(leadMinutes)>0?`-PT${Number(leadMinutes)}M`:'PT0M'}`);
+        lines.push(`DESCRIPTION:${icsEscape(event.title)}`,'END:VALARM','END:VEVENT');
+      }
+      lines.push('END:VCALENDAR');
+      return lines.map(foldIcsLine).join('\r\n')+'\r\n';
+    }
+
+    async function shareScheduleCalendar() {
+      const form=$('#schedule-form');
+      const events=selectedScheduleEvents();
+      if (!events.length) { toast('Nothing is available to add.',true); return; }
+      rememberSchedulePreferences();
+      const content=buildCalendarFile(events,form.elements.leadMinutes.value,form.elements.dayTime.value);
+      const name=`crux-${form.elements.date.value}-${form.elements.scope.value}.ics`;
+      try {
+        const file=new File([content],name,{type:'text/calendar;charset=utf-8'});
+        if (navigator.share&&navigator.canShare?.({files:[file]})) {
+          await navigator.share({title:'Crux Routine calendar',files:[file]});
+          toast('Calendar file shared.');
+          return;
+        }
+      } catch (error) {
+        if (error?.name==='AbortError') return;
+      }
+      downloadFile(name,content,'text/calendar;charset=utf-8');
+      toast('Calendar file downloaded. Open it to add the event(s).');
+    }
+
+    function googleCalendarUrl(event) {
+      const url=new URL('https://calendar.google.com/calendar/render');
+      url.searchParams.set('action','TEMPLATE');
+      url.searchParams.set('text',event.title);
+      url.searchParams.set('dates',event.allDay?`${icsDate(event.startDate)}/${icsDate(event.endDate)}`:`${icsUtc(event.start)}/${icsUtc(event.end)}`);
+      url.searchParams.set('details',`${event.details.slice(0,1800)}\n\nOpen in Crux Routine: ${event.target}`);
+      return url.href;
+    }
+
+    function openGoogleCalendar() {
+      const events=selectedScheduleEvents();
+      if (events.length!==1) { toast('For multiple events, import the calendar file with Google Calendar on desktop or add it through Apple Calendar/Files on iPhone.',true); return; }
+      window.open(googleCalendarUrl(events[0]),'_blank','noopener');
+      toast('Google Calendar draft opened. It uses your Google reminder defaults.');
+    }
+
+    function rememberSchedulePreferences() {
+      const form=$('#schedule-form');
+      state.settings.reminderLeadMinutes=Number(form.elements.leadMinutes.value)||0;
+      state.settings.dayReminderTime=form.elements.dayTime.value||'08:00';
+      saveState();
+    }
+
+    async function ensureNotificationPermission() {
+      const isIos=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+      const standalone=matchMedia('(display-mode: standalone)').matches||navigator.standalone===true;
+      if (isIos&&!standalone) { toast('On iPhone, add Crux to the Home Screen and open that installed app before enabling alerts.',true); return false; }
+      if (!('Notification' in window)||!('serviceWorker' in navigator)) { toast('App alerts are not available here. On iPhone, install Crux to the Home Screen and use calendar alerts.',true); return false; }
+      if (Notification.permission==='granted') return true;
+      if (Notification.permission==='denied') { toast('Notifications are blocked in system/browser settings. Calendar alerts still work.',true); return false; }
+      const permission=await Notification.requestPermission();
+      if (permission!=='granted') { toast('Notification permission was not granted. Calendar alerts still work.',true); return false; }
+      return true;
+    }
+
+    function reminderBody(event,alertBase,now=Date.now()) {
+      if (event.allDay) return 'Open today’s complete Crux route.';
+      const subject=event.sourceId==='planned-session'?'Your session':'This item';
+      const difference=alertBase.getTime()-now;
+      if (difference>60000) return `${subject} starts in ${Math.ceil(difference/60000)} minutes.`;
+      if (difference>0) return `${subject} starts in under a minute.`;
+      const elapsed=Math.floor(Math.abs(difference)/60000);
+      if (elapsed<1) return `${subject} has just begun.`;
+      return `${subject} began ${elapsed} minute${elapsed===1?'':'s'} ago.`;
+    }
+
+    function reminderForEvent(event,leadMinutes,dayTime,now=Date.now()) {
+      const alertBase=event.allDay?dateAtMinutes(event.date,timeMinutes(dayTime||'08:00')):new Date(event.start);
+      const trigger=new Date(alertBase.getTime()-(event.allDay?0:Number(leadMinutes)||0)*60000);
+      const expires=new Date(alertBase.getTime()+(event.allDay?12*60:20)*60000);
+      const lead=Number(leadMinutes)||0;
+      const body=reminderBody(event,alertBase,now);
+      return {id:event.key,date:event.date,sourceId:event.sourceId,title:event.title,body,triggerAt:trigger.toISOString(),expiresAt:expires.toISOString(),target:event.target,leadMinutes:lead,dayTime:dayTime||'08:00',notifiedAt:''};
+    }
+
+    async function saveScheduleAlerts() {
+      if (!await ensureNotificationPermission()) { updateScheduleDialog(); return; }
+      const form=$('#schedule-form');
+      const events=selectedScheduleEvents();
+      const lead=Number(form.elements.leadMinutes.value)||0;
+      const dayTime=form.elements.dayTime.value||'08:00';
+      state.settings.reminderLeadMinutes=lead;
+      state.settings.dayReminderTime=dayTime;
+      const records=events.map(event=>reminderForEvent(event,lead,dayTime)).filter(reminder=>Date.parse(reminder.expiresAt)>Date.now());
+      if (!records.length) { toast('Those alert times have already passed. Choose a future day or item.',true); return; }
+      const ids=new Set(records.map(record=>record.id));
+      state.reminders=state.reminders.filter(reminder=>!ids.has(reminder.id));
+      state.reminders.push(...records);
+      saveState(`${records.length} app alert${records.length===1?'':'s'} saved.`);
+      updateScheduleDialog();
+      renderToday();
+      processDueReminders();
+    }
+
+    function clearScheduleAlerts() {
+      const events=selectedScheduleEvents();
+      const ids=new Set(events.map(event=>event.key));
+      const before=state.reminders.length;
+      state.reminders=state.reminders.filter(reminder=>!ids.has(reminder.id));
+      if (state.reminders.length===before) return;
+      saveState('Saved app alerts cleared.');
+      updateScheduleDialog();
+      renderToday();
+    }
+
+    async function processDueReminders() {
+      if (processingReminders||!('Notification' in window)||Notification.permission!=='granted'||!('serviceWorker' in navigator)) return;
+      processingReminders=true;
+      let changed=false;
+      try {
+        const now=Date.now();
+        const registration=await navigator.serviceWorker.ready;
+        for (const reminder of state.reminders) {
+          if (!reminder.notifiedAt) {
+            const currentEvent=reminder.sourceId==='day-overview'?dayOverviewEvent(reminder.date):eventsForSchedule('item',reminder.date,reminder.sourceId)[0];
+            if (currentEvent) Object.assign(reminder,reminderForEvent(currentEvent,reminder.leadMinutes,reminder.dayTime));
+            else { reminder.notifiedAt='expired'; changed=true; continue; }
+          }
+          if (reminder.notifiedAt||Date.parse(reminder.triggerAt)>now) continue;
+          if (Date.parse(reminder.expiresAt)<now) { reminder.notifiedAt='expired'; changed=true; continue; }
+          await registration.showNotification(reminder.title,{body:reminder.body,tag:reminder.id,icon:'./icons/icon-192.png',badge:'./icons/icon-192.png',data:{target:reminder.target}});
+          reminder.notifiedAt=new Date().toISOString();
+          changed=true;
+          if (document.visibilityState==='visible') toast(`${reminder.title} · alert sent.`);
+        }
+        if (changed) saveState();
+      } catch (error) { console.warn('Could not show app alert:',error); }
+      finally { processingReminders=false; }
+    }
+
+    function focusLaunchTarget() {
+      if (!pendingLaunchTask) return;
+      const taskId=pendingLaunchTask;
+      pendingLaunchTask='';
+      requestAnimationFrame(()=>{
+        const element=document.querySelector(`[data-task-id="${CSS.escape(taskId)}"]`);
+        if (!element) { toast('That scheduled item is no longer on this day.',true); return; }
+        element.classList.add('launch-target');
+        element.tabIndex=-1;
+        element.scrollIntoView({behavior:'smooth',block:'center'});
+        element.focus({preventScroll:true});
+        setTimeout(()=>element.classList.remove('launch-target'),3500);
+      });
+    }
+
+    function openScheduleTarget(target,initial=false) {
+      try {
+        const url=new URL(target,location.href);
+        const dateValue=url.searchParams.get('date');
+        const taskId=url.searchParams.get('task')||'';
+        if (dateValue&&validLocalDate(dateValue)) state.selectedDate=dateValue;
+        pendingLaunchTask=taskId;
+        state.currentView='today';
+        if (initial) history.replaceState(null,'',`${location.pathname}#today`);
+        if (!initial) setView('today');
+      } catch (_) {}
+    }
+
     function downloadFile(name,text,type) {
       const blob=new Blob([text],{type}); const url=URL.createObjectURL(blob); const a=document.createElement('a');
       a.href=url; a.download=name; document.body.append(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),1000);
@@ -1742,7 +2232,7 @@
     function exportCSV() {
       const rows=[['date','type','title','category','status','actual','planned_target','completed_at']];
       Object.values(state.completions).sort((a,b)=>a.date.localeCompare(b.date)).forEach(c=>rows.push([c.date,'routine',c.title,c.category,c.status,c.actual,c.plannedTarget,c.completedAt]));
-      state.sessions.forEach(s=>rows.push([localDate(s.startedAt),'timer session',s.title,'training',s.status,humanDuration(s.durationSec||Math.round((new Date(s.endedAt||Date.now())-new Date(s.startedAt))/1000)),'',s.endedAt]));
+      state.sessions.forEach(s=>rows.push([localDate(s.startedAt),'timer session',s.title,'training',s.status,humanDuration(sessionDurationSec(s)),'',s.endedAt]));
       Object.entries(state.daily).forEach(([date,item])=>rows.push([date,'readiness','Daily readiness','recovery','logged',`Energy ${item.energy}/5; soreness ${item.soreness}/5; sleep ${item.sleep}/5; ${item.note||''}`,'',`${date}T23:59:00`]));
       downloadFile(`crux-history-${localDate()}.csv`,rows.map(r=>r.map(csvCell).join(',')).join('\n'),'text/csv'); toast('CSV downloaded.');
     }
@@ -1756,6 +2246,12 @@
       const control = event.target.closest('[data-action]');
       if (!control) return;
       const action = control.dataset.action;
+      if (action === 'open-day-schedule') openScheduleDialog();
+      if (action === 'open-task-schedule') openScheduleDialog(control.dataset.id);
+      if (action === 'share-calendar') void shareScheduleCalendar();
+      if (action === 'google-calendar') openGoogleCalendar();
+      if (action === 'save-app-alerts') void saveScheduleAlerts().catch(error=>{console.warn('Could not save app alerts:',error);toast('Could not save app alerts. Calendar export still works.',true);});
+      if (action === 'clear-app-alerts') clearScheduleAlerts();
       if (action === 'date-prev') { state.selectedDate=addDays(state.selectedDate,-1); saveState(); renderToday(); }
       if (action === 'date-next') { state.selectedDate=addDays(state.selectedDate,1); saveState(); renderToday(); }
       if (action === 'date-today') { state.selectedDate=localDate(); saveState(); renderToday(); }
@@ -1770,6 +2266,8 @@
       if (action === 'add-exercise') openExercise();
       if (action === 'edit-exercise') openExercise(control.dataset.id);
       if (action === 'delete-exercise') deleteExercise(control.dataset.id);
+      if (action === 'delete-session') requestDeleteSession(control.dataset.id);
+      if (action === 'show-more-sessions') { historySessionLimit+=20; renderHistory(); }
       if (action === 'library-add-timer') {
         if (!state.builderQueue.includes(control.dataset.id)) state.builderQueue.push(control.dataset.id);
         saveState('Added to timer queue.'); setView('timer');
@@ -1815,9 +2313,26 @@
       if (!control) return;
       const action=control.dataset.action;
       if (action === 'change-day-type') {
+        const current=getPlanDay(state.selectedDate);
+        const next=defaultForDayType(control.value);
+        const compatible=current.secondaryType&&current.secondaryType!==next.type&&next.type!=='rest'?current.secondaryType:'';
+        next.secondaryType=compatible;
+        if (compatible) next.title=`${combinedDayLabel(next)} session`;
         clearSessionChecks(state.selectedDate);
-        state.overrides[state.selectedDate]=defaultForDayType(control.value);
+        state.overrides[state.selectedDate]=next;
         saveState('Day type changed; session checks were cleared.'); renderToday();
+      }
+      if (action === 'change-day-secondary') {
+        const current=getPlanDay(state.selectedDate);
+        const oldSecondary=current.secondaryType||'';
+        const secondary=control.value!==current.type&&current.type!=='rest'&&SECONDARY_ACTIVITY_TYPES.includes(control.value)?control.value:'';
+        const next={type:current.type,secondaryType:secondary,title:current.title,time:current.time||'18:00',duration:Number(current.duration||0),focus:current.focus||''};
+        const primaryDefault=defaultForDayType(current.type);
+        const oldAutoTitle=oldSecondary?`${activityTypeLabel(current.type)} + ${activityTypeLabel(oldSecondary)} session`:primaryDefault.title;
+        if (current.title===primaryDefault.title||current.title===oldAutoTitle||current.title==='Strength + prehab') next.title=secondary?`${combinedDayLabel(next)} session`:primaryDefault.title;
+        clearSessionChecks(state.selectedDate);
+        state.overrides[state.selectedDate]=next;
+        saveState(secondary?'Second activity added; session checks were cleared.':'Second activity removed; session checks were cleared.'); renderToday();
       }
       if (action === 'toggle-routine') {
         const routine=state.routines.find(r=>r.id===control.dataset.id);
@@ -1899,6 +2414,12 @@
       saveState(index>=0?'Routine updated.':'Routine added.'); $('#routine-dialog').close(); renderView();
     });
 
+    $('#plan-type').addEventListener('change',()=>syncPlanTypeFields(true));
+    $('#plan-secondary-type').addEventListener('change',()=>syncPlanTypeFields(true));
+    $('#schedule-scope').addEventListener('change',updateScheduleDialog);
+    $('#schedule-lead').addEventListener('change',()=>{rememberSchedulePreferences();updateScheduleDialog();});
+    $('#schedule-day-time').addEventListener('change',()=>{rememberSchedulePreferences();updateScheduleDialog();});
+
     $('#plan-form').addEventListener('submit', event => {
       event.preventDefault();
       if (event.submitter?.value === 'cancel') { $('#plan-dialog').close(); return; }
@@ -1908,8 +2429,9 @@
       const today=localDate();
       const todayIndex=(parseLocalDate(today).getDay()+6)%7;
       const oldDay=state.plan[data.week][Number(data.dayIndex)];
-      const newDay={title:data.title.trim(),type:data.type,time:data.time||'18:00',duration:Number(data.duration||0),focus:data.focus.trim()};
-      const changed=oldDay.title!==newDay.title||oldDay.type!==newDay.type||(oldDay.time||'18:00')!==newDay.time||Number(oldDay.duration||0)!==newDay.duration||oldDay.focus!==newDay.focus;
+      const secondaryType=data.type==='rest'||data.secondaryType===data.type?'':data.secondaryType;
+      const newDay={title:data.title.trim(),type:data.type,secondaryType,time:data.time||'18:00',duration:Number(data.duration||0),focus:data.focus.trim()};
+      const changed=oldDay.title!==newDay.title||oldDay.type!==newDay.type||(oldDay.secondaryType||'')!==newDay.secondaryType||(oldDay.time||'18:00')!==newDay.time||Number(oldDay.duration||0)!==newDay.duration||oldDay.focus!==newDay.focus;
       const affectsToday=changed&&data.week===getWeekVariant(today)&&Number(data.dayIndex)===todayIndex&&!state.overrides[today];
       state.plan[data.week][Number(data.dayIndex)]=newDay;
       if (affectsToday) clearSessionChecks(today);
@@ -1960,6 +2482,7 @@
       if (document.visibilityState==='visible') {
         checkDateRollover();
         if (state.activeTimer&&!state.activeTimer.paused) { syncExpiredTimer(); requestWakeLock(); updateTimerDisplay(); }
+        void processDueReminders();
       }
       if (document.visibilityState==='hidden'&&noteSaveTimer) { clearTimeout(noteSaveTimer); noteSaveTimer=null; saveState(); }
     });
@@ -1969,14 +2492,22 @@
     applyTheme();
     syncExpiredTimer();
     if (state.activeTimer&&!state.activeTimer.paused) requestWakeLock();
-    setView(location.hash.slice(1)||state.currentView||'today',false);
+    const initialLaunch=new URL(location.href);
+    const hasScheduleTarget=initialLaunch.searchParams.has('date')||initialLaunch.searchParams.has('task');
+    if (hasScheduleTarget) openScheduleTarget(initialLaunch.href,true);
+    setView(hasScheduleTarget?'today':location.hash.slice(1)||state.currentView||'today',false);
     startTimerLoop();
     setInterval(checkDateRollover,60000);
+    reminderInterval=setInterval(()=>void processDueReminders(),30000);
 
     if ('serviceWorker' in navigator) {
       window.addEventListener('load',()=>{
         navigator.serviceWorker.register('./service-worker.js')
+          .then(()=>processDueReminders())
           .catch(error=>console.warn('Offline setup failed:',error));
+      });
+      navigator.serviceWorker.addEventListener('message',event=>{
+        if (event.data?.type==='OPEN_SCHEDULE_TARGET'&&event.data.target) openScheduleTarget(event.data.target);
       });
     }
   </script>
