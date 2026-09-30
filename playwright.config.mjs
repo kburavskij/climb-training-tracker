@@ -1,5 +1,7 @@
 import { defineConfig } from '@playwright/test';
 
+const browserName = process.env.PW_BROWSER || 'chromium';
+
 export default defineConfig({
   testDir: './tests',
   testMatch: '**/*.spec.mjs',
@@ -13,8 +15,8 @@ export default defineConfig({
     : [['list'], ['html', { outputFolder: 'playwright-report', open: 'never' }]],
   use: {
     baseURL: 'http://127.0.0.1:4173',
-    browserName: 'chromium',
-    channel: 'chrome',
+    browserName,
+    ...(browserName === 'chromium' ? { channel: 'chrome' } : {}),
     locale: 'en-US',
     timezoneId: 'Europe/Vilnius',
     colorScheme: 'light',

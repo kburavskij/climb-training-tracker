@@ -25,6 +25,8 @@ test('service worker caches the app shell and reloads it offline', async ({ page
     ]);
     const appleIcon = document.querySelector('link[rel="apple-touch-icon"]');
     if (appleIcon) urls.add(appleIcon.href);
+    const favicon = document.querySelector('link[rel~="icon"]');
+    if (favicon) urls.add(favicon.href);
     return [...urls];
   });
 

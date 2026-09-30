@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-title" content="Crux Routine">
   <link rel="manifest" href="./manifest.webmanifest">
   <link rel="apple-touch-icon" sizes="180x180" href="./icons/apple-touch-icon.png">
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='18' fill='%23cde86a'/%3E%3Cpath d='M43 22a17 17 0 1 0 0 20l-7-6a8 8 0 1 1 0-8z' fill='%2318382f'/%3E%3C/svg%3E">
+  <link rel="icon" type="image/png" sizes="192x192" href="./icons/icon-192.png">
   <title>Crux Routine</title>
   <style>
     :root {
@@ -686,6 +686,31 @@
       }
       dialog[open] { display: flex; flex-direction: column; animation: sheet-in .2s ease-out; }
       dialog > form { display: flex; min-height: 0; max-height: inherit; flex: 1; flex-direction: column; }
+      /*
+       * WebKit can collapse a modal whose only child is a flexible form when
+       * the dialog has a max-height but no definite height. The backdrop then
+       * opens correctly while the sheet itself is effectively off-screen.
+       * Give Settings a definite mobile sheet and use grid rows so its header
+       * and actions stay visible while only the body scrolls.
+       */
+      #settings-dialog {
+        position: fixed;
+        inset: auto 0 0;
+        width: 100%;
+        height: min(88vh, 760px);
+        height: min(88dvh, 760px);
+        max-height: calc(100vh - env(safe-area-inset-top));
+        max-height: calc(100dvh - env(safe-area-inset-top));
+        margin: 0;
+      }
+      #settings-dialog[open] { display: block; }
+      #settings-dialog > form {
+        display: grid;
+        grid-template-rows: auto minmax(0, 1fr) auto;
+        width: 100%;
+        height: 100%;
+        max-height: none;
+      }
       .dialog-head { flex: 0 0 auto; padding: 16px 17px 14px; }
       .dialog-head h2 { font-size: 21px; }
       .dialog-body { min-height: 0; max-height: none; flex: 1 1 auto; padding: 17px; }
@@ -842,7 +867,7 @@
           <div class="field full"><label class="check-line"><input type="checkbox" name="sound"> Sound at timer phase changes</label><label class="check-line"><input type="checkbox" name="vibration"> Vibration when supported</label></div>
           <section class="update-panel" aria-labelledby="update-panel-title">
             <strong id="update-panel-title">App update</strong>
-            <p id="pwa-update-status" role="status" aria-live="polite">Version 4.1 · checking when online…</p>
+            <p id="pwa-update-status" role="status" aria-live="polite">Version 4.2 · checking when online…</p>
             <div class="update-actions"><button class="btn secondary small" type="button" data-action="check-update">Check for updates</button><button class="btn small" type="button" data-action="apply-update" hidden>Update & reload</button></div>
           </section>
         </div>
@@ -974,7 +999,7 @@
 
     const STORAGE_KEY = 'crux-routine-v1';
     const SCHEMA_VERSION = 3;
-    const APP_VERSION = '4.1';
+    const APP_VERSION = '4.2';
     const DEMO_PREP_MS = 7000;
     const CATALOG_PAGE_SIZE = 24;
     const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];

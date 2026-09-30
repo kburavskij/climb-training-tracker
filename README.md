@@ -28,7 +28,7 @@ App-shell paths are relative, so the app works both on an account site and at `h
 2. Tap **Share → Add to Home Screen**.
 3. Ensure **Open as Web App** is enabled, then tap **Add**.
 
-Open the installed app online once so its offline shell is cached. If an old icon remains after an update, remove the Home Screen app and add it again; iOS caches icons aggressively.
+Open the installed app online once so its offline shell is cached. iOS caches Home Screen icons aggressively; if the old icon remains, export a JSON backup before removing and re-adding the Home Screen app.
 
 ## Offline updates
 

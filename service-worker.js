@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'crux-routine-';
-const WORKER_VERSION = 'v5';
+const WORKER_VERSION = 'v6';
 const CACHE_NAME = `${CACHE_PREFIX}${WORKER_VERSION}`;
 const MEDIA_CACHE_PREFIX = 'crux-exercise-media-';
 const DATASET_COMMIT = '7455efae41b330c265e7cd4b78dfa848e7ce5ebd';
@@ -18,6 +18,7 @@ const APP_SHELL = [
   new URL('exercise-catalog.json', ROOT_URL).href,
   new URL('icons/icon-192.png', ROOT_URL).href,
   new URL('icons/icon-512.png', ROOT_URL).href,
+  new URL('icons/icon-maskable-512.png', ROOT_URL).href,
   new URL('icons/apple-touch-icon.png', ROOT_URL).href
 ];
 const SHELL_URLS = new Set(APP_SHELL);

@@ -33,6 +33,25 @@ assert.equal(typeof manifest.start_url, 'string', 'manifest start_url is require
 assert.equal(typeof manifest.scope, 'string', 'manifest scope is required');
 assert.ok(['standalone', 'fullscreen', 'minimal-ui'].includes(manifest.display), 'manifest should be installable');
 assert.ok(Array.isArray(manifest.icons) && manifest.icons.length >= 2, 'manifest should provide app icons');
+assert.deepEqual(
+  manifest.icons.map(({ src, sizes, type, purpose }) => ({ src, sizes, type, purpose })),
+  [
+    { src: './icons/icon-192.png', sizes: '192x192', type: 'image/png', purpose: 'any' },
+    { src: './icons/icon-512.png', sizes: '512x512', type: 'image/png', purpose: 'any' },
+    { src: './icons/icon-maskable-512.png', sizes: '512x512', type: 'image/png', purpose: 'maskable' }
+  ],
+  'manifest should expose the supplied artwork at install and maskable sizes'
+);
+
+const linkTags = [...html.matchAll(/<link\b[^>]*>/gi)].map(match => match[0]);
+const linkAttribute = (tag, name) => tag.match(new RegExp(`\\b${name}\\s*=\\s*["']([^"']+)["']`, 'i'))?.[1];
+const findLink = relation => linkTags.find(tag => (linkAttribute(tag, 'rel') || '').split(/\s+/).includes(relation));
+const appleTouchIcon = findLink('apple-touch-icon');
+const favicon = findLink('icon');
+assert.equal(linkAttribute(appleTouchIcon || '', 'href'), './icons/apple-touch-icon.png', 'iPhone home-screen icon should use the supplied artwork');
+assert.equal(linkAttribute(appleTouchIcon || '', 'sizes'), '180x180', 'iPhone home-screen icon should declare 180x180');
+assert.equal(linkAttribute(favicon || '', 'href'), './icons/icon-192.png', 'browser icon should use the supplied artwork');
+assert.equal(linkAttribute(favicon || '', 'sizes'), '192x192', 'browser icon should declare its exact size');
 
 assert.equal(catalog.source?.repository, 'https://github.com/hasaneyldrm/exercises-dataset');
 assert.match(catalog.source?.commit || '', /^[a-f\d]{40}$/i, 'catalog source commit must be pinned');
@@ -64,6 +83,9 @@ assert.doesNotMatch(html, /demo-(?:play-badge|motion-toggle)/, 'removed exercise
 assert.doesNotMatch(html, /<symbol\b[^>]*\bid=["']i-(?:play|pause)["']/i, 'removed exercise playback icons must not return');
 assert.match(workerSource, /exercise-catalog\.json/, 'offline shell should include the local exercise catalog');
 assert.doesNotMatch(workerSource, /demos\/(?:workout-guide|quaternius)\//, 'obsolete generated demos should not be precached');
+for (const iconPath of ['icons/icon-192.png', 'icons/icon-512.png', 'icons/icon-maskable-512.png', 'icons/apple-touch-icon.png']) {
+  assert.ok(workerSource.includes(iconPath), `offline shell should include ${iconPath}`);
+}
 
 const staticHtml = html.replace(/<script\b[^>]*>[\s\S]*?<\/script>/gi, '');
 
@@ -133,6 +155,14 @@ for (const icon of manifest.icons) {
       `manifest size does not match ${localPath}`
     );
   }
+}
+
+for (const [localPath, expected] of [
+  ['icons/apple-touch-icon.png', { width: 180, height: 180 }],
+  ['icons/icon-192.png', { width: 192, height: 192 }]
+]) {
+  const dimensions = pngDimensions(await readFile(path.join(root, localPath)));
+  assert.deepEqual(dimensions, expected, `HTML icon size does not match ${localPath}`);
 }
 
 console.log(`Static audit passed: ${inlineScripts.length} inline script, ${localReferences.size} local references, ${catalog.exercises.length} catalog exercises.`);

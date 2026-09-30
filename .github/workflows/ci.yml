@@ -35,6 +35,12 @@ jobs:
       - name: Run static and browser checks
         run: npm test
 
+      - name: Install WebKit for the iPhone Settings regression
+        run: npx playwright install --with-deps webkit
+
+      - name: Run the mobile Settings smoke in WebKit
+        run: PW_BROWSER=webkit npx playwright test tests/app.spec.mjs --grep "mobile Settings"
+
       - name: Upload failure diagnostics
         if: failure()
         uses: actions/upload-artifact@v4

@@ -20,6 +20,71 @@ for (const viewport of [
     if (viewport.nestedTarget) await settingsButton.locator('use').click();
     else await settingsButton.click();
     await expect(dialog).toBeVisible();
+
+    if (viewport.name === 'mobile') {
+      const title = dialog.getByRole('heading', { name: 'Settings' });
+      const closeButton = dialog.getByRole('button', { name: 'Close' });
+      const saveButton = dialog.getByRole('button', { name: 'Save settings' });
+      await expect(title).toBeVisible();
+      await expect(closeButton).toBeVisible();
+      await expect(saveButton).toBeVisible();
+      await expect(title).toBeInViewport();
+      await expect(closeButton).toBeInViewport();
+      await expect(saveButton).toBeInViewport();
+
+      const surface = await dialog.evaluate(element => {
+        const rect = element.getBoundingClientRect();
+        const formRect = element.querySelector('form')?.getBoundingClientRect();
+        const bodyRect = element.querySelector('.dialog-body')?.getBoundingClientRect();
+        const footerRect = element.querySelector('.dialog-foot')?.getBoundingClientRect();
+        const style = getComputedStyle(element);
+        const viewport = window.visualViewport;
+        return {
+          rect: { left: rect.left, top: rect.top, right: rect.right, bottom: rect.bottom, width: rect.width, height: rect.height },
+          form: formRect && { width: formRect.width, height: formRect.height },
+          body: bodyRect && { width: bodyRect.width, height: bodyRect.height },
+          footer: footerRect && { top: footerRect.top, bottom: footerRect.bottom, width: footerRect.width, height: footerRect.height },
+          viewport: {
+            left: viewport?.offsetLeft || 0,
+            top: viewport?.offsetTop || 0,
+            width: viewport?.width || innerWidth,
+            height: viewport?.height || innerHeight
+          },
+          display: style.display,
+          visibility: style.visibility,
+          opacity: Number(style.opacity),
+          backgroundColor: style.backgroundColor
+        };
+      });
+
+      expect(surface.display).not.toBe('none');
+      expect(surface.visibility).toBe('visible');
+      expect(surface.opacity).toBeGreaterThan(0.99);
+      expect(surface.backgroundColor).not.toMatch(/^(?:transparent|rgba\([^)]*,\s*0\))$/);
+      expect(surface.rect.width).toBeGreaterThanOrEqual(320);
+      expect(surface.rect.height).toBeGreaterThanOrEqual(400);
+      expect(surface.form?.width).toBeGreaterThanOrEqual(300);
+      expect(surface.form?.height).toBeGreaterThanOrEqual(390);
+      expect(surface.body?.width).toBeGreaterThanOrEqual(300);
+      expect(surface.body?.height).toBeGreaterThan(100);
+      expect(surface.footer?.width).toBeGreaterThanOrEqual(300);
+      expect(surface.footer?.height).toBeGreaterThanOrEqual(44);
+      expect(surface.rect.left).toBeGreaterThanOrEqual(surface.viewport.left - 1);
+      expect(surface.rect.top).toBeGreaterThanOrEqual(surface.viewport.top - 1);
+      expect(surface.rect.right).toBeLessThanOrEqual(surface.viewport.left + surface.viewport.width + 1);
+      expect(surface.rect.bottom).toBeLessThanOrEqual(surface.viewport.top + surface.viewport.height + 1);
+      expect(surface.footer?.top).toBeGreaterThanOrEqual(surface.rect.top);
+      expect(surface.footer?.bottom).toBeLessThanOrEqual(surface.rect.bottom + 1);
+      const surfaceCenter = surface.rect.left + surface.rect.width / 2;
+      const viewportCenter = surface.viewport.left + surface.viewport.width / 2;
+      expect(Math.abs(surfaceCenter - viewportCenter)).toBeLessThanOrEqual(1);
+
+      await closeButton.click();
+      await expect(dialog).toBeHidden();
+      await settingsButton.click();
+      await expect(dialog).toBeVisible();
+    }
+
     await dialog.locator('[name="weight"]').fill('81.5');
     await dialog.locator('[name="theme"]').selectOption(changedTheme);
     await dialog.getByRole('button', { name: 'Cancel' }).click();
