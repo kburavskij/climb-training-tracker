@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'crux-routine-';
-const WORKER_VERSION = 'v7';
+const WORKER_VERSION = 'v8';
 const CACHE_NAME = `${CACHE_PREFIX}${WORKER_VERSION}`;
 const MEDIA_CACHE_PREFIX = 'crux-exercise-media-';
 const DATASET_COMMIT = '7455efae41b330c265e7cd4b78dfa848e7ce5ebd';
@@ -57,11 +57,11 @@ async function handleDatasetMediaRequest(request) {
 }
 
 self.addEventListener('install', event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(
-      APP_SHELL.map(url => new Request(url, {cache: 'reload'}))
-    ))
-  );
+  event.waitUntil((async () => {
+    const cache = await caches.open(CACHE_NAME);
+    await cache.addAll(APP_SHELL.map(url => new Request(url, {cache: 'reload'})));
+    await self.skipWaiting();
+  })());
 });
 
 self.addEventListener('activate', event => {
@@ -100,9 +100,25 @@ self.addEventListener('fetch', event => {
     const cache = await caches.open(CACHE_NAME);
 
     if (request.mode === 'navigate') {
-      const appShell = await cache.match(INDEX_URL);
+      let networkResponse = null;
+      try {
+        networkResponse = await fetch(new Request(request, {cache: 'no-store'}));
+        if (networkResponse.ok) {
+          try {
+            await Promise.all([
+              cache.put(INDEX_URL, networkResponse.clone()),
+              cache.put(ROOT_URL, networkResponse.clone())
+            ]);
+          } catch (error) {
+            console.warn('Could not refresh the offline app shell:', error);
+          }
+          return networkResponse;
+        }
+      } catch (_) {}
+
+      const appShell = await cache.match(INDEX_URL) || await cache.match(ROOT_URL);
       if (appShell) return appShell;
-      return fetch(request);
+      return networkResponse || Response.error();
     }
 
     const shellUrl = new URL(url.href);

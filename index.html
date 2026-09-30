@@ -803,7 +803,7 @@
   </svg>
 
   <div class="update-banner" id="update-banner" role="status" aria-live="polite" hidden>
-    <div><strong>App update ready</strong><small>Your current version stays available until you choose to reload.</small></div>
+    <div><strong>App update ready</strong><small>Installing automatically. Your saved data and timer will stay.</small></div>
     <button class="btn small" type="button" data-action="apply-update">Update</button>
   </div>
 
@@ -875,7 +875,7 @@
           <div class="field full"><label class="check-line"><input type="checkbox" name="sound"> Sound at timer phase changes</label><label class="check-line"><input type="checkbox" name="vibration"> Vibration when supported</label></div>
           <section class="update-panel" aria-labelledby="update-panel-title">
             <strong id="update-panel-title">App update</strong>
-            <p id="pwa-update-status" role="status" aria-live="polite">Version 4.3 · checking when online…</p>
+            <p id="pwa-update-status" role="status" aria-live="polite">Version 4.4 · checking when online…</p>
             <div class="update-actions"><button class="btn secondary small" type="button" data-action="check-update">Check for updates</button><button class="btn small" type="button" data-action="apply-update" hidden>Update & reload</button></div>
           </section>
         </div>
@@ -1007,7 +1007,7 @@
 
     const STORAGE_KEY = 'crux-routine-v1';
     const SCHEMA_VERSION = 3;
-    const APP_VERSION = '4.3';
+    const APP_VERSION = '4.4';
     const DEMO_PREP_MS = 7000;
     const CATALOG_PAGE_SIZE = 24;
     const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -1381,9 +1381,15 @@
     function showWaitingUpdate(worker) {
       waitingWorker=worker;
       $('#update-banner').hidden=false;
-      $('#update-banner small').textContent='Your current version stays available until you choose to reload.';
+      $('#update-banner small').textContent=navigator.onLine?'Installing automatically. Your saved data and timer will stay.':'Downloaded and ready. It will install when you reconnect, or you can update now.';
       $$('[data-action="apply-update"]').forEach(button=>{button.hidden=false;button.disabled=false;});
       setPwaUpdateStatus('update downloaded and ready');
+      if (navigator.onLine&&!updateActivationRequested) {
+        queueMicrotask(()=>{
+          const readyWorker=swRegistration?.waiting||waitingWorker;
+          if (readyWorker?.state==='installed'&&!updateActivationRequested) applyAppUpdate();
+        });
+      }
     }
 
     function watchInstallingWorker(worker) {
@@ -1450,6 +1456,7 @@
       setPwaUpdateStatus('activating update…');
       $('#update-banner small').textContent='Updating safely; your local data and active timer will stay.';
       $$('[data-action="apply-update"]').forEach(button=>button.disabled=true);
+      saveState();
       updateActivationRequested=true;
       clearTimeout(updateActivationTimer);
       updateActivationTimer=setTimeout(()=>{
@@ -3661,7 +3668,14 @@
         waitingWorker=null;
         $('#update-banner').hidden=true;
         $$('[data-action="apply-update"]').forEach(button=>{button.disabled=false;button.hidden=true;});
-        if (shouldReload&&!updateReloading) { updateReloading=true; location.reload(); }
+        if (shouldReload&&!updateReloading) {
+          updateReloading=true;
+          if (noteSaveTimer) { clearTimeout(noteSaveTimer); noteSaveTimer=null; }
+          syncExpiredTimer();
+          saveState();
+          setPwaUpdateStatus('update installed; reopening…');
+          location.reload();
+        }
         else setPwaUpdateStatus('offline app installed');
       });
       navigator.serviceWorker.addEventListener('message',event=>{

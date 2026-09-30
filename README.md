@@ -32,9 +32,9 @@ Open the installed app online once so its offline shell is cached. iOS caches Ho
 
 ## Offline updates
 
-Crux checks for a new service worker when it starts, returns to the foreground, comes online, or when **Settings → Check for updates** is pressed. A downloaded release waits behind an **Update & reload** button, so the current cached version keeps working until the user applies it. An already-downloaded update can be activated while offline; local data and an active timer stay in local storage.
+Crux checks for a new service worker when it starts, returns to the foreground, comes online, or when **Settings → Check for updates** is pressed. Online updates precache fully, activate automatically, save local state and reopen the current app on the new release. The button remains as a fallback for an already-downloaded update. Local data and an active timer stay in local storage.
 
-A failed install does not delete the previous working cache. Every release that changes the app shell or bundled assets must also change `WORKER_VERSION`/`CACHE_NAME` in `service-worker.js`; otherwise an installed cache-first copy will not discover the release.
+Online navigation refreshes the app shell; offline navigation falls back to the last successfully installed shell. A failed install does not delete the previous working cache. Every release that changes the app shell or bundled assets must also change `WORKER_VERSION`/`CACHE_NAME` in `service-worker.js`.
 
 ## Calendar and alerts
 

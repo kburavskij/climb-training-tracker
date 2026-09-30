@@ -25,6 +25,95 @@ inlineScripts.forEach((source, index) => {
 });
 new vm.Script(workerSource, { filename: 'service-worker.js' });
 
+const appVersion = html.match(/\bconst APP_VERSION = ['"]([^'"]+)['"]/)?.[1];
+const displayedAppVersion = html.match(/id=["']pwa-update-status["'][^>]*>Version ([\d.]+)/)?.[1];
+const workerVersion = workerSource.match(/\bconst WORKER_VERSION = ['"]([^'"]+)['"]/)?.[1];
+assert.equal(appVersion, '4.4', 'application release constant should be current');
+assert.equal(displayedAppVersion, appVersion, 'visible application version should match its release constant');
+assert.equal(workerVersion, 'v8', 'service-worker cache release should match app 4.4');
+assert.ok(workerSource.includes('const CACHE_NAME = `${CACHE_PREFIX}${WORKER_VERSION}`'), 'app-shell cache should derive from the worker release');
+
+function createWorkerHarness({ addAllError = null, cacheKeys = [] } = {}) {
+  const handlers = new Map();
+  const events = [];
+  const cache = {
+    async addAll(requests) {
+      events.push(`precache:${requests.length}`);
+      if (addAllError) throw addAllError;
+    },
+    async match() { return undefined; },
+    async put() {}
+  };
+  const sandbox = {
+    URL,
+    Request,
+    Response,
+    console,
+    fetch: async () => { throw new Error('network is not available in the lifecycle harness'); },
+    caches: {
+      async open(name) { events.push(`open:${name}`); return cache; },
+      async keys() { return cacheKeys; },
+      async delete(name) { events.push(`delete:${name}`); return true; },
+      async match() { return undefined; }
+    },
+    self: {
+      location: { href: 'https://app.test/service-worker.js', origin: 'https://app.test' },
+      registration: { scope: 'https://app.test/' },
+      clients: {
+        async claim() { events.push('claim'); },
+        async matchAll() { return []; },
+        async openWindow() {}
+      },
+      async skipWaiting() { events.push('skipWaiting'); },
+      addEventListener(type, listener) { handlers.set(type, listener); }
+    }
+  };
+  vm.createContext(sandbox);
+  new vm.Script(workerSource, { filename: 'service-worker-lifecycle.js' }).runInContext(sandbox);
+  const dispatch = type => {
+    let completion;
+    handlers.get(type)({ waitUntil(promise) { completion = Promise.resolve(promise); } });
+    assert.ok(completion, `${type} listener should extend its lifecycle`);
+    return completion;
+  };
+  return { dispatch, events };
+}
+
+const successfulInstall = createWorkerHarness();
+await successfulInstall.dispatch('install');
+assert.ok(successfulInstall.events[0] === 'open:crux-routine-v8', 'install should open the current app-shell cache first');
+assert.ok(successfulInstall.events.some(event => event.startsWith('precache:')), 'install should precache the complete app shell');
+assert.ok(
+  successfulInstall.events.indexOf('skipWaiting') > successfulInstall.events.findIndex(event => event.startsWith('precache:')),
+  'install should skip waiting only after the app shell is precached'
+);
+
+const failedInstall = createWorkerHarness({ addAllError: new Error('fixture precache failure') });
+await assert.rejects(failedInstall.dispatch('install'), /fixture precache failure/);
+assert.ok(!failedInstall.events.includes('skipWaiting'), 'a failed precache must leave the installed worker in control');
+
+const currentMediaCache = 'crux-exercise-media-7455efae41b3';
+const activation = createWorkerHarness({
+  cacheKeys: ['crux-routine-v7', 'crux-routine-v8', 'crux-exercise-media-old', currentMediaCache, 'unrelated-cache']
+});
+await activation.dispatch('activate');
+assert.deepEqual(
+  activation.events.filter(event => event.startsWith('delete:')).sort(),
+  ['delete:crux-exercise-media-old', 'delete:crux-routine-v7'],
+  'activation should delete only stale app and exercise-media caches'
+);
+assert.equal(activation.events.at(-1), 'claim', 'the current worker should claim clients after cache cleanup');
+
+const navigationBranch = workerSource.match(/if \(request\.mode === ['"]navigate['"]\) \{([\s\S]*?)\n    \}\n\n    const shellUrl/)?.[1] || '';
+assert.match(navigationBranch, /fetch\(new Request\(request, \{cache: ['"]no-store['"]\}\)\)/, 'navigations should bypass the HTTP cache');
+assert.ok(
+  navigationBranch.indexOf('fetch(new Request') < navigationBranch.indexOf('cache.match(INDEX_URL)'),
+  'navigations should try the network before the cached shell'
+);
+assert.match(navigationBranch, /cache\.put\(INDEX_URL, networkResponse\.clone\(\)\)/, 'fresh navigation HTML should replace cached index.html');
+assert.match(navigationBranch, /cache\.put\(ROOT_URL, networkResponse\.clone\(\)\)/, 'fresh navigation HTML should replace the cached root shell');
+assert.match(navigationBranch, /cache\.match\(INDEX_URL\) \|\| await cache\.match\(ROOT_URL\)/, 'failed navigations should fall back to the cached app shell');
+
 const manifest = JSON.parse(manifestSource);
 const catalog = JSON.parse(catalogSource);
 assert.equal(typeof manifest.name, 'string', 'manifest name is required');
