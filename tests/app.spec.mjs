@@ -2,13 +2,33 @@ import { test, expect } from '@playwright/test';
 import { stubDatasetMedia, waitForApp, watchForBrowserProblems } from './helpers.mjs';
 
 for (const viewport of [
-  { name: 'desktop', size: { width: 1280, height: 900 }, trigger: '.sidebar [data-open-settings]' },
-  { name: 'mobile', size: { width: 390, height: 844 }, trigger: '.topbar [data-open-settings]', nestedTarget: true }
+  {
+    name: 'desktop',
+    size: { width: 1280, height: 900 },
+    trigger: '.sidebar [data-open-settings]',
+    brand: '.sidebar .brand-mark img'
+  },
+  {
+    name: 'mobile',
+    size: { width: 390, height: 844 },
+    trigger: '.topbar [data-open-settings]',
+    brand: '.mobile-brand .brand-mark img',
+    nestedTarget: true
+  }
 ]) {
   test(`${viewport.name} Settings opens and preserves cancel or save intent`, async ({ page }) => {
     const assertClean = watchForBrowserProblems(page);
     await page.setViewportSize(viewport.size);
     await waitForApp(page);
+
+    const visibleBrand = page.locator(viewport.brand);
+    await expect(visibleBrand).toBeVisible();
+    await expect(visibleBrand).toHaveAttribute('src', './icons/icon-192-v2.png');
+    expect(await visibleBrand.evaluate(image => ({
+      complete: image.complete,
+      naturalWidth: image.naturalWidth,
+      naturalHeight: image.naturalHeight
+    }))).toEqual({ complete: true, naturalWidth: 192, naturalHeight: 192 });
 
     const dialog = page.locator('#settings-dialog');
     const settingsButton = page.locator(viewport.trigger);
@@ -78,6 +98,54 @@ for (const viewport of [
       const surfaceCenter = surface.rect.left + surface.rect.width / 2;
       const viewportCenter = surface.viewport.left + surface.viewport.width / 2;
       expect(Math.abs(surfaceCenter - viewportCenter)).toBeLessThanOrEqual(1);
+
+      const weekAnchor = dialog.locator('[name="weekAnchor"]');
+      await expect(weekAnchor).toHaveAttribute('type', 'date');
+      for (const mobileViewport of [
+        { width: 320, height: 568 },
+        { width: 390, height: 844 }
+      ]) {
+        await page.setViewportSize(mobileViewport);
+        await expect(dialog).toBeVisible();
+        const layout = await weekAnchor.evaluate(input => {
+          const field = input.closest('.field');
+          const grid = input.closest('.form-grid');
+          const body = input.closest('.dialog-body');
+          const dialog = input.closest('dialog');
+          const rect = element => {
+            const box = element.getBoundingClientRect();
+            return { left: box.left, right: box.right, width: box.width };
+          };
+          const size = element => ({ clientWidth: element.clientWidth, scrollWidth: element.scrollWidth });
+          return {
+            typeAttribute: input.getAttribute('type'),
+            typeProperty: input.type,
+            viewportWidth: innerWidth,
+            document: size(document.documentElement),
+            dialog: { rect: rect(dialog), size: size(dialog) },
+            body: { rect: rect(body), size: size(body) },
+            grid: { rect: rect(grid), size: size(grid) },
+            field: { rect: rect(field), size: size(field) },
+            input: { rect: rect(input), size: size(input) }
+          };
+        });
+
+        expect(layout.typeAttribute).toBe('date');
+        expect(layout.typeProperty).toBe('date');
+        expect(layout.viewportWidth).toBe(mobileViewport.width);
+        const containsHorizontally = (outer, inner) => {
+          expect(inner.left).toBeGreaterThanOrEqual(outer.left - 1);
+          expect(inner.right).toBeLessThanOrEqual(outer.right + 1);
+        };
+        containsHorizontally(layout.dialog.rect, layout.body.rect);
+        containsHorizontally(layout.body.rect, layout.grid.rect);
+        containsHorizontally(layout.grid.rect, layout.field.rect);
+        containsHorizontally(layout.field.rect, layout.input.rect);
+        for (const region of [layout.document, layout.dialog.size, layout.body.size, layout.grid.size, layout.field.size, layout.input.size]) {
+          expect(region.scrollWidth).toBeLessThanOrEqual(region.clientWidth + 1);
+        }
+      }
+      await page.setViewportSize(viewport.size);
 
       await closeButton.click();
       await expect(dialog).toBeHidden();
