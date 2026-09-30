@@ -508,7 +508,13 @@
       background: var(--surface); color: var(--ink); box-shadow: 0 24px 90px rgba(0,0,0,.28);
     }
     dialog::backdrop { background: rgba(10,18,15,.58); backdrop-filter: blur(3px); }
-    dialog > form { min-width: 0; max-width: 100%; }
+    .dialog-frame {
+      display: grid;
+      grid-template-rows: auto minmax(0, 1fr) auto;
+      min-width: 0;
+      max-width: 100%;
+      max-height: inherit;
+    }
     .dialog-head { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 22px; border-bottom: 1px solid var(--line); }
     .dialog-head h2 { margin: 0; font: 720 23px/1 Georgia, serif; }
     .dialog-body {
@@ -688,36 +694,29 @@
       .form-grid { grid-template-columns: minmax(0, 1fr); }
       .field.full { grid-column: auto; }
       dialog {
-        inset: auto 0 0;
-        width: 100%; max-width: 100%; max-height: min(88dvh, 760px); margin: auto 0 0;
-        border-right: 0; border-bottom: 0; border-left: 0; border-radius: 22px 22px 0 0;
-      }
-      dialog[open] { display: flex; flex-direction: column; animation: sheet-in .2s ease-out; }
-      dialog > form { display: flex; min-height: 0; max-height: inherit; flex: 1; flex-direction: column; }
-      /*
-       * WebKit can collapse a modal whose only child is a flexible form when
-       * the dialog has a max-height but no definite height. The backdrop then
-       * opens correctly while the sheet itself is effectively off-screen.
-       * Give Settings a definite mobile sheet and use grid rows so its header
-       * and actions stay visible while only the body scrolls.
-       */
-      #settings-dialog {
         position: fixed;
         inset: auto 0 0;
-        width: 100%;
-        height: min(88vh, 760px);
-        height: min(88dvh, 760px);
+        width: 100%; max-width: 100%; height: min(88vh, 760px); height: min(88dvh, 760px);
         max-height: calc(100vh - env(safe-area-inset-top));
         max-height: calc(100dvh - env(safe-area-inset-top));
         margin: 0;
+        border-right: 0; border-bottom: 0; border-left: 0; border-radius: 22px 22px 0 0;
       }
-      #settings-dialog[open] { display: block; }
-      #settings-dialog > form {
-        display: grid;
-        grid-template-rows: auto minmax(0, 1fr) auto;
+      dialog[open] { display: block; animation: sheet-in .2s ease-out; }
+      .dialog-frame {
         width: 100%;
         height: 100%;
         max-height: none;
+      }
+      dialog.dialog-compact {
+        height: auto;
+        max-height: min(70vh, 480px);
+        max-height: min(70dvh, 480px);
+      }
+      dialog.dialog-compact > .dialog-frame { height: auto; max-height: inherit; }
+      dialog.dialog-compact .dialog-body {
+        max-height: min(40vh, 320px);
+        max-height: min(40dvh, 320px);
       }
       .dialog-head { flex: 0 0 auto; padding: 16px 17px 14px; }
       .dialog-head h2 { font-size: 21px; }
@@ -865,7 +864,7 @@
   <div class="sr-only" id="timer-announcer" aria-live="assertive"></div>
 
   <dialog id="settings-dialog" aria-labelledby="settings-dialog-title">
-    <form method="dialog" id="settings-form">
+    <form method="dialog" id="settings-form" class="dialog-frame">
       <div class="dialog-head"><h2 id="settings-dialog-title">Settings</h2><button class="icon-btn" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
       <div class="dialog-body">
         <div class="form-grid">
@@ -875,7 +874,7 @@
           <div class="field full"><label class="check-line"><input type="checkbox" name="sound"> Sound at timer phase changes</label><label class="check-line"><input type="checkbox" name="vibration"> Vibration when supported</label></div>
           <section class="update-panel" aria-labelledby="update-panel-title">
             <strong id="update-panel-title">App update</strong>
-            <p id="pwa-update-status" role="status" aria-live="polite">Version 4.4 · checking when online…</p>
+            <p id="pwa-update-status" role="status" aria-live="polite">Version 4.5 · checking when online…</p>
             <div class="update-actions"><button class="btn secondary small" type="button" data-action="check-update">Check for updates</button><button class="btn small" type="button" data-action="apply-update" hidden>Update & reload</button></div>
           </section>
         </div>
@@ -889,7 +888,7 @@
   </dialog>
 
   <dialog id="exercise-dialog" aria-labelledby="exercise-dialog-title">
-    <form method="dialog" id="exercise-form">
+    <form method="dialog" id="exercise-form" class="dialog-frame">
       <div class="dialog-head"><h2 id="exercise-dialog-title">Add exercise</h2><button class="icon-btn" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
       <div class="dialog-body"><div class="form-grid">
         <input type="hidden" name="id">
@@ -906,22 +905,24 @@
   </dialog>
 
   <dialog id="catalog-dialog" aria-labelledby="catalog-dialog-title">
-    <div class="dialog-head"><div><h2 id="catalog-dialog-title">Exercise catalog</h2><p class="dialog-subtitle">Add only what you use. The timer stays uncluttered.</p></div><button class="icon-btn" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
-    <div class="dialog-body catalog-body">
-      <div class="catalog-filters">
-        <input class="search" id="catalog-search" type="search" data-action="catalog-search" placeholder="Search exercise catalog…" aria-label="Search exercise catalog">
-        <select class="search" id="catalog-focus" data-action="catalog-filter" aria-label="Filter catalog by focus"><option value="climbing">Climbing support</option><option value="bodyweight">Bodyweight</option><option value="mobility">Mobility & stretching</option><option value="finger-care">Forearm & grip</option><option value="all">All relevant</option></select>
-        <select class="search" id="catalog-body-part" data-action="catalog-filter" aria-label="Filter catalog by body part"><option value="all">All body parts</option></select>
-        <select class="search" id="catalog-equipment" data-action="catalog-filter" aria-label="Filter catalog by equipment"><option value="all">All equipment</option></select>
+    <div class="dialog-frame">
+      <div class="dialog-head"><div><h2 id="catalog-dialog-title">Exercise catalog</h2><p class="dialog-subtitle">Add only what you use. The timer stays uncluttered.</p></div><button class="icon-btn" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
+      <div class="dialog-body catalog-body">
+        <div class="catalog-filters">
+          <input class="search" id="catalog-search" type="search" data-action="catalog-search" placeholder="Search exercise catalog…" aria-label="Search exercise catalog">
+          <select class="search" id="catalog-focus" data-action="catalog-filter" aria-label="Filter catalog by focus"><option value="climbing">Climbing support</option><option value="bodyweight">Bodyweight</option><option value="mobility">Mobility & stretching</option><option value="finger-care">Forearm & grip</option><option value="all">All relevant</option></select>
+          <select class="search" id="catalog-body-part" data-action="catalog-filter" aria-label="Filter catalog by body part"><option value="all">All body parts</option></select>
+          <select class="search" id="catalog-equipment" data-action="catalog-filter" aria-label="Filter catalog by equipment"><option value="all">All equipment</option></select>
+        </div>
+        <p class="catalog-summary" id="catalog-summary" role="status" aria-live="polite">Loading English catalog…</p>
+        <div class="catalog-results" id="catalog-results"><div class="empty">Loading exercise catalog…</div></div>
       </div>
-      <p class="catalog-summary" id="catalog-summary" role="status" aria-live="polite">Loading English catalog…</p>
-      <div class="catalog-results" id="catalog-results"><div class="empty">Loading exercise catalog…</div></div>
+      <div class="dialog-foot catalog-foot"><button class="btn" type="button" data-close-dialog>Done</button></div>
     </div>
-    <div class="dialog-foot catalog-foot"><button class="btn" type="button" data-close-dialog>Done</button></div>
   </dialog>
 
   <dialog id="routine-dialog" aria-labelledby="routine-dialog-title">
-    <form method="dialog" id="routine-form">
+    <form method="dialog" id="routine-form" class="dialog-frame">
       <div class="dialog-head"><h2 id="routine-dialog-title">Add routine</h2><button class="icon-btn" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
       <div class="dialog-body"><div class="form-grid">
         <input type="hidden" name="id">
@@ -943,7 +944,7 @@
   </dialog>
 
   <dialog id="plan-dialog" aria-labelledby="plan-dialog-title">
-    <form method="dialog" id="plan-form">
+    <form method="dialog" id="plan-form" class="dialog-frame">
       <div class="dialog-head"><h2 id="plan-dialog-title">Edit plan day</h2><button class="icon-btn" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
       <div class="dialog-body"><div class="form-grid">
         <input type="hidden" name="week"><input type="hidden" name="dayIndex"><input type="hidden" name="date">
@@ -959,7 +960,7 @@
   </dialog>
 
   <dialog id="schedule-dialog" aria-labelledby="schedule-dialog-title">
-    <form method="dialog" id="schedule-form">
+    <form method="dialog" id="schedule-form" class="dialog-frame">
       <div class="dialog-head"><h2 id="schedule-dialog-title">Calendar & alerts</h2><button class="icon-btn" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
       <div class="dialog-body"><div class="stack">
         <input type="hidden" name="date"><input type="hidden" name="taskId">
@@ -983,21 +984,25 @@
   </dialog>
 
   <dialog id="demo-dialog" aria-labelledby="demo-dialog-title" aria-describedby="demo-dialog-copy">
-    <div class="dialog-head"><h2 id="demo-dialog-title">Movement preview</h2><button class="icon-btn" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
-    <div class="dialog-body">
-      <div class="demo-stage" id="demo-dialog-stage"></div>
-      <p id="demo-dialog-copy" class="muted" style="line-height:1.55;margin:0"></p>
-      <details class="demo-steps" id="demo-dialog-steps" hidden><summary id="demo-dialog-steps-summary">Step-by-step</summary><ol id="demo-dialog-steps-list"></ol></details>
-      <div class="exercise-stats" id="demo-dialog-stats"></div>
-      <p class="demo-note">Movement overview—not a prescribed tempo. Use a comfortable range and stop for sharp or increasing pain.</p>
+    <div class="dialog-frame">
+      <div class="dialog-head"><h2 id="demo-dialog-title">Movement preview</h2><button class="icon-btn" type="button" data-close-dialog aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
+      <div class="dialog-body">
+        <div class="demo-stage" id="demo-dialog-stage"></div>
+        <p id="demo-dialog-copy" class="muted" style="line-height:1.55;margin:0"></p>
+        <details class="demo-steps" id="demo-dialog-steps" hidden><summary id="demo-dialog-steps-summary">Step-by-step</summary><ol id="demo-dialog-steps-list"></ol></details>
+        <div class="exercise-stats" id="demo-dialog-stats"></div>
+        <p class="demo-note">Movement overview—not a prescribed tempo. Use a comfortable range and stop for sharp or increasing pain.</p>
+      </div>
+      <div class="dialog-foot"><button class="btn secondary" type="button" data-close-dialog>Back</button><button class="btn" id="demo-dialog-start" type="button" data-action="confirm-timer-start" hidden>Start 7-second prep</button></div>
     </div>
-    <div class="dialog-foot"><button class="btn secondary" type="button" data-close-dialog>Back</button><button class="btn" id="demo-dialog-start" type="button" data-action="confirm-timer-start" hidden>Start 7-second prep</button></div>
   </dialog>
 
-  <dialog id="confirm-dialog" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message">
-    <div class="dialog-head"><h2 id="confirm-dialog-title">Confirm action</h2><button class="icon-btn" type="button" data-confirm-cancel aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
-    <div class="dialog-body"><p id="confirm-dialog-message" style="margin:0;color:var(--muted);line-height:1.6"></p></div>
-    <div class="dialog-foot"><button class="btn secondary" type="button" data-confirm-cancel>Cancel</button><button class="btn danger" id="confirm-dialog-accept" type="button" data-confirm-accept>Confirm</button></div>
+  <dialog id="confirm-dialog" class="dialog-compact" aria-labelledby="confirm-dialog-title" aria-describedby="confirm-dialog-message">
+    <div class="dialog-frame">
+      <div class="dialog-head"><h2 id="confirm-dialog-title">Confirm action</h2><button class="icon-btn" type="button" data-confirm-cancel aria-label="Close"><svg class="icon"><use href="#i-x"/></svg></button></div>
+      <div class="dialog-body"><p id="confirm-dialog-message" style="margin:0;color:var(--muted);line-height:1.6"></p></div>
+      <div class="dialog-foot"><button class="btn secondary" type="button" data-confirm-cancel>Cancel</button><button class="btn danger" id="confirm-dialog-accept" type="button" data-confirm-accept>Confirm</button></div>
+    </div>
   </dialog>
 
   <input type="file" id="import-input" accept="application/json" hidden>
@@ -1007,7 +1012,7 @@
 
     const STORAGE_KEY = 'crux-routine-v1';
     const SCHEMA_VERSION = 3;
-    const APP_VERSION = '4.4';
+    const APP_VERSION = '4.5';
     const DEMO_PREP_MS = 7000;
     const CATALOG_PAGE_SIZE = 24;
     const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -1512,8 +1517,7 @@
       const restore=confirmationOpener;
       confirmationOpener=null;
       const dialog=$('#confirm-dialog');
-      if (typeof dialog.close === 'function' && dialog.open) dialog.close();
-      else dialog.removeAttribute('open');
+      closeAppDialog(dialog);
       if (restore?.isConnected) setTimeout(()=>restore.focus(),0);
     }
 
@@ -1522,8 +1526,7 @@
       pendingConfirmation = null;
       confirmationOpener=null;
       const dialog=$('#confirm-dialog');
-      if (typeof dialog.close === 'function' && dialog.open) dialog.close();
-      else dialog.removeAttribute('open');
+      closeAppDialog(dialog);
       if (typeof action === 'function') action();
     }
 
@@ -1537,7 +1540,11 @@
       const accept=$('#confirm-dialog-accept');
       accept.textContent=confirmLabel;
       accept.className=`btn${danger?' danger':''}`;
-      if (typeof dialog.showModal==='function') dialog.showModal(); else dialog.setAttribute('open','');
+      if (!showAppDialog(dialog)) {
+        pendingConfirmation=null;
+        confirmationOpener=null;
+        return false;
+      }
       const initial=danger?$$('[data-confirm-cancel]',dialog).at(-1):accept;
       setTimeout(()=>initial?.focus(),0);
       return true;
@@ -2204,7 +2211,7 @@
 
     async function openExerciseCatalog() {
       const dialog=$('#catalog-dialog');
-      if (!dialog.open) dialog.showModal();
+      if (!showAppDialog(dialog)) return;
       $('#catalog-search').value=catalogFilters.query;
       $('#catalog-focus').value=catalogFilters.focus;
       catalogVisibleCount=CATALOG_PAGE_SIZE;
@@ -2607,7 +2614,7 @@
         ['id','name','category','demo','sets','workSec','restSec','instructions'].forEach(key=>{if(form.elements[key])form.elements[key].value=exercise[key]??'';});
         if (exercise.sourceId) { form.elements.demo.value='dataset'; form.elements.demo.disabled=true; }
       } else form.elements.id.value = '';
-      $('#exercise-dialog').showModal();
+      if (!showAppDialog($('#exercise-dialog'))) return;
       setTimeout(()=>form.elements.name.focus(),0);
     }
 
@@ -2630,7 +2637,7 @@
       startButton.hidden=!startSession;
       startButton.textContent=`Start ${Math.round(DEMO_PREP_MS/1000)}-second prep`;
       const dialog=$('#demo-dialog');
-      if (!dialog.open) dialog.showModal();
+      if (!showAppDialog(dialog)) return;
       setupDemoAnimations(dialog);
       setTimeout(()=>(startSession?startButton:dialog.querySelector('[data-close-dialog]'))?.focus(),0);
     }
@@ -2656,7 +2663,7 @@
     function confirmTimerStart() {
       if (!pendingTimerStart) return;
       pendingTimerStart=false;
-      $('#demo-dialog').close();
+      closeAppDialog($('#demo-dialog'));
       startTimer();
     }
 
@@ -2683,7 +2690,7 @@
         form.elements.frequency.value = 'daily';
       }
       updateRoutineFormFields();
-      $('#routine-dialog').showModal();
+      if (!showAppDialog($('#routine-dialog'))) return;
       setTimeout(()=>form.elements.title.focus(),0);
     }
 
@@ -2724,7 +2731,7 @@
       form.dataset.lastSecondary=item.secondaryType||'';
       syncPlanTypeFields(false);
       $('#plan-dialog-title').textContent = `Edit ${DAY_NAMES[(Number(index)+1)%7]} · Week ${week}`;
-      $('#plan-dialog').showModal();
+      if (!showAppDialog($('#plan-dialog'))) return;
     }
 
     function openTodayDay() {
@@ -2744,7 +2751,7 @@
       form.dataset.lastSecondary=item.secondaryType||'';
       syncPlanTypeFields(false);
       $('#plan-dialog-title').textContent=`Edit ${formatDate(dateValue,{weekday:'long',month:'short',day:'numeric'})}`;
-      $('#plan-dialog').showModal();
+      if (!showAppDialog($('#plan-dialog'))) return;
     }
 
     function deleteRoutine(id) {
@@ -3061,7 +3068,7 @@
       form.elements.leadMinutes.value=String(state.settings.reminderLeadMinutes??10);
       form.elements.dayTime.value=state.settings.dayReminderTime||'08:00';
       updateScheduleDialog();
-      $('#schedule-dialog').showModal();
+      showAppDialog($('#schedule-dialog'));
     }
 
     function updateScheduleDialog() {
@@ -3513,7 +3520,7 @@
 
     $('#exercise-form').addEventListener('submit', event => {
       event.preventDefault();
-      if (event.submitter?.value === 'cancel') { $('#exercise-dialog').close(); return; }
+      if (event.submitter?.value === 'cancel') { closeAppDialog($('#exercise-dialog')); return; }
       const form=event.currentTarget;
       if (!form.reportValidity()) return;
       const data=Object.fromEntries(new FormData(form));
@@ -3527,12 +3534,12 @@
         sets:Number(data.sets),workSec:Number(data.workSec),restSec:Number(data.restSec),instructions:data.instructions.trim()
       },state.exercises.length);
       if (index>=0) state.exercises[index]=item; else state.exercises.push(item);
-      saveState(index>=0?'Exercise updated.':'Exercise added.'); $('#exercise-dialog').close(); renderView();
+      saveState(index>=0?'Exercise updated.':'Exercise added.'); closeAppDialog($('#exercise-dialog')); renderView();
     });
 
     $('#routine-form').addEventListener('submit', event => {
       event.preventDefault();
-      if (event.submitter?.value === 'cancel') { $('#routine-dialog').close(); return; }
+      if (event.submitter?.value === 'cancel') { closeAppDialog($('#routine-dialog')); return; }
       const form=event.currentTarget;
       if (!form.reportValidity()) return;
       const data=Object.fromEntries(new FormData(form));
@@ -3543,7 +3550,7 @@
       const item={id:data.id||uid('routine'),title:data.title.trim(),category:data.category,route:existing?.route||'',time:data.time,relativeMinutes,amount:data.amount.trim(),frequency:data.frequency,weekdays,monthDay:Number(data.monthDay||1),detail:data.detail.trim(),optional:form.elements.optional.checked,active:existing?.active??true};
       const index=state.routines.findIndex(r=>r.id===item.id);
       if (index>=0) state.routines[index]=item; else state.routines.push(item);
-      saveState(index>=0?'Routine updated.':'Routine added.'); $('#routine-dialog').close(); renderView();
+      saveState(index>=0?'Routine updated.':'Routine added.'); closeAppDialog($('#routine-dialog')); renderView();
     });
 
     $('#plan-type').addEventListener('change',()=>syncPlanTypeFields(true));
@@ -3554,7 +3561,7 @@
 
     $('#plan-form').addEventListener('submit', event => {
       event.preventDefault();
-      if (event.submitter?.value === 'cancel') { $('#plan-dialog').close(); return; }
+      if (event.submitter?.value === 'cancel') { closeAppDialog($('#plan-dialog')); return; }
       const form=event.currentTarget;
       if (!form.reportValidity()) return;
       const data=Object.fromEntries(new FormData(form));
@@ -3568,7 +3575,7 @@
           clearSessionChecks(data.date);
           saveState('Day updated; session checks were cleared.');
         }
-        $('#plan-dialog').close();
+        closeAppDialog($('#plan-dialog'));
         renderToday();
         return;
       }
@@ -3579,7 +3586,7 @@
       const affectsToday=changed&&data.week===getWeekVariant(today)&&Number(data.dayIndex)===todayIndex&&!state.overrides[today];
       state.plan[data.week][Number(data.dayIndex)]=newDay;
       if (affectsToday) clearSessionChecks(today);
-      saveState(affectsToday?'Plan updated; today’s session checks were cleared.':'Plan day updated.'); $('#plan-dialog').close(); renderPlan();
+      saveState(affectsToday?'Plan updated; today’s session checks were cleared.':'Plan day updated.'); closeAppDialog($('#plan-dialog')); renderPlan();
     });
 
     const confirmationDialog=$('#confirm-dialog');

@@ -28,9 +28,9 @@ new vm.Script(workerSource, { filename: 'service-worker.js' });
 const appVersion = html.match(/\bconst APP_VERSION = ['"]([^'"]+)['"]/)?.[1];
 const displayedAppVersion = html.match(/id=["']pwa-update-status["'][^>]*>Version ([\d.]+)/)?.[1];
 const workerVersion = workerSource.match(/\bconst WORKER_VERSION = ['"]([^'"]+)['"]/)?.[1];
-assert.equal(appVersion, '4.4', 'application release constant should be current');
+assert.equal(appVersion, '4.5', 'application release constant should be current');
 assert.equal(displayedAppVersion, appVersion, 'visible application version should match its release constant');
-assert.equal(workerVersion, 'v8', 'service-worker cache release should match app 4.4');
+assert.equal(workerVersion, 'v9', 'service-worker cache release should match app 4.5');
 assert.ok(workerSource.includes('const CACHE_NAME = `${CACHE_PREFIX}${WORKER_VERSION}`'), 'app-shell cache should derive from the worker release');
 
 function createWorkerHarness({ addAllError = null, cacheKeys = [] } = {}) {
@@ -81,7 +81,7 @@ function createWorkerHarness({ addAllError = null, cacheKeys = [] } = {}) {
 
 const successfulInstall = createWorkerHarness();
 await successfulInstall.dispatch('install');
-assert.ok(successfulInstall.events[0] === 'open:crux-routine-v8', 'install should open the current app-shell cache first');
+assert.ok(successfulInstall.events[0] === 'open:crux-routine-v9', 'install should open the current app-shell cache first');
 assert.ok(successfulInstall.events.some(event => event.startsWith('precache:')), 'install should precache the complete app shell');
 assert.ok(
   successfulInstall.events.indexOf('skipWaiting') > successfulInstall.events.findIndex(event => event.startsWith('precache:')),
@@ -94,12 +94,12 @@ assert.ok(!failedInstall.events.includes('skipWaiting'), 'a failed precache must
 
 const currentMediaCache = 'crux-exercise-media-7455efae41b3';
 const activation = createWorkerHarness({
-  cacheKeys: ['crux-routine-v7', 'crux-routine-v8', 'crux-exercise-media-old', currentMediaCache, 'unrelated-cache']
+  cacheKeys: ['crux-routine-v8', 'crux-routine-v9', 'crux-exercise-media-old', currentMediaCache, 'unrelated-cache']
 });
 await activation.dispatch('activate');
 assert.deepEqual(
   activation.events.filter(event => event.startsWith('delete:')).sort(),
-  ['delete:crux-exercise-media-old', 'delete:crux-routine-v7'],
+  ['delete:crux-exercise-media-old', 'delete:crux-routine-v8'],
   'activation should delete only stale app and exercise-media caches'
 );
 assert.equal(activation.events.at(-1), 'claim', 'the current worker should claim clients after cache cleanup');

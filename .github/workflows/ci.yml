@@ -35,11 +35,11 @@ jobs:
       - name: Run static and browser checks
         run: npm test
 
-      - name: Install WebKit for the iPhone Settings regression
+      - name: Install WebKit for iPhone dialog regressions
         run: npx playwright install --with-deps webkit
 
-      - name: Run the mobile Settings smoke in WebKit
-        run: PW_BROWSER=webkit npx playwright test tests/app.spec.mjs --grep "mobile Settings"
+      - name: Run all mobile dialog smokes in WebKit
+        run: PW_BROWSER=webkit npx playwright test tests/app.spec.mjs tests/dialogs.spec.mjs --grep "mobile Settings|mobile dialog matrix"
 
       - name: Upload failure diagnostics
         if: failure()
