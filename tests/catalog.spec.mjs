@@ -30,6 +30,7 @@ async function expectSuspendedPoster(scope, sourceId, state = 'poster') {
 test('catalog stays modular and supports filters, search, library add, and timer add', async ({ page }) => {
   const assertClean = watchForBrowserProblems(page);
   await stubDatasetMedia(page);
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.setViewportSize({ width: 390, height: 844 });
   await waitForApp(page);
 
@@ -87,7 +88,7 @@ test('catalog stays modular and supports filters, search, library add, and timer
 test('exercise media stays animated without Play or Pause controls', async ({ page }) => {
   const assertClean = watchForBrowserProblems(page);
   await stubDatasetMedia(page);
-  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.emulateMedia({ reducedMotion: 'no-preference' });
   await page.setViewportSize({ width: 390, height: 844 });
   await waitForApp(page);
   await page.locator('.bottom-nav [data-view="library"]').click();
@@ -120,11 +121,26 @@ test('exercise media stays animated without Play or Pause controls', async ({ pa
   assertClean();
 });
 
+test('reduced motion uses still exercise posters without adding playback controls', async ({ page }) => {
+  const assertClean = watchForBrowserProblems(page);
+  await stubDatasetMedia(page);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
+  await page.setViewportSize({ width: 390, height: 844 });
+  await waitForApp(page);
+  await page.locator('.bottom-nav [data-view="library"]').click();
+
+  const warmup = page.locator('.exercise-card').filter({ hasText: /world greatest stretch/i }).first();
+  await expectSuspendedPoster(warmup, '1604');
+  await expect(page.locator(MEDIA_PLAYBACK_CONTROLS)).toHaveCount(0);
+  assertClean();
+});
+
 test.describe('exercise media network fallback', () => {
   test.use({ serviceWorkers: 'block' });
 
   test('failed exercise GIF falls back to a decoded poster with an accurate still label', async ({ page }) => {
     await stubDatasetMedia(page, { failGifs: true });
+    await page.emulateMedia({ reducedMotion: 'no-preference' });
     await page.setViewportSize({ width: 390, height: 844 });
     await waitForApp(page);
     await page.locator('.bottom-nav [data-view="library"]').click();
