@@ -3,8 +3,8 @@ import { stubDatasetMedia } from './helpers.mjs';
 
 const LEGACY_WORKER_SOURCE = String.raw`
 'use strict';
-const APP_CACHE = 'crux-routine-v8-fixture';
-const MEDIA_CACHE = 'crux-exercise-media-v8-fixture';
+const APP_CACHE = 'crux-routine-v9-fixture';
+const MEDIA_CACHE = 'crux-exercise-media-v9-fixture';
 const ROOT = new URL('./', self.location.href);
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
@@ -26,7 +26,7 @@ self.addEventListener('fetch', event => {
 });
 `;
 
-test('legacy controlled shell upgrades to v9, preserves data, and keeps the current shell offline', async ({ page, context }) => {
+test('legacy controlled shell upgrades to v10, preserves data, and keeps the current shell offline', async ({ page, context }) => {
   let legacyWorkerRequests = 0;
   await context.route(/\/service-worker\.js\?legacy-upgrade-fixture=1$/, async route => {
     legacyWorkerRequests += 1;
@@ -60,8 +60,8 @@ test('legacy controlled shell upgrades to v9, preserves data, and keeps the curr
   expect(legacyWorkerRequests).toBeGreaterThan(0);
   expect(await page.evaluate(() => navigator.serviceWorker.controller?.scriptURL)).toContain('legacy-upgrade-fixture=1');
   expect(await page.evaluate(() => caches.keys())).toEqual(expect.arrayContaining([
-    'crux-routine-v8-fixture',
-    'crux-exercise-media-v8-fixture'
+    'crux-routine-v9-fixture',
+    'crux-exercise-media-v9-fixture'
   ]));
 
   await page.goto('/', { waitUntil: 'domcontentloaded' });
@@ -70,16 +70,16 @@ test('legacy controlled shell upgrades to v9, preserves data, and keeps the curr
     && Number(sessionStorage.getItem('ci-current-shell-loads') || 0) >= 2
   ));
   await expect(page.locator('#view-today')).toBeVisible();
-  await expect(page.locator('#pwa-update-status')).toContainText('Version 4.5');
+  await expect(page.locator('#pwa-update-status')).toContainText('Version 4.6');
   expect(await page.evaluate(() => localStorage.getItem('ci-upgrade-sentinel'))).toBe('preserved');
 
   const upgradedCaches = await page.evaluate(() => caches.keys());
-  expect(upgradedCaches).toContain('crux-routine-v9');
-  expect(upgradedCaches).not.toContain('crux-routine-v8-fixture');
-  expect(upgradedCaches).not.toContain('crux-exercise-media-v8-fixture');
+  expect(upgradedCaches).toContain('crux-routine-v10');
+  expect(upgradedCaches).not.toContain('crux-routine-v9-fixture');
+  expect(upgradedCaches).not.toContain('crux-exercise-media-v9-fixture');
 
   await page.evaluate(async () => {
-    const cache = await caches.open('crux-routine-v9');
+    const cache = await caches.open('crux-routine-v10');
     const stale = new Response('<!doctype html><main id="stale-shell">Stale cached shell</main>', {
       headers: { 'content-type': 'text/html; charset=utf-8' }
     });
@@ -95,12 +95,12 @@ test('legacy controlled shell upgrades to v9, preserves data, and keeps the curr
   const refreshedShell = await page.evaluate(async () => (
     await (await caches.match(new URL('index.html', location.href))).text()
   ));
-  expect(refreshedShell).toContain("const APP_VERSION = '4.5'");
+  expect(refreshedShell).toContain("const APP_VERSION = '4.6'");
 
   await context.setOffline(true);
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.locator('#view-today')).toBeVisible();
-  await expect(page.locator('#pwa-update-status')).toContainText('Version 4.5');
+  await expect(page.locator('#pwa-update-status')).toContainText('Version 4.6');
   expect(await page.evaluate(() => localStorage.getItem('ci-upgrade-sentinel'))).toBe('preserved');
   await context.setOffline(false);
 });
