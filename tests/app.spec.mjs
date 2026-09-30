@@ -205,6 +205,60 @@ test('all primary views render without browser or network errors', async ({ page
   assertClean();
 });
 
+test('V2 mobile views stay contained and keep core touch targets usable', async ({ page }) => {
+  const assertClean = watchForBrowserProblems(page);
+  await stubDatasetMedia(page);
+  await page.setViewportSize({ width: 320, height: 568 });
+  await waitForApp(page);
+
+  const containment = async () => page.evaluate(() => ({
+    clientWidth: document.documentElement.clientWidth,
+    scrollWidth: document.documentElement.scrollWidth
+  }));
+  const expectContained = async () => {
+    const size = await containment();
+    expect(size.scrollWidth - size.clientWidth).toBeLessThanOrEqual(1);
+  };
+
+  for (const control of await page.locator('.mobile-brand:visible, .topbar .top-actions .icon-btn:visible').all()) {
+    const box = await control.boundingBox();
+    expect(box?.width || 0).toBeGreaterThanOrEqual(44);
+    expect(box?.height || 0).toBeGreaterThanOrEqual(44);
+  }
+
+  const weekDays = page.locator('#today-week-calendar .calendar-day');
+  await expect(weekDays).toHaveCount(7);
+  for (const day of await weekDays.all()) {
+    const box = await day.boundingBox();
+    expect(box?.width || 0).toBeGreaterThanOrEqual(44);
+    expect(box?.height || 0).toBeGreaterThanOrEqual(44);
+  }
+  await expectContained();
+
+  await page.locator('.bottom-nav [data-view="plan"]').click();
+  const planLayout = await page.locator('.week-grid').evaluate(grid => ({
+    clientWidth: grid.clientWidth,
+    scrollWidth: grid.scrollWidth,
+    cardLefts: [...grid.querySelectorAll('.day-card')].map(card => Math.round(card.getBoundingClientRect().left))
+  }));
+  expect(planLayout.scrollWidth - planLayout.clientWidth).toBeLessThanOrEqual(1);
+  expect(new Set(planLayout.cardLefts).size).toBe(1);
+  await expectContained();
+
+  for (const view of ['timer', 'library', 'history']) {
+    await page.locator(`.bottom-nav [data-view="${view}"]`).click();
+    await expect(page.locator(`#view-${view}`)).toBeVisible();
+    await expectContained();
+  }
+
+  await page.locator('.mobile-guide-btn').click();
+  await page.getByRole('button', { name: 'Training', exact: true }).click();
+  await expect(page.locator('#guide-training')).toBeInViewport();
+  expect(page.url()).toContain('#guide');
+  await expectContained();
+  assertClean();
+});
+
 test('mobile timer keeps End visible, advances, ends, and deletes its saved workout', async ({ page }) => {
   const assertClean = watchForBrowserProblems(page);
   const timestamp = '2026-01-05T10:00:00.000Z';
@@ -263,7 +317,7 @@ test('mobile timer keeps End visible, advances, ends, and deletes its saved work
   await page.addInitScript(state => {
     localStorage.setItem('crux-routine-v1', JSON.stringify(state));
   }, seededState);
-  await page.setViewportSize({ width: 320, height: 700 });
+  await page.setViewportSize({ width: 320, height: 568 });
   await page.goto('/#timer');
   await expect(page.locator('#view-timer')).toBeVisible();
 
@@ -284,7 +338,13 @@ test('mobile timer keeps End visible, advances, ends, and deletes its saved work
   const endBox = await endButton.boundingBox();
   expect(endBox).not.toBeNull();
   expect(endBox.height).toBeGreaterThanOrEqual(44);
-  expect(endBox.y + endBox.height).toBeLessThanOrEqual(700);
+  expect(endBox.y + endBox.height).toBeLessThanOrEqual(568);
+  const workoutColors = await page.locator('.active-timer').evaluate(element => ({
+    surface: getComputedStyle(element).backgroundColor,
+    end: getComputedStyle(element.querySelector('[data-action="timer-end"]')).backgroundColor
+  }));
+  expect(workoutColors.surface).toBe('rgb(24, 56, 47)');
+  expect(workoutColors.end).not.toBe('rgba(255, 255, 255, 0.08)');
 
   await page.locator('[data-action="timer-skip"]').click();
   await expect(page.locator('#timer-phase')).toHaveText('work');

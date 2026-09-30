@@ -26,7 +26,7 @@ self.addEventListener('fetch', event => {
 });
 `;
 
-test('legacy controlled shell upgrades to v10, preserves data, and keeps the current shell offline', async ({ page, context }) => {
+test('legacy controlled shell upgrades to v11, preserves data, and keeps the current shell offline', async ({ page, context }) => {
   let legacyWorkerRequests = 0;
   await context.route(/\/service-worker\.js\?legacy-upgrade-fixture=1$/, async route => {
     legacyWorkerRequests += 1;
@@ -70,16 +70,16 @@ test('legacy controlled shell upgrades to v10, preserves data, and keeps the cur
     && Number(sessionStorage.getItem('ci-current-shell-loads') || 0) >= 2
   ));
   await expect(page.locator('#view-today')).toBeVisible();
-  await expect(page.locator('#pwa-update-status')).toContainText('Version 4.6');
+  await expect(page.locator('#pwa-update-status')).toContainText('Version 5.0');
   expect(await page.evaluate(() => localStorage.getItem('ci-upgrade-sentinel'))).toBe('preserved');
 
   const upgradedCaches = await page.evaluate(() => caches.keys());
-  expect(upgradedCaches).toContain('crux-routine-v10');
+  expect(upgradedCaches).toContain('crux-routine-v11');
   expect(upgradedCaches).not.toContain('crux-routine-v9-fixture');
   expect(upgradedCaches).not.toContain('crux-exercise-media-v9-fixture');
 
   await page.evaluate(async () => {
-    const cache = await caches.open('crux-routine-v10');
+    const cache = await caches.open('crux-routine-v11');
     const stale = new Response('<!doctype html><main id="stale-shell">Stale cached shell</main>', {
       headers: { 'content-type': 'text/html; charset=utf-8' }
     });
@@ -95,12 +95,12 @@ test('legacy controlled shell upgrades to v10, preserves data, and keeps the cur
   const refreshedShell = await page.evaluate(async () => (
     await (await caches.match(new URL('index.html', location.href))).text()
   ));
-  expect(refreshedShell).toContain("const APP_VERSION = '4.6'");
+  expect(refreshedShell).toContain("const APP_VERSION = '5.0'");
 
   await context.setOffline(true);
   await page.reload({ waitUntil: 'domcontentloaded' });
   await expect(page.locator('#view-today')).toBeVisible();
-  await expect(page.locator('#pwa-update-status')).toContainText('Version 4.6');
+  await expect(page.locator('#pwa-update-status')).toContainText('Version 5.0');
   expect(await page.evaluate(() => localStorage.getItem('ci-upgrade-sentinel'))).toBe('preserved');
   await context.setOffline(false);
 });

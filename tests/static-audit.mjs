@@ -28,9 +28,9 @@ new vm.Script(workerSource, { filename: 'service-worker.js' });
 const appVersion = html.match(/\bconst APP_VERSION = ['"]([^'"]+)['"]/)?.[1];
 const displayedAppVersion = html.match(/id=["']pwa-update-status["'][^>]*>Version ([\d.]+)/)?.[1];
 const workerVersion = workerSource.match(/\bconst WORKER_VERSION = ['"]([^'"]+)['"]/)?.[1];
-assert.equal(appVersion, '4.6', 'application release constant should be current');
+assert.equal(appVersion, '5.0', 'application release constant should be current');
 assert.equal(displayedAppVersion, appVersion, 'visible application version should match its release constant');
-assert.equal(workerVersion, 'v10', 'service-worker cache release should match app 4.6');
+assert.equal(workerVersion, 'v11', 'service-worker cache release should match app 5.0');
 assert.ok(workerSource.includes('const CACHE_NAME = `${CACHE_PREFIX}${WORKER_VERSION}`'), 'app-shell cache should derive from the worker release');
 
 function createWorkerHarness({ addAllError = null, cacheKeys = [] } = {}) {
@@ -81,7 +81,7 @@ function createWorkerHarness({ addAllError = null, cacheKeys = [] } = {}) {
 
 const successfulInstall = createWorkerHarness();
 await successfulInstall.dispatch('install');
-assert.ok(successfulInstall.events[0] === 'open:crux-routine-v10', 'install should open the current app-shell cache first');
+assert.ok(successfulInstall.events[0] === 'open:crux-routine-v11', 'install should open the current app-shell cache first');
 assert.ok(successfulInstall.events.some(event => event.startsWith('precache:')), 'install should precache the complete app shell');
 assert.ok(
   successfulInstall.events.indexOf('skipWaiting') > successfulInstall.events.findIndex(event => event.startsWith('precache:')),
@@ -94,12 +94,12 @@ assert.ok(!failedInstall.events.includes('skipWaiting'), 'a failed precache must
 
 const currentMediaCache = 'crux-exercise-media-7455efae41b3';
 const activation = createWorkerHarness({
-  cacheKeys: ['crux-routine-v9', 'crux-routine-v10', 'crux-exercise-media-old', currentMediaCache, 'unrelated-cache']
+  cacheKeys: ['crux-routine-v10', 'crux-routine-v11', 'crux-exercise-media-old', currentMediaCache, 'unrelated-cache']
 });
 await activation.dispatch('activate');
 assert.deepEqual(
   activation.events.filter(event => event.startsWith('delete:')).sort(),
-  ['delete:crux-exercise-media-old', 'delete:crux-routine-v9'],
+  ['delete:crux-exercise-media-old', 'delete:crux-routine-v10'],
   'activation should delete only stale app and exercise-media caches'
 );
 assert.equal(activation.events.at(-1), 'claim', 'the current worker should claim clients after cache cleanup');
@@ -144,7 +144,7 @@ assert.equal(linkAttribute(appleTouchIcon || '', 'sizes'), '180x180', 'iPhone ho
 assert.equal(linkAttribute(favicon || '', 'href'), './icons/icon-192-v2.png', 'browser icon should use a cache-busted copy of the supplied artwork');
 assert.match(linkAttribute(favicon || '', 'href'), /-v\d+\.png$/, 'browser icon should have a versioned filename');
 assert.equal(linkAttribute(favicon || '', 'sizes'), '192x192', 'browser icon should declare its exact size');
-const brandMarks = [...html.matchAll(/<div class="brand-mark"><img\b[^>]*\bsrc="([^"]+)"[^>]*><\/div>/g)];
+const brandMarks = [...html.matchAll(/<(?:div|span) class="brand-mark"><img\b[^>]*\bsrc="([^"]+)"[^>]*><\/(?:div|span)>/g)];
 assert.equal(brandMarks.length, 2, 'desktop and mobile headers should both show the climbing artwork');
 assert.ok(brandMarks.every(match => match[1] === './icons/icon-192-v2.png'), 'header artwork should use the cache-busted icon');
 

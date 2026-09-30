@@ -133,7 +133,7 @@ async function expectUsableMobileDialog(page, selector) {
 test('mobile dialog matrix keeps every modal visible, reachable, and contained', async ({ page }) => {
   const assertClean = watchForBrowserProblems(page);
   await stubDatasetMedia(page);
-  await page.setViewportSize({ width: 320, height: 700 });
+  await page.setViewportSize({ width: 320, height: 568 });
   await waitForApp(page);
 
   const openView = async view => {

@@ -1,7 +1,7 @@
 'use strict';
 
 const CACHE_PREFIX = 'crux-routine-';
-const WORKER_VERSION = 'v10';
+const WORKER_VERSION = 'v11';
 const CACHE_NAME = `${CACHE_PREFIX}${WORKER_VERSION}`;
 const MEDIA_CACHE_PREFIX = 'crux-exercise-media-';
 const DATASET_COMMIT = '7455efae41b330c265e7cd4b78dfa848e7ce5ebd';
