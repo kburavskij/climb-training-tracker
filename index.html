@@ -378,17 +378,8 @@
     .demo-visual { position: relative; width: 100%; aspect-ratio: 16/10; overflow: hidden; padding: 0; border: 1px solid var(--line); border-radius: 14px; background: #edf2f0; color: var(--ink); }
     button.demo-visual { display: block; text-align: left; }
     button.demo-visual:hover { border-color: var(--moss); }
-    .demo-poster, .demo-animation { width: 100%; height: 100%; display: block; object-fit: cover; }
+    .demo-animation { width: 100%; height: 100%; display: block; object-fit: cover; }
     .demo-visual.external-media { width: min(180px,100%); aspect-ratio: 1; margin-inline: auto; background: #f4f4f4; }
-    .demo-play-badge, .demo-motion-toggle {
-      position: absolute; right: 9px; bottom: 9px; min-width: 44px; height: 44px; display: inline-flex;
-      align-items: center; justify-content: center; gap: 6px; padding: 0 11px; border: 1px solid rgba(255,255,255,.45);
-      border-radius: 12px; background: rgba(24,56,47,.9); color: #fff; box-shadow: 0 5px 16px rgba(0,0,0,.2);
-      font-size: 11px; font-weight: 800; backdrop-filter: blur(5px);
-    }
-    .demo-play-badge .icon, .demo-motion-toggle .icon { width: 18px; height: 18px; }
-    .demo-thumb .demo-play-badge { right: 4px; bottom: 4px; min-width: 32px; width: 32px; height: 32px; padding: 0; border-radius: 9px; }
-    .demo-thumb .demo-play-badge span { display: none; }
     .demo-placeholder { display: grid; place-items: center; align-content: center; gap: 8px; padding: 18px; color: rgba(255,255,255,.82); text-align: center; }
     .demo-placeholder { background: #18382f; }
     .demo-placeholder svg { width: 26px; height: 26px; color: var(--lime); }
@@ -770,8 +761,6 @@
     <symbol id="i-edit" viewBox="0 0 24 24"><path d="m4 20 4.5-1 10-10-3.5-3.5-10 10zM13.8 6.7l3.5 3.5M14.8 5.7l1.4-1.4a2 2 0 0 1 2.8 0l.7.7a2 2 0 0 1 0 2.8l-1.4 1.4"/></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
     <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
-    <symbol id="i-play" viewBox="0 0 24 24"><path d="m8 5 11 7-11 7z"/></symbol>
-    <symbol id="i-pause" viewBox="0 0 24 24"><path d="M8 5v14M16 5v14"/></symbol>
     <symbol id="i-minimize" viewBox="0 0 24 24"><path d="M5 12h14M8 16h8"/></symbol>
     <symbol id="i-trash" viewBox="0 0 24 24"><path d="M4 7h16M9 7V4h6v3M7 7l1 14h8l1-14M10 11v6M14 11v6"/></symbol>
     <symbol id="i-download" viewBox="0 0 24 24"><path d="M12 3v12m0 0 5-5m-5 5-5-5M4 19v2h16v-2"/></symbol>
@@ -801,7 +790,7 @@
       </nav>
       <div class="sidebar-foot">
         <div class="local-note"><span class="local-dot"></span><span>Private by default.<br>Data stays in this browser.</span></div>
-        <button class="nav-btn settings-btn" data-open-settings aria-label="Settings" title="Settings"><svg class="icon"><use href="#i-settings"/></svg><span>Settings</span></button>
+        <button class="nav-btn settings-btn" type="button" data-open-settings aria-label="Settings" title="Settings"><svg class="icon"><use href="#i-settings"/></svg><span>Settings</span></button>
       </div>
     </aside>
 
@@ -812,7 +801,7 @@
         <div class="top-actions">
           <span class="save-state" id="save-state">Saved locally</span>
           <button class="icon-btn" id="theme-toggle" aria-label="Toggle dark theme" title="Toggle theme">☾</button>
-          <button class="icon-btn" data-open-settings aria-label="Open settings"><svg class="icon"><use href="#i-settings"/></svg></button>
+          <button class="icon-btn" type="button" data-open-settings aria-label="Open settings"><svg class="icon"><use href="#i-settings"/></svg></button>
         </div>
       </header>
       <div class="content">
@@ -853,7 +842,7 @@
           <div class="field full"><label class="check-line"><input type="checkbox" name="sound"> Sound at timer phase changes</label><label class="check-line"><input type="checkbox" name="vibration"> Vibration when supported</label></div>
           <section class="update-panel" aria-labelledby="update-panel-title">
             <strong id="update-panel-title">App update</strong>
-            <p id="pwa-update-status" role="status" aria-live="polite">Version 4.0 · checking when online…</p>
+            <p id="pwa-update-status" role="status" aria-live="polite">Version 4.1 · checking when online…</p>
             <div class="update-actions"><button class="btn secondary small" type="button" data-action="check-update">Check for updates</button><button class="btn small" type="button" data-action="apply-update" hidden>Update & reload</button></div>
           </section>
         </div>
@@ -985,7 +974,7 @@
 
     const STORAGE_KEY = 'crux-routine-v1';
     const SCHEMA_VERSION = 3;
-    const APP_VERSION = '4.0';
+    const APP_VERSION = '4.1';
     const DEMO_PREP_MS = 7000;
     const CATALOG_PAGE_SIZE = 24;
     const DAY_NAMES = ['Sunday','Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'];
@@ -1312,6 +1301,7 @@
     let updateActivationTimer = null;
     let serviceWorkerControllerSeen = Boolean('serviceWorker' in navigator && navigator.serviceWorker.controller);
     let pendingTimerStart = false;
+    const failedDemoAnimationUrls = new Set();
     const watchedServiceWorkerRegistrations = new WeakSet();
     const watchedInstallingWorkers = new WeakSet();
 
@@ -1445,6 +1435,38 @@
       }
     }
 
+    function showAppDialog(dialog) {
+      if (!dialog) return false;
+      if (dialog.open || dialog.hasAttribute('open')) { syncDemoAnimations(dialog); return true; }
+      try {
+        if (typeof dialog.showModal === 'function') dialog.showModal();
+        else {
+          dialog.setAttribute('open','');
+          dialog.setAttribute('aria-modal','true');
+        }
+        syncDemoAnimations(dialog);
+        return true;
+      } catch (error) {
+        if (!dialog.isConnected || $$('dialog[open]').some(openDialog=>openDialog!==dialog)) return false;
+        dialog.setAttribute('open','');
+        dialog.setAttribute('aria-modal','true');
+        syncDemoAnimations(dialog);
+        return true;
+      }
+    }
+
+    function closeAppDialog(dialog) {
+      if (!dialog) return;
+      suspendDemoAnimations(dialog);
+      try {
+        if (typeof dialog.close === 'function' && dialog.open) dialog.close();
+        else dialog.removeAttribute('open');
+      } catch (error) {
+        dialog.removeAttribute('open');
+      }
+      if (!dialog.open) dialog.removeAttribute('aria-modal');
+    }
+
     function closeConfirmation() {
       pendingConfirmation = null;
       const restore=confirmationOpener;
@@ -1576,7 +1598,7 @@
     function setView(name, updateHistory = true) {
       if (!VIEW_META[name]) name = 'today';
       const previousView=$('.view.active');
-      if (previousView) pauseDemoAnimations(previousView);
+      if (previousView) suspendDemoAnimations(previousView);
       state.currentView = name;
       $$('.view').forEach(v => v.classList.toggle('active', v.id === `view-${name}`));
       $$('[data-view]').forEach(b => {
@@ -1601,6 +1623,7 @@
       if (name === 'guide') renderGuide();
       syncActiveTimerBody();
       updateMiniTimer();
+      syncDemoAnimations(document);
     }
 
     function dayTypeCopy(planDay) {
@@ -1861,11 +1884,12 @@
         label:exercise?.name||starter?.[0]||fallback.label,
         image,
         gif,
-        alt:`Animated demonstration of ${exercise?.name||starter?.[0]||fallback.label}`
+        alt:`Animated demonstration of ${exercise?.name||starter?.[0]||fallback.label}`,
+        posterAlt:`Still demonstration of ${exercise?.name||starter?.[0]||fallback.label}`
       };
     }
 
-    function demoVisualMarkup(exercise,{compact=false,animated=false,autoplay=true,eager=false}={}) {
+    function demoVisualMarkup(exercise,{compact=false,animated=false,eager=false}={}) {
       const demo=demoDefinition(exercise);
       const hasExercise=Boolean(exercise?.id);
       if (!demo.image||!demo.gif) {
@@ -1873,51 +1897,93 @@
         return `<div class="demo-visual demo-placeholder${compact?' demo-thumb':''}" role="img" aria-label="${esc(`${demo.label}: instructions only`)}">${icon('exercise')}<strong>${esc(compact?'Cues':demo.label)}</strong>${compact?'':`<small>${esc(demo.note||'Use the written movement cues.')}</small>`}</div>`;
       }
       if (!animated) {
-        return `<button class="demo-visual external-media is-poster${compact?' demo-thumb':''}" type="button" data-action="preview-exercise" data-id="${esc(exercise.id)}" aria-label="Play ${esc(demo.label)} demonstration"><img class="demo-poster" src="${esc(demo.image)}" alt="" ${eager?'':'loading="lazy"'} decoding="async" width="180" height="180"><span class="demo-play-badge" aria-hidden="true">${icon('play')}<span>Play</span></span></button>`;
+        return `<button class="demo-visual external-media is-animated${compact?' demo-thumb':''}" type="button" data-action="preview-exercise" data-id="${esc(exercise.id)}" aria-label="Open ${esc(demo.label)} details"><img class="demo-animation" data-demo-animation data-animation="${esc(demo.gif)}" data-poster="${esc(demo.image)}" data-animation-alt="${esc(demo.alt)}" data-poster-alt="${esc(demo.posterAlt)}" data-demo-state="animation" data-gif-failed="false" src="${esc(demo.gif)}" alt="${esc(demo.alt)}" ${eager?'':'loading="lazy"'} decoding="async" width="180" height="180"></button>`;
       }
-      const wantsAutoplay=autoplay&&!matchMedia('(prefers-reduced-motion: reduce)').matches;
-      return `<div class="demo-visual external-media is-animated${compact?' demo-thumb':''}" role="group" aria-label="${esc(demo.alt)}"><img class="demo-animation" data-demo-animation data-playing="${wantsAutoplay}" data-poster="${esc(demo.image)}" data-animation="${esc(demo.gif)}" src="${esc(wantsAutoplay?demo.gif:demo.image)}" alt="${esc(demo.alt)}" decoding="async" width="180" height="180"><button class="demo-motion-toggle" type="button" data-action="toggle-demo-motion" aria-label="${wantsAutoplay?'Pause':'Play'} ${esc(demo.label)} animation">${icon(wantsAutoplay?'pause':'play')}<span>${wantsAutoplay?'Pause':'Play'}</span></button></div>`;
+      return `<div class="demo-visual external-media is-animated${compact?' demo-thumb':''}" role="img" aria-label="${esc(demo.alt)}"><img class="demo-animation" data-demo-animation data-animation="${esc(demo.gif)}" data-poster="${esc(demo.image)}" data-animation-alt="${esc(demo.alt)}" data-poster-alt="${esc(demo.posterAlt)}" data-demo-state="animation" data-gif-failed="false" src="${esc(demo.gif)}" alt="${esc(demo.alt)}" ${eager?'':'loading="lazy"'} decoding="async" width="180" height="180"></div>`;
     }
 
-    function updateDemoMotionControl(animation) {
-      const control=animation.closest('.demo-visual')?.querySelector('[data-action="toggle-demo-motion"]');
-      if (!control) return;
-      const playing=animation.dataset.playing==='true';
-      const label=playing?'Pause':'Play';
-      control.innerHTML=`${icon(playing?'pause':'play')}<span>${label}</span>`;
-      control.setAttribute('aria-label',`${label} animation`);
+    function demoMediaKey(value) {
+      if (!value) return '';
+      try { return new URL(value,document.baseURI).href; }
+      catch (error) { return value; }
+    }
+
+    function sameDemoMediaUrl(first,second) {
+      return Boolean(first&&second&&demoMediaKey(first)===demoMediaKey(second));
+    }
+
+    function setDemoMediaLabel(animation,label) {
+      animation.alt=label||'';
+      const labelledVisual=animation.closest('.demo-visual[role="img"]');
+      if (labelledVisual) labelledVisual.setAttribute('aria-label',label||'Exercise demonstration');
+    }
+
+    function showDemoPoster(animation,{failed=false}={}) {
+      const poster=animation.dataset.poster;
+      if (!poster) return;
+      if (failed) animation.dataset.gifFailed='true';
+      animation.dataset.demoState=failed?'failed':'poster';
+      setDemoMediaLabel(animation,animation.dataset.posterAlt||'Still exercise demonstration');
+      if (!sameDemoMediaUrl(animation.getAttribute('src'),poster)) animation.src=poster;
+    }
+
+    function resumeDemoAnimation(animation) {
+      const source=animation.dataset.animation;
+      if (!source) return;
+      if (animation.dataset.gifFailed==='true'||failedDemoAnimationUrls.has(demoMediaKey(source))) {
+        showDemoPoster(animation,{failed:true});
+        return;
+      }
+      animation.dataset.demoState='animation';
+      setDemoMediaLabel(animation,animation.dataset.animationAlt||'Animated exercise demonstration');
+      if (!sameDemoMediaUrl(animation.getAttribute('src'),source)) animation.src=source;
+    }
+
+    function demoAnimationShouldRun(animation) {
+      if (document.visibilityState!=='visible'||!animation.isConnected||animation.closest('[hidden]')) return false;
+      const view=animation.closest('.view');
+      if (view&&!view.classList.contains('active')) return false;
+      const dialog=animation.closest('dialog');
+      if (dialog&&!dialog.open&&!dialog.hasAttribute('open')) return false;
+      return true;
+    }
+
+    function syncDemoAnimation(animation) {
+      if (demoAnimationShouldRun(animation)) resumeDemoAnimation(animation);
+      else if (animation.dataset.gifFailed!=='true') showDemoPoster(animation);
+    }
+
+    function syncDemoAnimations(root=document) {
+      $$('img[data-demo-animation]',root).forEach(syncDemoAnimation);
+    }
+
+    function suspendDemoAnimations(root=document) {
+      $$('img[data-demo-animation]',root).forEach(animation=>{
+        if (animation.dataset.gifFailed!=='true') showDemoPoster(animation);
+      });
+    }
+
+    function markDemoAnimationFailed(animation) {
+      const failedKey=demoMediaKey(animation.dataset.animation);
+      if (failedKey) failedDemoAnimationUrls.add(failedKey);
+      $$('img[data-demo-animation]').forEach(candidate=>{
+        if (demoMediaKey(candidate.dataset.animation)===failedKey) showDemoPoster(candidate,{failed:true});
+      });
     }
 
     function setupDemoAnimations(root=document) {
       $$('img[data-demo-animation]',root).forEach(animation=>{
-        if (animation.dataset.ready==='true') return;
-        animation.dataset.ready='true';
-        animation.addEventListener('error',()=>{
-          if (animation.dataset.playing==='true') {
-            animation.dataset.playing='false';
-            animation.src=animation.dataset.poster;
-            updateDemoMotionControl(animation);
-          }
-        });
-        updateDemoMotionControl(animation);
+        if (animation.dataset.ready!=='true') {
+          animation.dataset.ready='true';
+          animation.addEventListener('error',()=>{
+            if (animation.dataset.demoState!=='animation'||animation.dataset.gifFailed==='true') return;
+            const failedSource=animation.currentSrc||animation.getAttribute('src')||'';
+            if (!sameDemoMediaUrl(failedSource,animation.dataset.animation)) return;
+            markDemoAnimationFailed(animation);
+          });
+        }
+        syncDemoAnimation(animation);
       });
-    }
-
-    function pauseDemoAnimations(root=document) {
-      $$('img[data-demo-animation]',root).forEach(animation=>{
-        animation.dataset.playing='false';
-        if (animation.dataset.poster) animation.src=animation.dataset.poster;
-        updateDemoMotionControl(animation);
-      });
-    }
-
-    function toggleDemoMotion(control) {
-      const animation=control.closest('.demo-visual')?.querySelector('img[data-demo-animation]');
-      if (!animation) return;
-      const playing=animation.dataset.playing==='true';
-      animation.dataset.playing=String(!playing);
-      animation.src=playing?animation.dataset.poster:animation.dataset.animation;
-      updateDemoMotionControl(animation);
     }
 
     function displayExerciseName(value) {
@@ -2088,11 +2154,12 @@
         const existing=libraryExerciseForSource(record.id);
         const name=displayExerciseName(record.name);
         return `<article class="catalog-card">
-          <div><button class="catalog-media" type="button" data-action="catalog-preview" data-source-id="${esc(record.id)}" aria-label="Preview ${esc(name)}"><img src="${esc(record.imageUrl)}" alt="" loading="lazy" decoding="async" width="180" height="180"></button></div>
+          <div><button class="catalog-media" type="button" data-action="catalog-preview" data-source-id="${esc(record.id)}" aria-label="Preview ${esc(name)}"><img class="demo-animation" data-demo-animation data-animation="${esc(record.gifUrl)}" data-poster="${esc(record.imageUrl)}" data-animation-alt="Animated demonstration of ${esc(name)}" data-poster-alt="Still demonstration of ${esc(name)}" data-demo-state="animation" data-gif-failed="false" src="${esc(record.gifUrl)}" alt="Animated demonstration of ${esc(name)}" loading="lazy" decoding="async" width="180" height="180"></button></div>
           <div class="catalog-card-copy"><span class="catalog-meta">${esc(record.bodyPart)} · ${esc(record.equipment)} · ${esc(record.target)}</span><h3>${esc(name)}</h3><p>${esc(record.instructions)}</p>
           <div class="catalog-actions"><button class="btn small" type="button" data-action="catalog-add" data-source-id="${esc(record.id)}" ${existing?'disabled':''}>${existing?'Added':`${icon('plus')} Add`}</button></div></div>
         </article>`;
       }).join('')+(shown.length<matches.length?`<button class="btn secondary catalog-more" type="button" data-action="catalog-more">Show ${Math.min(CATALOG_PAGE_SIZE,matches.length-shown.length)} more</button>`:'');
+      setupDemoAnimations(results);
     }
 
     async function openExerciseCatalog() {
@@ -2186,8 +2253,7 @@
 
     function activeDemoMarkup(timer) {
       const context=timerDisplayContext(timer);
-      const autoplay=timer.phase!=='work'&&!timer.paused;
-      return `<div class="active-demo" id="active-demo" data-demo-key="${esc(context.key)}">${demoVisualMarkup(context.exercise,{animated:true,autoplay,eager:true})}<div class="active-demo-copy">${esc(context.caption)}</div></div>`;
+      return `<div class="active-demo" id="active-demo" data-demo-key="${esc(context.key)}">${demoVisualMarkup(context.exercise,{animated:true,eager:true})}<div class="active-demo-copy">${esc(context.caption)}</div></div>`;
     }
 
     function renderTimer() {
@@ -2251,6 +2317,7 @@
           </section>
         </div>`;
       syncActiveTimerBody();
+      setupDemoAnimations(root);
     }
 
     function renderLibrary() {
@@ -2267,6 +2334,7 @@
           <div class="exercise-compact-stats">${e.sets} sets · ${e.workSec}s / ${e.restSec}s</div>
           <div class="exercise-actions"><button class="btn small add-to-timer" data-action="library-add-timer" data-id="${esc(e.id)}" ${queuedIds.has(e.id)?'disabled':''}>${queuedIds.has(e.id)?'In timer':`${icon('plus')} Timer`}</button><button class="btn secondary small" data-action="edit-exercise" data-id="${esc(e.id)}" aria-label="Edit ${esc(e.name)}">${icon('edit')}</button><button class="btn ghost small" data-action="delete-exercise" data-id="${esc(e.id)}" aria-label="Remove ${esc(e.name)}">${icon('trash')}</button></div>
         </article>`).join('') : '<div class="empty" style="grid-column:1/-1">No exercises match that filter.</div>'}</div>`;
+      setupDemoAnimations($('#view-library'));
     }
 
     function ensureDaySnapshot(dateValue,tasks) {
@@ -2471,12 +2539,18 @@
 
     function openSettings() {
       const form = $('#settings-form');
+      const dialog = $('#settings-dialog');
+      if (!form || !dialog) return;
       form.elements.weight.value = state.settings.weightKg || '';
       form.elements.weekAnchor.value = state.settings.weekAnchor;
       form.elements.theme.value = state.settings.theme;
       form.elements.sound.checked = state.settings.sound;
       form.elements.vibration.checked = state.settings.vibration;
-      $('#settings-dialog').showModal();
+      if (!showAppDialog(dialog)) {
+        toast('Close the open window before opening Settings.',true);
+        return;
+      }
+      setTimeout(()=>dialog.querySelector('[data-close-dialog]')?.focus(),0);
     }
 
     function openExercise(id = '') {
@@ -2501,7 +2575,7 @@
       pendingTimerStart=startSession;
       const demo=demoDefinition(exercise);
       $('#demo-dialog-title').textContent=startSession?`Ready for ${exercise.name}?`:exercise.name;
-      $('#demo-dialog-stage').innerHTML=demoVisualMarkup(exercise,{animated:true,autoplay:true,eager:true});
+      $('#demo-dialog-stage').innerHTML=demoVisualMarkup(exercise,{animated:true,eager:true});
       $('#demo-dialog-copy').textContent=[exercise.instructions||'No movement cues saved.',demo.note||''].filter(Boolean).join(' ');
       const steps=(exercise.instructionSteps||[]).filter(Boolean);
       const stepsDetails=$('#demo-dialog-steps');
@@ -3190,17 +3264,18 @@
     }
 
     document.addEventListener('click', event => {
-      const closeDialogButton = event.target.closest('[data-close-dialog]');
+      const target = event.target instanceof Element ? event.target : event.target?.parentElement;
+      if (!target) return;
+      const closeDialogButton = target.closest('[data-close-dialog]');
       if (closeDialogButton) {
         const dialog=closeDialogButton.closest('dialog');
-        if (dialog) pauseDemoAnimations(dialog);
-        dialog?.close();
+        closeAppDialog(dialog);
         return;
       }
-      const viewButton = event.target.closest('[data-view]');
+      const viewButton = target.closest('[data-view]');
       if (viewButton) { setView(viewButton.dataset.view); return; }
-      if (event.target.closest('[data-open-settings]')) { openSettings(); return; }
-      const control = event.target.closest('[data-action]');
+      if (target.closest('[data-open-settings]')) { openSettings(); return; }
+      const control = target.closest('[data-action]');
       if (!control) return;
       const action = control.dataset.action;
       if (action === 'check-update') void checkForAppUpdate(true);
@@ -3241,7 +3316,6 @@
       if (action === 'add-exercise') openExercise();
       if (action === 'edit-exercise') openExercise(control.dataset.id);
       if (action === 'preview-exercise') void openExerciseDemo(control.dataset.id);
-      if (action === 'toggle-demo-motion') toggleDemoMotion(control);
       if (action === 'confirm-timer-start') confirmTimerStart();
       if (action === 'delete-exercise') deleteExercise(control.dataset.id);
       if (action === 'delete-session') requestDeleteSession(control.dataset.id);
@@ -3387,14 +3461,14 @@
 
     $('#settings-form').addEventListener('submit', event => {
       event.preventDefault();
-      if (event.submitter?.value === 'cancel') { $('#settings-dialog').close(); return; }
+      if (event.submitter?.value === 'cancel') { closeAppDialog($('#settings-dialog')); return; }
       const form=event.currentTarget;
       state.settings.weightKg=form.elements.weight.value ? Number(form.elements.weight.value) : '';
       state.settings.weekAnchor=startOfWeek(form.elements.weekAnchor.value || localDate());
       state.settings.theme=form.elements.theme.value;
       state.settings.sound=form.elements.sound.checked;
       state.settings.vibration=form.elements.vibration.checked;
-      applyTheme(); saveState('Settings saved.'); $('#settings-dialog').close(); renderView();
+      applyTheme(); saveState('Settings saved.'); closeAppDialog($('#settings-dialog')); renderView();
     });
 
     $('#exercise-form').addEventListener('submit', event => {
@@ -3469,7 +3543,8 @@
     });
 
     const confirmationDialog=$('#confirm-dialog');
-    $('#demo-dialog').addEventListener('close',event=>{pauseDemoAnimations(event.currentTarget);pendingTimerStart=false;});
+    $$('dialog').forEach(dialog=>dialog.addEventListener('close',()=>suspendDemoAnimations(dialog)));
+    $('#demo-dialog').addEventListener('close',()=>{pendingTimerStart=false;});
     confirmationDialog.addEventListener('cancel',event=>{
       event.preventDefault();
       closeConfirmation();
@@ -3484,7 +3559,7 @@
         message:'Routines, exercises and history will be removed. Export a backup first if needed.',
         confirmLabel:'Reset all data',
         onConfirm:()=>{
-          releaseWakeLock(); localStorage.removeItem(STORAGE_KEY); state=defaultState(); applyTheme(); saveState('Fresh plan restored.'); $('#settings-dialog').close(); setView('today');
+          releaseWakeLock(); localStorage.removeItem(STORAGE_KEY); state=defaultState(); applyTheme(); saveState('Fresh plan restored.'); closeAppDialog($('#settings-dialog')); setView('today');
         }
       });
     });
@@ -3515,11 +3590,13 @@
         if (state.activeTimer&&!state.activeTimer.paused) { syncExpiredTimer(); requestWakeLock(); updateTimerDisplay(); }
         void processDueReminders();
         void checkForAppUpdate();
+        syncDemoAnimations(document);
       }
-      if (document.visibilityState==='hidden') pauseDemoAnimations(document);
+      if (document.visibilityState==='hidden') suspendDemoAnimations(document);
       if (document.visibilityState==='hidden'&&noteSaveTimer) { clearTimeout(noteSaveTimer); noteSaveTimer=null; saveState(); }
     });
-    window.addEventListener('pagehide',()=>{ if(noteSaveTimer){clearTimeout(noteSaveTimer);noteSaveTimer=null;saveState();} });
+    window.addEventListener('pagehide',()=>{ suspendDemoAnimations(document); if(noteSaveTimer){clearTimeout(noteSaveTimer);noteSaveTimer=null;saveState();} });
+    window.addEventListener('pageshow',()=>syncDemoAnimations(document));
     matchMedia('(prefers-color-scheme: dark)').addEventListener?.('change',()=>{if(state.settings.theme==='system')applyTheme();});
 
     applyTheme();

@@ -1,6 +1,61 @@
 import { test, expect } from '@playwright/test';
 import { stubDatasetMedia, waitForApp, watchForBrowserProblems } from './helpers.mjs';
 
+for (const viewport of [
+  { name: 'desktop', size: { width: 1280, height: 900 }, trigger: '.sidebar [data-open-settings]' },
+  { name: 'mobile', size: { width: 390, height: 844 }, trigger: '.topbar [data-open-settings]', nestedTarget: true }
+]) {
+  test(`${viewport.name} Settings opens and preserves cancel or save intent`, async ({ page }) => {
+    const assertClean = watchForBrowserProblems(page);
+    await page.setViewportSize(viewport.size);
+    await waitForApp(page);
+
+    const dialog = page.locator('#settings-dialog');
+    const settingsButton = page.locator(viewport.trigger);
+    const initialSettings = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('crux-routine-v1')).settings
+    );
+    const changedTheme = initialSettings.theme === 'dark' ? 'light' : 'dark';
+
+    if (viewport.nestedTarget) await settingsButton.locator('use').click();
+    else await settingsButton.click();
+    await expect(dialog).toBeVisible();
+    await dialog.locator('[name="weight"]').fill('81.5');
+    await dialog.locator('[name="theme"]').selectOption(changedTheme);
+    await dialog.getByRole('button', { name: 'Cancel' }).click();
+    await expect(dialog).toBeHidden();
+
+    const settingsAfterCancel = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('crux-routine-v1')).settings
+    );
+    expect(settingsAfterCancel.weightKg).toBe(initialSettings.weightKg);
+    expect(settingsAfterCancel.theme).toBe(initialSettings.theme);
+
+    await settingsButton.click();
+    await expect(dialog).toBeVisible();
+    await expect(dialog.locator('[name="weight"]')).toHaveValue(String(initialSettings.weightKg || ''));
+    await expect(dialog.locator('[name="theme"]')).toHaveValue(initialSettings.theme);
+    await dialog.locator('[name="weight"]').fill('81.5');
+    await dialog.locator('[name="theme"]').selectOption(changedTheme);
+    await dialog.getByRole('button', { name: 'Save settings' }).click();
+    await expect(dialog).toBeHidden();
+
+    const settingsAfterSave = await page.evaluate(() =>
+      JSON.parse(localStorage.getItem('crux-routine-v1')).settings
+    );
+    expect(settingsAfterSave.weightKg).toBe(81.5);
+    expect(settingsAfterSave.theme).toBe(changedTheme);
+
+    await settingsButton.click();
+    await expect(dialog).toBeVisible();
+    await expect(dialog.locator('[name="weight"]')).toHaveValue('81.5');
+    await expect(dialog.locator('[name="theme"]')).toHaveValue(changedTheme);
+    await dialog.getByRole('button', { name: 'Cancel' }).click();
+    await expect(dialog).toBeHidden();
+    assertClean();
+  });
+}
+
 test('all primary views render without browser or network errors', async ({ page }) => {
   const assertClean = watchForBrowserProblems(page);
   await stubDatasetMedia(page);

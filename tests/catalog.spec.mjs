@@ -1,6 +1,32 @@
 import { test, expect } from '@playwright/test';
 import { stubDatasetMedia, waitForApp, watchForBrowserProblems } from './helpers.mjs';
 
+const MEDIA_PLAYBACK_CONTROLS = [
+  '.demo-play-badge',
+  '.demo-motion-toggle',
+  '[data-action="toggle-demo-motion"]',
+  '[aria-label^="Play " i]',
+  '[aria-label^="Pause " i]'
+].join(', ');
+
+async function expectAutomaticGif(scope, sourceId = '\\d{4}') {
+  const animation = scope.locator('img[data-demo-animation]').first();
+  await expect(animation).toHaveAttribute(
+    'src',
+    new RegExp(`/videos/${sourceId}-[^/]+\\.gif$`)
+  );
+  await expect(animation).toHaveAttribute('data-demo-state', 'animation');
+  await expect(animation).toHaveAttribute('alt', /^Animated demonstration of /);
+  await expect(scope.locator(MEDIA_PLAYBACK_CONTROLS)).toHaveCount(0);
+}
+
+async function expectSuspendedPoster(scope, sourceId, state = 'poster') {
+  const animation = scope.locator('img[data-demo-animation]').first();
+  await expect(animation).toHaveAttribute('src', new RegExp(`/images/${sourceId}-[^/]+\\.jpg$`));
+  await expect(animation).toHaveAttribute('data-demo-state', state);
+  await expect(animation).toHaveAttribute('alt', /^Still demonstration of /);
+}
+
 test('catalog stays modular and supports filters, search, library add, and timer add', async ({ page }) => {
   const assertClean = watchForBrowserProblems(page);
   await stubDatasetMedia(page);
@@ -19,6 +45,7 @@ test('catalog stays modular and supports filters, search, library add, and timer
   const initialResultCount = await page.locator('.catalog-card').count();
   expect(initialResultCount).toBeGreaterThan(0);
   expect(initialResultCount).toBeLessThan(50);
+  await expectAutomaticGif(page.locator('.catalog-card').first());
   await expect(page.locator('[data-action="catalog-more"]')).toBeVisible();
 
   await page.locator('#catalog-focus').selectOption('all');
@@ -57,37 +84,58 @@ test('catalog stays modular and supports filters, search, library add, and timer
   assertClean();
 });
 
-test('exercise preview is static for reduced motion and can explicitly animate', async ({ page }) => {
+test('exercise media stays animated without Play or Pause controls', async ({ page }) => {
   const assertClean = watchForBrowserProblems(page);
   await stubDatasetMedia(page);
+  await page.emulateMedia({ reducedMotion: 'reduce' });
   await page.setViewportSize({ width: 390, height: 844 });
   await waitForApp(page);
   await page.locator('.bottom-nav [data-view="library"]').click();
 
   const warmup = page.locator('.exercise-card').filter({ hasText: /world greatest stretch/i }).first();
-  await warmup.locator('button.demo-visual').click();
+  await expectAutomaticGif(warmup, '1604');
+
+  await warmup.locator('[data-action="preview-exercise"]').click();
   const dialog = page.locator('#demo-dialog');
-  const animation = dialog.locator('[data-demo-animation]');
-  const toggle = dialog.locator('[data-action="toggle-demo-motion"]');
 
   await expect(dialog).toBeVisible();
-  await expect(animation).toHaveAttribute('data-playing', 'false');
-  await expect(animation).toHaveAttribute('src', /\/images\/1604-[^/]+\.jpg$/);
-  await expect(toggle).toHaveAccessibleName(/play/i);
-
-  await toggle.click();
-  await expect(animation).toHaveAttribute('data-playing', 'true');
-  await expect(animation).toHaveAttribute('src', /\/videos\/1604-[^/]+\.gif$/);
-  await expect(toggle).toHaveAccessibleName(/pause/i);
-
-  await toggle.click();
-  await expect(animation).toHaveAttribute('data-playing', 'false');
-  await expect(animation).toHaveAttribute('src', /\/images\/1604-[^/]+\.jpg$/);
+  await expectAutomaticGif(dialog, '1604');
   await dialog.getByRole('button', { name: 'Close' }).click();
+  await expect(dialog).toBeHidden();
+  await expectSuspendedPoster(dialog, '1604');
 
-  await page.emulateMedia({ reducedMotion: 'no-preference' });
-  await warmup.locator('button.demo-visual').click();
-  await expect(animation).toHaveAttribute('data-playing', 'true');
-  await expect(animation).toHaveAttribute('src', /\/videos\/1604-[^/]+\.gif$/);
+  await page.locator('.bottom-nav [data-view="timer"]').click();
+  await expectSuspendedPoster(warmup, '1604');
+  const firstQueueItem = page.locator('.queue-item').first();
+  await expect(firstQueueItem).toBeVisible();
+  await expectAutomaticGif(firstQueueItem, '1604');
+
+  await page.locator('[data-action="timer-start"]').click();
+  await expect(dialog).toBeVisible();
+  await dialog.locator('#demo-dialog-start').click();
+  const activeDemo = page.locator('.active-demo');
+  await expect(activeDemo).toBeVisible();
+  await expectAutomaticGif(activeDemo, '1604');
+  await expect(page.locator(MEDIA_PLAYBACK_CONTROLS)).toHaveCount(0);
   assertClean();
+});
+
+test.describe('exercise media network fallback', () => {
+  test.use({ serviceWorkers: 'block' });
+
+  test('failed exercise GIF falls back to a decoded poster with an accurate still label', async ({ page }) => {
+    await stubDatasetMedia(page, { failGifs: true });
+    await page.setViewportSize({ width: 390, height: 844 });
+    await waitForApp(page);
+    await page.locator('.bottom-nav [data-view="library"]').click();
+
+    const warmup = page.locator('.exercise-card').filter({ hasText: /world greatest stretch/i }).first();
+    const media = warmup.locator('img[data-demo-animation]');
+    await media.scrollIntoViewIfNeeded();
+    await expect(media).toBeVisible();
+    await expectSuspendedPoster(warmup, '1604', 'failed');
+    await expect(media).toHaveAttribute('data-gif-failed', 'true');
+    await expect(media).toHaveAttribute('alt', 'Still demonstration of World greatest stretch');
+    await expect.poll(() => media.evaluate(image => image.complete && image.naturalWidth > 0)).toBe(true);
+  });
 });

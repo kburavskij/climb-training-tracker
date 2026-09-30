@@ -68,8 +68,9 @@ browser may evict cached media under storage pressure. Loading new media contact
 `raw.githubusercontent.com`.
 
 The interval timer shows a seven-second movement preview before each new exercise,
-while normal rest remains between sets. Animation controls and the reduced-motion
-preference can stop motion; exercises without matching media remain instruction-only.
+while normal rest remains between sets. Matching exercise GIFs animate automatically
+wherever they appear and have no playback controls. If a GIF cannot load, the app falls
+back to its still image; exercises without matching media remain instruction-only.
 
 ### Dataset and media licensing
 

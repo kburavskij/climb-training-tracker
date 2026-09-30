@@ -59,6 +59,9 @@ for (const starterId of catalog.starterIds) {
   assert.ok(catalogIds.has(starterId), `starter exercise is missing from catalog: ${starterId}`);
 }
 assert.ok(html.includes(catalog.source.commit), 'app and catalog must use the same pinned dataset commit');
+assert.doesNotMatch(html, /data-action=["']toggle-demo-motion["']/, 'exercise media must not expose Play/Pause toggle actions');
+assert.doesNotMatch(html, /demo-(?:play-badge|motion-toggle)/, 'removed exercise playback control classes must not return');
+assert.doesNotMatch(html, /<symbol\b[^>]*\bid=["']i-(?:play|pause)["']/i, 'removed exercise playback icons must not return');
 assert.match(workerSource, /exercise-catalog\.json/, 'offline shell should include the local exercise catalog');
 assert.doesNotMatch(workerSource, /demos\/(?:workout-guide|quaternius)\//, 'obsolete generated demos should not be precached');
 

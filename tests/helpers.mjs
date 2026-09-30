@@ -1,15 +1,19 @@
 import { expect } from '@playwright/test';
 
 const TINY_GIF = Buffer.from('R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=', 'base64');
+const TINY_JPEG = Buffer.from('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/wAALCAACAAIBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AVN//2Q==', 'base64');
 
-export async function stubDatasetMedia(page) {
-  await page.route(/^https:\/\/raw\.githubusercontent\.com\/hasaneyldrm\/exercises-dataset\//, route =>
-    route.fulfill({
+export async function stubDatasetMedia(page, { failGifs = false } = {}) {
+  await page.route(/^https:\/\/raw\.githubusercontent\.com\/hasaneyldrm\/exercises-dataset\//, route => {
+    const isGif = new URL(route.request().url()).pathname.endsWith('.gif');
+    if (failGifs && isGif) return route.abort('failed');
+    return route.fulfill({
       status: 200,
-      contentType: 'image/gif',
+      contentType: isGif ? 'image/gif' : 'image/jpeg',
       headers: { 'cache-control': 'public, max-age=3600' },
-      body: TINY_GIF
-    }));
+      body: isGif ? TINY_GIF : TINY_JPEG
+    });
+  });
 }
 
 export function watchForBrowserProblems(page) {
