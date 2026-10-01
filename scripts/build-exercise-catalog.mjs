@@ -7,7 +7,7 @@ import process from 'node:process';
 const SOURCE_REPOSITORY = 'https://github.com/hasaneyldrm/exercises-dataset';
 const SOURCE_COMMIT = '7455efae41b330c265e7cd4b78dfa848e7ce5ebd';
 const MEDIA_ROOT = `https://raw.githubusercontent.com/hasaneyldrm/exercises-dataset/${SOURCE_COMMIT}/`;
-const ATTRIBUTION = '© Gym visual — https://gymvisual.com/';
+const ATTRIBUTION = '© Gym visual, https://gymvisual.com/';
 const STARTER_IDS = ['1604', '0688', '0662', '2368', '0276', '1428', '0721', '1271'];
 const PREFERRED_DUPLICATES = new Set(['0126', '1471', '0499', '0514', '0659', '0697', '2802']);
 
