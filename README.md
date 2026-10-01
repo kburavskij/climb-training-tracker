@@ -1,6 +1,6 @@
 # Crux Routine
 
-Crux Routine is a privacy-friendly, offline-capable climbing, strength, mobility and supplement tracker. It is a dependency-free static web app at runtime: all routine data stays in the browser's local storage unless you explicitly export it.
+Crux Routine is a climbing, strength, mobility and supplement tracker. It is a dependency-free static web app. Routine data stays in the browser's local storage until you export it.
 
 ## Run locally
 
@@ -62,9 +62,9 @@ The service worker precaches the catalog metadata with the app shell, so names,
 instructions, filters and saved exercises remain available offline. Thumbnails and
 animation GIFs are not bundled or bulk-downloaded: they are requested from the same
 pinned upstream commit only when displayed. Successfully viewed media is kept in a
-separate, bounded 48-entry runtime cache as a best-effort convenience. Previously
-viewed media may therefore work offline, but unviewed media needs a connection and any
-browser may evict cached media under storage pressure. Loading new media contacts
+separate runtime cache with room for 48 entries. Previously viewed media may work
+offline, but unviewed media needs a connection. Browsers may evict cached media when
+storage is low. Loading new media contacts
 `raw.githubusercontent.com`.
 
 The interval timer shows a seven-second movement preview before each new exercise,
@@ -79,12 +79,12 @@ text under the MIT License. Its earlier history identifies ExerciseDB v1/AscendA
 the source of the base English data and media; ExerciseDB publishes separate usage
 terms, including non-commercial limits. That provenance should be reviewed rather than
 assuming the repository's later license change settled every downstream right. The
-thumbnail and GIF media are different: they are **© Gym visual**, are
-**not covered by MIT**, and are not presented here as free or open-license assets.
+Thumbnail and GIF media are separate. They are **© Gym visual** and are
+**not covered by MIT**. This project does not present them as free or open-license assets.
 The upstream [`LICENSE`](https://github.com/hasaneyldrm/exercises-dataset/blob/7455efae41b330c265e7cd4b78dfa848e7ce5ebd/LICENSE)
 and [`NOTICE.md`](https://github.com/hasaneyldrm/exercises-dataset/blob/7455efae41b330c265e7cd4b78dfa848e7ce5ebd/NOTICE.md)
 say that its permission to redistribute 180×180 media does not automatically grant
-downstream reuse rights. Keep the visible `© Gym visual — https://gymvisual.com/`
+downstream reuse rights. Keep the visible `© Gym visual, https://gymvisual.com/`
 attribution, review [Gym visual's terms](https://gymvisual.com/content/3-terms-and-conditions-of-use)
 and [ExerciseDB's terms](https://oss.exercisedb.dev/swagger), and obtain any required
 permission or license before publicly or commercially deploying the integration.

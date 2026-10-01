@@ -1293,7 +1293,7 @@
     <aside class="sidebar" aria-label="Primary navigation">
       <div class="brand">
         <div class="brand-mark"><img src="./icons/icon-192-v2.png" alt="" aria-hidden="true"></div>
-        <div class="brand-copy"><strong>Crux Routine</strong><small>Train · climb · recover</small></div>
+        <div class="brand-copy"><strong>Crux Routine</strong><small>Training, climbing and recovery</small></div>
       </div>
       <nav class="nav" data-nav>
         <button class="nav-btn active" data-view="today" aria-label="Today" title="Today"><svg class="icon"><use href="#i-home"/></svg><span>Today</span></button>
@@ -1312,7 +1312,7 @@
     <main class="main" id="app-content" tabindex="-1">
       <header class="topbar">
         <button class="mobile-brand" type="button" data-view="today" aria-label="Go to Today"><span class="brand-mark"><img src="./icons/icon-192-v2.png" alt="" aria-hidden="true"></span></button>
-        <div class="topbar-title"><h1 id="top-title">Today</h1><p id="top-subtitle">Your plan, one useful action at a time.</p></div>
+        <div class="topbar-title"><h1 id="top-title">Today</h1><p id="top-subtitle">Plan and log one useful action at a time.</p></div>
         <div class="top-actions">
           <span class="save-state" id="save-state">Saved locally</span>
           <button class="icon-btn mobile-guide-btn" type="button" data-view="guide" aria-label="Open evidence guide" title="Evidence guide"><svg class="icon"><use href="#i-guide"/></svg></button>
@@ -1453,7 +1453,7 @@
         </div></fieldset>
         <div class="field" id="routine-month-field"><label for="routine-month-day">Day of month</label><input id="routine-month-day" name="monthDay" type="number" min="1" max="31" value="1"><small>Uses the month's last day when needed.</small></div>
         <div class="field full"><label for="routine-detail">Instructions</label><textarea id="routine-detail" name="detail" maxlength="420" placeholder="What to do and any useful conditions"></textarea></div>
-        <div class="field full"><label class="check-line"><input type="checkbox" name="optional"> Optional — do not count this toward adherence</label></div>
+        <div class="field full"><label class="check-line"><input type="checkbox" name="optional"> Optional. Do not count this toward adherence.</label></div>
       </div></div>
       <div class="dialog-foot"><button class="btn secondary" type="button" data-close-dialog>Cancel</button><button class="btn" type="submit" value="save">Save routine</button></div>
     </form>
@@ -1483,7 +1483,7 @@
         <div class="field"><label for="schedule-scope">What to add</label><select id="schedule-scope" name="scope"></select></div>
         <div class="schedule-choice"><strong id="schedule-selection-title">Day overview</strong><p id="schedule-selection-copy">One event summarizing the selected day.</p></div>
         <div class="form-grid">
-          <div class="field" id="schedule-lead-field"><label for="schedule-lead">Calendar file / app reminder</label><select id="schedule-lead" name="leadMinutes"><option value="0">At start</option><option value="10">10 minutes before</option><option value="30">30 minutes before</option><option value="60">1 hour before</option></select><small>Google Calendar uses your Google account’s reminder defaults.</small></div>
+          <div class="field" id="schedule-lead-field"><label for="schedule-lead">Calendar file / app reminder</label><select id="schedule-lead" name="leadMinutes"><option value="0">At start</option><option value="10">10 minutes before</option><option value="30">30 minutes before</option><option value="60">1 hour before</option></select><small>Google Calendar uses your Google account's reminder defaults.</small></div>
           <div class="field" id="schedule-day-time-field"><label for="schedule-day-time">Day overview alert time</label><input id="schedule-day-time" name="dayTime" type="time" value="08:00"></div>
         </div>
         <div class="schedule-actions">
@@ -1507,7 +1507,7 @@
         <p id="demo-dialog-copy" class="muted" style="line-height:1.55;margin:0"></p>
         <details class="demo-steps" id="demo-dialog-steps" hidden><summary id="demo-dialog-steps-summary">Step-by-step</summary><ol id="demo-dialog-steps-list"></ol></details>
         <div class="exercise-stats" id="demo-dialog-stats"></div>
-        <p class="demo-note">Movement overview—not a prescribed tempo. Use a comfortable range and stop for sharp or increasing pain.</p>
+        <p class="demo-note">Movement overview. This is not a prescribed tempo. Use a comfortable range and stop for sharp or increasing pain.</p>
       </div>
       <div class="dialog-foot"><button class="btn secondary" type="button" data-close-dialog>Back</button><button class="btn" id="demo-dialog-start" type="button" data-action="confirm-timer-start" hidden>Start workout</button></div>
     </div>
@@ -1564,11 +1564,11 @@
       '1271':['Chest and front of shoulder stretch','images/1271-Uto7l43.jpg','videos/1271-Uto7l43.gif']
     });
     const VIEW_META = {
-      today: ['Today', 'Your plan, one useful action at a time.'],
-      plan: ['Plan', 'A repeatable rhythm with room to recover.'],
+      today: ['Today', 'Plan and log one useful action at a time.'],
+      plan: ['Plan', 'Schedule hard sessions with room to recover.'],
       timer: ['Interval timer', 'Work, rest and move to the next set.'],
       library: ['Exercise library', 'Build a session from movements you trust.'],
-      history: ['History', 'Look for patterns, not perfect streaks.'],
+      history: ['History', 'Review completed items and workouts.'],
       guide: ['Evidence guide', 'Practical defaults, limits and sources.']
     };
 
@@ -1608,13 +1608,13 @@
         currentView: 'today',
         plan: {
           A: [
-            {type:'climb', title:'Technique → power bouldering', duration:90, focus:'New/returning: stay submaximal. Experienced and pain-free: a few quality hard attempts, stopping before finger power falls sharply.'},
+            {type:'climb', title:'Technique to power bouldering', duration:90, focus:'New/returning: stay submaximal. Experienced and pain-free: a few quality hard attempts, stopping before finger power falls sharply.'},
             {type:'recovery', title:'Active recovery', duration:25, focus:'Easy walk or cycle, plus comfortable mobility.'},
             {type:'strength', secondaryType:'prehab', title:'Strength + prehab', duration:55, focus:'Pull, push, legs and core. Leave 2–3 reps in reserve.'},
             {type:'rest', title:'Full rest', duration:0, focus:'Normal movement is fine. Protect sleep and eat normally.'},
             {type:'climb', title:'Technique + volume', duration:90, focus:'Submaximal movement quality; avoid repeated failure.'},
             {type:'recovery', title:'Easy aerobic + mobility', duration:35, focus:'Conversational pace. Optional easy climbing only if fresh.'},
-            {type:'rest', title:'Rest + weekly review', duration:10, focus:'Review soreness, session RPE and next week’s load.'}
+            {type:'rest', title:'Rest + weekly review', duration:10, focus:"Review soreness, session RPE and next week's load."}
           ],
           B: [
             {type:'climb', title:'Technique / power bouldering', duration:80, focus:'Use submaximal technique work unless experienced, recovered and pain-free; then use long rests and few hard moves.'},
@@ -1631,10 +1631,10 @@
           {id:'r-creatine', title:'Creatine monohydrate', category:'supplement', route:'oral', time:'08:00', amount:'3–5 g', frequency:'daily', weekdays:[], monthDay:1, detail:'With water or a meal. Consistency matters more than workout timing.', optional:false, active:true},
           {id:'r-am-mobility', title:'Morning movement reset', category:'mobility', time:'07:30', amount:'5–8 min', frequency:'daily', weekdays:[], monthDay:1, detail:'Gentle joint circles and comfortable range; this is not a deep stretch test.', optional:true, active:true},
           {id:'r-collagen', title:'Collagen + vitamin C food', category:'supplement', route:'oral', time:'17:00', relativeMinutes:-60, amount:'10–15 g', frequency:'session', weekdays:[], monthDay:1, detail:'Optional collagen/gelatin 30–60 min before tendon-loading work. Evidence is promising but not definitive; it does not replace complete protein.', optional:true, active:true},
-          {id:'r-electrolyte', title:'Prepare electrolytes — only if needed', category:'supplement', route:'oral', time:'17:30', relativeMinutes:-30, amount:'label / sweat plan', frequency:'session', weekdays:[], monthDay:1, detail:'Have them ready for use during long, hot or very sweaty sessions. For short/cool sessions, water and normal meals are usually enough.', optional:true, active:true},
+          {id:'r-electrolyte', title:'Prepare electrolytes (only if needed)', category:'supplement', route:'oral', time:'17:30', relativeMinutes:-30, amount:'label / sweat plan', frequency:'session', weekdays:[], monthDay:1, detail:'Have them ready for use during long, hot or very sweaty sessions. For short/cool sessions, water and normal meals are usually enough.', optional:true, active:true},
           {id:'r-pm-flex', title:'Evening flexibility', category:'mobility', time:'20:30', amount:'8–12 min', frequency:'daily', weekdays:[], monthDay:1, detail:'Optional comfortable static holds after training or later in the day. No bouncing, numbness or joint pain.', optional:true, active:true},
-          {id:'r-magnesium', title:'Magnesium — if indicated', category:'supplement', route:'oral', time:'21:00', amount:'your elemental dose', frequency:'daily', weekdays:[], monthDay:1, detail:'Food first; supplement only for a dietary gap or clinician-guided reason. Timing is for tolerance/routine, not an acute performance effect.', optional:true, active:true},
-          {id:'r-review', title:'Weekly training review', category:'recovery', time:'18:00', amount:'10 min', frequency:'weekly', weekdays:[0], monthDay:1, detail:'Review hard sessions, pain, sleep and whether next week should progress or ease off.', optional:false, active:true},
+          {id:'r-magnesium', title:'Magnesium (if indicated)', category:'supplement', route:'oral', time:'21:00', amount:'your elemental dose', frequency:'daily', weekdays:[], monthDay:1, detail:'Food first; supplement only for a dietary gap or clinician-guided reason. Timing is for tolerance/routine, not an acute performance effect.', optional:true, active:true},
+          {id:'r-review', title:'Weekly training review', category:'recovery', time:'18:00', amount:'10 min', frequency:'weekly', weekdays:[0], monthDay:1, detail:"Review hard sessions, pain, sleep and whether next week's load should increase or ease off.", optional:false, active:true},
           {id:'r-monthly', title:'Monthly plan check', category:'recovery', time:'18:30', amount:'15 min', frequency:'monthly', weekdays:[], monthDay:1, detail:'Review the last block, deload if needed, and change only one main training variable.', optional:false, active:true}
         ],
         exercises: [
@@ -2218,7 +2218,7 @@
     function weekRangeLabel(weekStart) {
       const end=addDays(weekStart,6);
       const startYear=weekStart.slice(0,4),endYear=end.slice(0,4);
-      return `${formatDate(weekStart,{month:'short',day:'numeric'})} – ${formatDate(end,{month:'short',day:'numeric'})}${startYear!==endYear?` ${endYear}`:''}`;
+      return `${formatDate(weekStart,{month:'short',day:'numeric'})} to ${formatDate(end,{month:'short',day:'numeric'})}${startYear!==endYear?` ${endYear}`:''}`;
     }
 
     function renderTodayCalendar() {
@@ -2323,14 +2323,14 @@
 
           <div class="grid-2">
             <section class="card card-pad">
-              <div class="section-title"><div><h3>Today’s route</h3><p>Tap the check to log. Optional items never reduce adherence.</p></div><button class="btn secondary small" data-action="add-routine">${icon('plus')} Add</button></div>
+              <div class="section-title"><div><h3>Today's route</h3><p>Tap the check to log. Optional items never reduce adherence.</p></div><button class="btn secondary small" data-action="add-routine">${icon('plus')} Add</button></div>
               <div class="timeline">
                 ${tasks.length ? tasks.map(task => renderTask(task,dateValue)).join('') : '<div class="empty">No items planned. Add a routine when you are ready.</div>'}
               </div>
             </section>
             <aside class="stack">
               <section class="card card-pad">
-                <div class="section-title"><div><h3>Readiness check</h3><p>A quick signal, not a score.</p></div></div>
+                <div class="section-title"><div><h3>Readiness check</h3><p>Record energy, soreness and sleep.</p></div></div>
                 <div class="readiness">
                   ${readinessLine('energy','Energy',daily.energy)}
                   ${readinessLine('soreness','Soreness',daily.soreness)}
@@ -2342,7 +2342,7 @@
                 <div class="section-title"><div><h3>Fuel snapshot</h3><p>Food-first planning ranges.</p></div></div>
                 <div class="stack">
                   <div class="formula-box"><span class="tiny muted">Daily protein range for active adults</span><br><strong>${protein}</strong><div class="tiny muted" style="margin-top:5px">1.4–2.0 g/kg/day, spread across meals. Clinical diets, kidney disease and some body-composition contexts need an individualized target.</div></div>
-                  <div class="callout"><strong>Hydration is conditional</strong>Water is usually enough for short, cool sessions. Consider sodium during long, hot or unusually sweaty work—and avoid drinking beyond thirst/body-mass needs.</div>
+                  <div class="callout"><strong>Hydration depends on the session</strong>Water is usually enough for short, cool sessions. Consider sodium during long, hot or unusually sweaty work, but avoid drinking beyond thirst or normal body-mass needs.</div>
                   <button class="btn secondary small" data-view="guide">Open the intake guide</button>
                 </div>
               </section>
@@ -2398,7 +2398,7 @@
       const cycleWeek = ((Math.floor(diffDays(startOfWeek(localDate()), startOfWeek(state.settings.weekAnchor)) / 7) % 4) + 4) % 4;
       const phases = [
         ['1 · Foundation','Establish repeatable volume and leave margin.'],
-        ['2 · Build','Add a little volume or difficulty—not both.'],
+        ['2 · Build','Add a little volume or difficulty. Do not change both at once.'],
         ['3 · Consolidate','Keep quality high; do not chase fatigue.'],
         ['4 · Recovery check','If fatigue calls for it, reduce hard volume roughly 30–50%; keep easy movement.']
       ];
@@ -2421,7 +2421,7 @@
                 <button class="btn secondary small" data-action="edit-plan-day" data-week="${selected}" data-index="${index}">${icon('edit')} Edit</button>
               </article>`).join('')}
             </div>
-            <div class="callout" style="margin-top:14px"><strong>Load heuristic</strong>Use 48 hours as a minimum between hard finger-loading sessions—including fingerboard work. Session load, training age and symptoms may require longer. Pain that changes movement is a stop signal.</div>
+            <div class="callout" style="margin-top:14px"><strong>Minimum rest</strong>Leave at least 48 hours between hard finger-loading sessions, including fingerboard work. Session load, training age and symptoms may require longer. Pain that changes movement is a stop signal.</div>
           </section>
           <section class="card card-pad">
             <div class="section-title"><div><h3>Four-week wave</h3><p>A simple monthly rhythm; current phase is highlighted from your Week A anchor.</p></div></div>
@@ -2805,7 +2805,7 @@
         const changedExercise=next.exerciseIndex!==timer.exerciseIndex;
         return {exercise,exerciseIndex:next.exerciseIndex,setIndex:next.setIndex,key:`rest-${exercise.id}-${next.setIndex}`,caption:changedExercise?'Up next: review the movement before the seven-second prep.':`Recover, then repeat set ${next.setIndex+1}.`};
       }
-      const caption=timer.phase==='prepare'?'Watch the position sequence. Work begins when prep reaches zero.':'Movement overview—not a required tempo.';
+      const caption=timer.phase==='prepare'?'Watch the position sequence. Work begins when prep reaches zero.':'Movement overview. This is not a required tempo.';
       return {exercise:currentExercise,exerciseIndex:timer.exerciseIndex,setIndex:timer.setIndex,key:`${timer.phase}-${currentExercise?.id}-${timer.setIndex}`,caption};
     }
 
@@ -2834,7 +2834,7 @@
         const total = timer.phaseDurationMs || 1;
         const progress = clamp(100 - (remaining / total * 100),0,100);
         const next = nextTimerLabel(timer);
-        root.innerHTML = `<div class="page-heading"><div><p class="eyebrow">Session in progress</p><h2 id="timer-heading">Stay with the set</h2></div></div>
+        root.innerHTML = `<div class="page-heading"><div><p class="eyebrow">Session in progress</p><h2 id="timer-heading">Current interval</h2></div></div>
           <section class="active-timer card">
             <button class="btn secondary small workout-minimize" type="button" data-action="timer-minimize" aria-label="Minimize active timer">Minimize</button>
             <div class="phase-pill" id="timer-phase">${esc(timerPhaseText(timer))}</div>
@@ -2956,7 +2956,7 @@
         ...Object.entries(state.daily).map(([date,item])=>({kind:'readiness',title:'Readiness + note',date,status:'logged',category:'recovery',actual:`Energy ${item.energy}/5 · soreness ${item.soreness}/5 · sleep ${item.sleep}/5${item.note?` · ${item.note}`:''}`,sortAt:`${date}T23:59:00`}))
       ].filter(item=>item.date>=cutoff&&item.date<=today).sort((a,b)=>String(b.sortAt).localeCompare(String(a.sortAt))).slice(0,20);
       $('#view-history').innerHTML = `
-        <div class="page-heading"><div><p class="eyebrow">Last 14 days</p><h2 id="history-heading">Patterns, not perfection</h2><p>Skipped items stay visible without pretending recovery is failure. Optional items and days without a saved schedule are neutral.</p></div><div class="heading-actions"><button class="btn secondary" data-action="export-csv">${icon('download')} CSV</button><button class="btn" data-action="export-json">${icon('download')} Backup</button></div></div>
+        <div class="page-heading"><div><p class="eyebrow">Last 14 days</p><h2 id="history-heading">Training history</h2><p>Skipped items remain visible. Optional items and unscheduled days do not count toward adherence.</p></div><div class="heading-actions"><button class="btn secondary" data-action="export-csv">${icon('download')} CSV</button><button class="btn" data-action="export-json">${icon('download')} Backup</button></div></div>
         <div class="history-stats">
           <div class="stat-card card"><strong>${adherence}%</strong><span>LOGGED PLAN THIS WEEK</span></div>
           <div class="stat-card card"><strong>${plannedDone}</strong><span>PLANNED DAYS DONE</span></div>
@@ -2967,7 +2967,7 @@
           <section class="card card-pad"><div class="section-title"><div><h3>Daily completion</h3><p>Non-optional scheduled items completed.</p></div></div><div class="history-bars">${dates.map(d=>{const s=dayStats(d);return `<div class="bar-day ${d===today?'today':''}" role="img" title="${esc(formatDate(d))}: ${s.done}/${s.total}" aria-label="${esc(formatDate(d))}: ${s.done} of ${s.total} completed"><div class="bar-track"><div class="bar-fill" style="height:${s.pct}%"></div></div><small>${esc(formatDate(d,{weekday:'narrow',day:'numeric'}))}</small></div>`}).join('')}</div></section>
           <section class="card"><div class="card-pad" style="padding-bottom:8px"><div class="section-title"><div><h3>Recent log</h3><p>Actual entries and targets are distinct; later edits will not rewrite logs.</p></div></div></div><div class="log-list">${recentLogs.length ? recentLogs.map(item=>renderHistoryLogRow(item)).join('') : '<div class="empty" style="margin:0 16px 16px">Complete an item to begin your history.</div>'}</div></section>
           <section class="card"><div class="card-pad" style="padding-bottom:8px"><div class="section-title"><div><h3 id="saved-workouts-heading" tabindex="-1">Saved timer workouts</h3><p>Completed and ended-early sessions are both workouts. Remove any accidental or unwanted entry here.</p></div></div></div><div class="saved-session-list">${savedSessions.length?savedSessions.slice(0,historySessionLimit).map(session=>renderHistoryLogRow({kind:'session',id:session.id,title:session.title||'Interval session',date:localDate(session.startedAt),status:session.status,actual:humanDuration(sessionDurationSec(session))},true)).join(''):'<div class="empty" style="margin:0 16px 16px">No saved timer workouts yet.</div>'}</div>${savedSessions.length>historySessionLimit?`<div class="card-pad" style="padding-top:8px"><button class="btn secondary small" data-action="show-more-sessions">Show older workouts</button></div>`:''}</section>
-          <section class="card card-pad"><div class="section-title"><div><h3>Your data</h3><p>Stored only in this browser’s local storage.</p></div></div><div style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn secondary" data-action="import-json">${icon('upload')} Import backup</button><button class="btn secondary" data-action="print-guide">Print guide</button></div></section>
+          <section class="card card-pad"><div class="section-title"><div><h3>Your data</h3><p>Stored only in this browser's local storage.</p></div></div><div style="display:flex;flex-wrap:wrap;gap:8px"><button class="btn secondary" data-action="import-json">${icon('upload')} Import backup</button><button class="btn secondary" data-action="print-guide">Print guide</button></div></section>
         </div>`;
     }
 
@@ -2995,21 +2995,21 @@
                 <tr><td><strong>Electrolytes</strong><br><span class="chip optional">conditional</span></td><td><strong>Oral drink/food.</strong> Water plus normal meals is usually enough for short, cool sessions. For &gt;60–90 min, heat or heavy/salty sweating, ~500–700 mg sodium/L is a reasonable starting drink.</td><td>During the qualifying session. After large sweat loss, use sodium-containing meals/fluid and roughly 1–1.5 L per kg body mass lost if rapid recovery is needed.</td><td>Individual sweat loss varies widely. Do not force fluids or finish heavier than you started. Heart/kidney disease, hypertension, diuretics or potassium-altering medicines need review.</td></tr>
               </tbody>
             </table>
-            <div class="callout" style="margin-top:15px"><strong>Route for all four: oral</strong>Use liquid, food, capsules or a prepared drink according to the label. No injection or “dry scoop” is appropriate here. Prefer single-ingredient, third-party-tested products (for example, NSF Certified for Sport or Informed Sport).</div>
+            <div class="callout" style="margin-top:15px"><strong>Route for all four: oral</strong>Use liquid, food, capsules or a prepared drink according to the label. Do not inject or dry scoop these products. Choose single-ingredient, third-party-tested products such as NSF Certified for Sport or Informed Sport.</div>
           </section>
 
           <section class="guide-card card" id="guide-timing">
             <h3>Before, during, after</h3>
             <h4>2–3 hours before</h4><p>Eat a familiar meal with carbohydrate and complete protein. Hydrate normally; urine should not be persistently dark, but clear urine all day is not the goal.</p>
             <h4>45–60 minutes before</h4><p>Optional collagen + vitamin C food if you deliberately use it for a tendon-loading session. Creatine can stay at its usual daily time.</p>
-            <h4>10–15 minutes before</h4><p>Raise body temperature, use dynamic shoulders/wrists/hips, then progress through easy climbing. For experienced climbers, planned fingerboard work is a hard finger session that may replace—not automatically precede—maximal climbing. Never load through finger pain.</p>
+            <h4>10–15 minutes before</h4><p>Raise body temperature, use dynamic shoulders/wrists/hips, then progress through easy climbing. For experienced climbers, planned fingerboard work is a hard finger session that may replace, but does not automatically precede, maximal climbing. Never load through finger pain.</p>
             <h4>During</h4><p>Most indoor sessions: water to thirst. Add electrolytes for long, hot or high-sweat work. Power/skill comes before fatiguing accessories.</p>
-            <h4>Within the next few hours</h4><p>Eat 20–40 g complete protein with carbohydrate and ordinary fluids/food. Your whole day matters more than a tiny “anabolic window.” Log session RPE and any pain.</p>
+            <h4>Within the next few hours</h4><p>Eat 20–40 g complete protein with carbohydrate and ordinary fluids/food. Daily protein and energy matter more than exact post-workout timing. Log session RPE and any pain.</p>
           </section>
 
           <section class="guide-card card" id="guide-stretching">
             <h3>Can you stretch twice a day?</h3>
-            <p><strong>Yes—if both sessions are gentle, comfortable and useful. It is not required.</strong> A good split is 5–10 minutes of easy mobility in the morning and relaxed flexibility after training or later in the day.</p>
+            <p><strong>Yes. Both sessions should be gentle, comfortable and useful. Stretching twice a day is optional.</strong> A good split is 5–10 minutes of easy mobility in the morning and relaxed flexibility after training or later in the day.</p>
             <ul>
               <li>Before hard climbing: favor dynamic mobility and progressively harder easy moves.</li>
               <li>Later: use relaxed static holds. Formal flexibility work at least 2–3 days/week, accumulating about 60 seconds per muscle group, is enough for progress; daily can help.</li>
@@ -3022,7 +3022,7 @@
 
           <section class="guide-card card" id="guide-training">
             <h3>Weekly rhythm</h3>
-            <p>The included plan uses two climbing days, one general strength day and a minimum 48-hour heuristic between hard grip exposures; some people need longer. If you are new or returning, keep both climbs submaximal at first and make strength work short.</p>
+            <p>The included plan uses two climbing days, one general strength day and at least 48 hours between hard grip sessions. Some people need longer. If you are new or returning, keep both climbs submaximal at first and make strength work short.</p>
             <ul>
               <li><strong>Mon:</strong> submaximal technique if new/returning; experienced, recovered climbers can use a few hard bouldering/power attempts and stop when quality falls.</li>
               <li><strong>Tue:</strong> easy aerobic recovery + mobility.</li>
@@ -3038,12 +3038,12 @@
           <section class="guide-card card">
             <h3>Biweekly, monthly, longer</h3>
             <ul>
-              <li><strong>Every 2 weeks:</strong> review performance, sleep and general soreness. If performance falls for two sessions or whole-body fatigue persists, cut the next week’s hard volume about 20–30%. Persistent focal or worsening pain—or pain that changes movement—means stop that load and seek assessment, not merely a deload.</li>
+              <li><strong>Every 2 weeks:</strong> review performance, sleep and general soreness. If performance falls for two sessions or whole-body fatigue persists, cut the next week's hard volume about 20–30%. Persistent focal or worsening pain, especially pain that changes movement, means stop that load and seek assessment. A deload alone is not enough.</li>
               <li><strong>Every 4th week:</strong> optional deload. Reduce hard volume roughly 30–50% while keeping easy technique and normal movement.</li>
-              <li><strong>Every 8–12 weeks:</strong> choose one priority—power, technique, strength or endurance—and reassess the same safe benchmarks. Change one main variable at a time.</li>
+              <li><strong>Every 8–12 weeks:</strong> pick one focus: power, technique, strength or endurance. Reassess the same safe benchmarks and change one main variable at a time.</li>
               <li><strong>Every 3–6 months:</strong> reconsider whether each supplement is still useful. None of these needs monthly cycling. Labs should follow symptoms/risk and clinical advice, not the calendar alone.</li>
             </ul>
-            <p>Progress when two weeks feel repeatable, technique stays clean, and pain is not rising. More fatigue is not automatically more adaptation.</p>
+            <p>Progress after two weeks with stable performance, clean technique and no increase in pain. More fatigue does not guarantee more adaptation.</p>
           </section>
 
           <section class="guide-card card wide">
@@ -3051,13 +3051,13 @@
             <div class="guide-grid" style="margin-top:15px">
               <div><h4>Adequate energy + carbohydrate</h4><p>Climbers are vulnerable to low energy availability (RED-S). Persistent fatigue, repeated injuries, falling performance, menstrual changes, low libido, mood changes or rapid intentional weight loss warrant a sports-dietitian/medical review.</p></div>
               <div><h4>Complete protein</h4><div class="formula-box"><span class="tiny muted">Food-first planning range</span><br><strong>${protein}</strong><div class="tiny muted" style="margin-top:5px">Spread across 3–5 meals. Kidney disease, pregnancy, clinical diets and some body-composition contexts need individual advice.</div></div></div>
-              <div><h4>Calcium + vitamin D</h4><p>Use food/fortified foods and follow local seasonal vitamin-D guidance—especially at northern latitudes. High-dose vitamin D should follow risk assessment or testing, not guesswork.</p></div>
+              <div><h4>Calcium + vitamin D</h4><p>Use food or fortified foods and follow local seasonal vitamin-D guidance, especially at northern latitudes. High-dose vitamin D should follow risk assessment or testing, not guesswork.</p></div>
               <div><h4>Iron, B12, iodine + omega-3 foods</h4><p>This is not a deficiency checklist. Do not add iron blindly. Vegans need reliable B12; iodine can matter with little iodized salt, dairy or seafood. Use oily fish or other omega-3-rich foods and review the actual diet first.</p></div>
             </div>
           </section>
 
           <section class="guide-card card wide" id="guide-safety">
-            <h3>Sources & safety boundary</h3>
+            <h3>Sources and safety</h3>
             <p>These defaults assume a generally healthy adult. Ask a pharmacist or clinician before supplements if you have kidney/heart disease, hypertension, pregnancy, a history of disordered eating, or take diuretics or medicines affecting electrolytes. Seek urgent care for chest pain, fainting, severe unusual breathlessness, limb deformity, loss of sensation or inability to use a limb; seek individual care for persistent symptoms.</p>
             <ol class="source-list">
               <li><a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5469049/" target="_blank" rel="noopener">ISSN position stand: creatine</a></li>
@@ -3079,7 +3079,7 @@
 
     function defaultForDayType(type) {
       return {
-        climb:{type:'climb',secondaryType:'',title:'Climbing session',time:'18:00',duration:90,focus:'Choose power, technique or endurance as today’s main focus; keep the goal specific.'},
+        climb:{type:'climb',secondaryType:'',title:'Climbing session',time:'18:00',duration:90,focus:"Choose power, technique or endurance as today's main focus; keep the goal specific."},
         strength:{type:'strength',secondaryType:'',title:'Strength session',time:'18:00',duration:50,focus:'General strength with 2–3 good reps left in reserve.'},
         prehab:{type:'prehab',secondaryType:'',title:'Prehab session',time:'18:00',duration:30,focus:'Controlled finger, elbow and shoulder capacity work in a comfortable range.'},
         recovery:{type:'recovery',secondaryType:'',title:'Active recovery',time:'18:00',duration:25,focus:'Easy conversational movement and comfortable mobility.'},
@@ -3289,7 +3289,7 @@
       const routine = state.routines.find(r=>r.id===id);
       if (!routine) return;
       askConfirmation({
-        title:'Delete routine?', message:`Delete “${routine.title}”? Existing history will stay.`, confirmLabel:'Delete routine',
+        title:'Delete routine?', message:`Delete "${routine.title}"? Existing history will stay.`, confirmLabel:'Delete routine',
         onConfirm:()=>{ state.routines=state.routines.filter(r=>r.id!==id); saveState('Routine deleted.'); renderView(); }
       });
     }
@@ -3299,7 +3299,7 @@
       if (!exercise) return;
       const fromCatalog=Boolean(exercise.sourceId);
       askConfirmation({
-        title:fromCatalog?'Remove exercise?':'Delete exercise?', message:`${fromCatalog?'Remove':'Delete'} “${exercise.name}”? Completed session history will stay${fromCatalog?' and you can add it again from the catalog.':'.'}`, confirmLabel:fromCatalog?'Remove exercise':'Delete exercise',
+        title:fromCatalog?'Remove exercise?':'Delete exercise?', message:`${fromCatalog?'Remove':'Delete'} "${exercise.name}"? Completed session history will stay${fromCatalog?' and you can add it again from the catalog.':'.'}`, confirmLabel:fromCatalog?'Remove exercise':'Delete exercise',
         onConfirm:()=>{ state.exercises=state.exercises.filter(e=>e.id!==id); state.builderQueue=state.builderQueue.filter(x=>x!==id); saveState(fromCatalog?'Exercise removed from your library.':'Exercise deleted.'); renderView(); }
       });
     }
@@ -3311,7 +3311,7 @@
       const duration=humanDuration(sessionDurationSec(session));
       askConfirmation({
         title:'Delete saved workout?',
-        message:`Delete “${session.title||'Interval session'}” from ${date} (${duration}, ${session.status})? This removes it from History and future exports.`,
+        message:`Delete "${session.title||'Interval session'}" from ${date} (${duration}, ${session.status})? This removes it from History and future exports.`,
         confirmLabel:'Delete workout',
         onConfirm:()=>{
           const index=state.sessions.findIndex(item=>item.id===id);
@@ -3443,7 +3443,7 @@
       state.activeTimer = null;
       $('#timer-announcer').textContent='Session complete.';
       if (cue) { beep(1040,.18); vibrate([100,50,100,50,160]); }
-      releaseWakeLock(); saveState('Session complete — nice work.');
+      releaseWakeLock(); saveState('Session complete.');
       renderView(state.currentView);
     }
 
@@ -3458,7 +3458,7 @@
     function requestEndTimer() {
       if (!state.activeTimer) return;
       askConfirmation({
-        title:'End this session?', message:'Your completed time will be saved in History as “ended early.”', confirmLabel:'End and save',
+        title:'End this session?', message:'Your completed time will be saved in History as "ended early."', confirmLabel:'End and save',
         onConfirm:endTimer
       });
     }
@@ -3556,7 +3556,7 @@
 
     function dayOverviewEvent(dateValue) {
       const planDay=getPlanDay(dateValue);
-      const route=tasksForDate(dateValue).map(task=>`${formatTaskTime(task)} — ${task.title}${task.amount?` (${task.amount})`:''}`).join('\n');
+      const route=tasksForDate(dateValue).map(task=>`${formatTaskTime(task)}: ${task.title}${task.amount?` (${task.amount})`:''}`).join('\n');
       return {key:`${dateValue}::day-overview`,sourceId:'day-overview',date:dateValue,title:`Crux day · ${planDay.title}`,category:'plan',details:[`${combinedDayLabel(planDay)} · ${planDay.focus||''}`,route].filter(Boolean).join('\n\n'),allDay:true,startDate:dateValue,endDate:addDays(dateValue,1),transparent:true,target:scheduleTargetUrl(dateValue)};
     }
 
@@ -3723,7 +3723,7 @@
     }
 
     function reminderBody(event,alertBase,now=Date.now()) {
-      if (event.allDay) return 'Open today’s complete Crux route.';
+      if (event.allDay) return "Open today's complete Crux route.";
       const subject=event.sourceId==='planned-session'?'Your session':'This item';
       const difference=alertBase.getTime()-now;
       if (difference>60000) return `${subject} starts in ${Math.ceil(difference/60000)} minutes.`;
@@ -4143,7 +4143,7 @@
       const affectsToday=changed&&data.week===getWeekVariant(today)&&Number(data.dayIndex)===todayIndex&&!state.overrides[today];
       state.plan[data.week][Number(data.dayIndex)]=newDay;
       if (affectsToday) clearSessionChecks(today);
-      saveState(affectsToday?'Plan updated; today’s session checks were cleared.':'Plan day updated.'); closeAppDialog($('#plan-dialog')); renderPlan();
+      saveState(affectsToday?"Plan updated; today's session checks were cleared.":'Plan day updated.'); closeAppDialog($('#plan-dialog')); renderPlan();
     });
 
     const confirmationDialog=$('#confirm-dialog');
