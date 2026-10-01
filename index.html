@@ -758,7 +758,7 @@
         flex: 0 0 auto; flex-wrap: wrap; padding: 13px 17px calc(13px + env(safe-area-inset-bottom));
       }
       .dialog-foot .btn { min-height: 44px; }
-      .settings-section { padding: 15px; }
+      .settings-section { padding: 0; }
       .settings-actions, .settings-actions.two { grid-template-columns: 1fr; }
       .settings-actions .btn { width: 100%; justify-content: flex-start; }
       .settings-danger { align-items: stretch; flex-direction: column; }
@@ -1021,15 +1021,29 @@
     .dialog-head h2 { font-weight: 820; letter-spacing: -.035em; }
     .dialog-foot { background: color-mix(in srgb,var(--surface-2) 72%,var(--surface)); }
 
+    /* Keep Timer on its original builder and queue layout. */
+    .timer-layout { display: grid; grid-template-columns: minmax(300px,.9fr) minmax(340px,1.1fr); gap: 18px; }
+    .preset-grid { grid-template-columns: repeat(3,1fr); gap: 9px; }
+    .preset { min-height: unset; padding: 13px 10px; border-radius: 13px; }
+    .queue-item { padding: 11px; border-radius: 13px; }
+    .queue-actions button { width: 36px; height: 36px; }
+    .active-timer.card { box-shadow: none; }
+
+    /* Modal fields share one sheet inset, including Settings' grouped sections. */
+    .settings-section { padding: 0; border: 0; border-radius: 0; background: transparent; }
+    .settings-section + .settings-section { padding-top: 16px; border-top: 1px solid var(--line); }
+
     @media (max-width: 1180px) {
       :root { --sidebar: 80px; }
       .brand { justify-content: center; padding-inline: 0; }
       .brand-copy, .sidebar .nav-btn span, .sidebar-foot .local-note { display: none; }
       .sidebar .nav-btn { justify-content: center; padding: 0; }
       .sidebar-foot .nav-btn { display: flex; }
-      .timer-layout { display: flex; flex-direction: column; }
-      .timer-queue-card { order: -1; }
       .week-grid { grid-template-columns: repeat(2,minmax(0,1fr)); overflow: visible; }
+    }
+
+    @media (max-width: 980px) {
+      .timer-layout { grid-template-columns: 1fr; }
     }
 
     @media (max-width: 980px) {
@@ -1135,13 +1149,11 @@
       .toggle { width: 48px; height: 28px; }
       .toggle span::before { width: 22px; height: 22px; }
       .toggle input:checked + span::before { transform: translateX(20px); }
-      .timer-layout { display: flex; flex-direction: column; }
-      .timer-queue-card { order: -1; }
-      .preset-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 7px; }
-      .preset { min-height: 96px; padding: 13px 10px; }
-      .queue-item.with-demo { grid-template-columns: auto minmax(0,1fr) auto; }
-      .queue-item.with-demo .demo-thumb { display: none; }
-      .queue-item.with-demo .queue-actions { grid-column: 3; grid-row: 1; justify-content: flex-end; }
+      .preset-grid { grid-template-columns: repeat(3,minmax(0,1fr)); gap: 9px; }
+      .preset { min-height: unset; padding: 13px 10px; }
+      .queue-item.with-demo { grid-template-columns: auto 62px minmax(0,1fr); }
+      .queue-item.with-demo .demo-thumb { display: block; width: 62px; height: 48px; }
+      .queue-item.with-demo .queue-actions { grid-column: 2 / -1; grid-row: auto; justify-content: flex-end; }
       .queue-actions button { width: 44px; height: 44px; }
       .filter-row { display: grid; grid-template-columns: minmax(0,1fr); gap: 8px; }
       .filter-row .search { width: 100%; flex: none !important; }
@@ -1219,8 +1231,9 @@
         padding-right: 4px; padding-left: 4px; border-right: 0; border-left: 0; border-radius: 0;
       }
       .week-strip, .month-weekdays, .month-grid { gap: 0; }
-      .queue-item.with-demo { grid-template-columns: auto minmax(0,1fr); }
-      .queue-item.with-demo .queue-actions { grid-column: 2; grid-row: auto; justify-content: flex-end; }
+      .queue-item.with-demo { grid-template-columns: auto 62px minmax(0,1fr); }
+      .queue-item.with-demo .demo-thumb { display: block; width: 62px; height: 48px; }
+      .queue-item.with-demo .queue-actions { grid-column: 2 / -1; grid-row: auto; justify-content: flex-end; }
     }
 
     @media (max-width: 700px) and (max-height: 680px) {
@@ -2847,12 +2860,12 @@
       root.innerHTML = `
         <div class="page-heading"><div><p class="eyebrow">Built-in work / rest timer</p><h2 id="timer-heading">Build a session</h2><p>Each exercise runs through its saved sets, work and rest. You can edit those defaults in the library.</p></div></div>
         <div class="timer-layout">
-          <div class="stack timer-builder-tools">
+          <div class="stack">
             <section class="card card-pad"><div class="section-title"><div><h3>Quick starts</h3><p>Replace the queue with a preset.</p></div></div>
               <div class="preset-grid">
-                <button class="preset" data-action="timer-preset" data-preset="strength"><b>Strength + prehab</b><small>Warm-up and balanced strength</small></button>
-                <button class="preset" data-action="timer-preset" data-preset="mobility"><b>Mobility reset</b><small>4–5 minutes of movement</small></button>
-                <button class="preset" data-action="timer-preset" data-preset="prehab"><b>Antagonists</b><small>Push, core and extensors</small></button>
+                <button class="preset" data-action="timer-preset" data-preset="strength"><b>Balanced</b><small>Warm-up + strength</small></button>
+                <button class="preset" data-action="timer-preset" data-preset="mobility"><b>Mobility</b><small>4–5 minute reset</small></button>
+                <button class="preset" data-action="timer-preset" data-preset="prehab"><b>Prehab</b><small>Push + extensors</small></button>
               </div>
             </section>
             <section class="card card-pad"><div class="section-title"><div><h3>Add an exercise</h3><p>Use your editable library.</p></div></div>
@@ -2860,7 +2873,7 @@
               <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px"><button class="btn secondary small" data-action="open-catalog">Browse catalog</button><button class="btn secondary small" data-action="add-exercise">${icon('plus')} New exercise</button></div>
             </section>
           </div>
-          <section class="card card-pad timer-queue-card">
+          <section class="card card-pad">
             <div class="section-title"><div><h3>Session queue</h3><p>${queue.length} exercises · about ${humanDuration(estimateQueueSeconds(queue))}</p></div>${queue.length?'<button class="btn ghost small" data-action="timer-clear">Clear</button>':''}</div>
             <div class="queue">${queue.length ? queue.map((id,index) => {
               const e = state.exercises.find(x=>x.id===id);
