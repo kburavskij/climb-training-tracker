@@ -30,7 +30,7 @@ const displayedAppVersion = html.match(/id=["']pwa-update-status["'][^>]*>Versio
 const workerVersion = workerSource.match(/\bconst WORKER_VERSION = ['"]([^'"]+)['"]/)?.[1];
 assert.equal(appVersion, '5.0', 'application release constant should be current');
 assert.equal(displayedAppVersion, appVersion, 'visible application version should match its release constant');
-assert.equal(workerVersion, 'v11', 'service-worker cache release should match app 5.0');
+assert.equal(workerVersion, 'v12', 'service-worker cache release should match app 5.0');
 assert.ok(workerSource.includes('const CACHE_NAME = `${CACHE_PREFIX}${WORKER_VERSION}`'), 'app-shell cache should derive from the worker release');
 
 function createWorkerHarness({ addAllError = null, cacheKeys = [] } = {}) {
@@ -81,7 +81,7 @@ function createWorkerHarness({ addAllError = null, cacheKeys = [] } = {}) {
 
 const successfulInstall = createWorkerHarness();
 await successfulInstall.dispatch('install');
-assert.ok(successfulInstall.events[0] === 'open:crux-routine-v11', 'install should open the current app-shell cache first');
+assert.ok(successfulInstall.events[0] === 'open:crux-routine-v12', 'install should open the current app-shell cache first');
 assert.ok(successfulInstall.events.some(event => event.startsWith('precache:')), 'install should precache the complete app shell');
 assert.ok(
   successfulInstall.events.indexOf('skipWaiting') > successfulInstall.events.findIndex(event => event.startsWith('precache:')),
@@ -99,7 +99,7 @@ const activation = createWorkerHarness({
 await activation.dispatch('activate');
 assert.deepEqual(
   activation.events.filter(event => event.startsWith('delete:')).sort(),
-  ['delete:crux-exercise-media-old', 'delete:crux-routine-v10'],
+  ['delete:crux-exercise-media-old', 'delete:crux-routine-v10', 'delete:crux-routine-v11'],
   'activation should delete only stale app and exercise-media caches'
 );
 assert.equal(activation.events.at(-1), 'claim', 'the current worker should claim clients after cache cleanup');
