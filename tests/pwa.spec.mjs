@@ -26,7 +26,7 @@ self.addEventListener('fetch', event => {
 });
 `;
 
-test('legacy controlled shell upgrades to v11, preserves data, and keeps the current shell offline', async ({ page, context }) => {
+test('legacy controlled shell upgrades to v12, preserves data, and keeps the current shell offline', async ({ page, context }) => {
   let legacyWorkerRequests = 0;
   await context.route(/\/service-worker\.js\?legacy-upgrade-fixture=1$/, async route => {
     legacyWorkerRequests += 1;
@@ -74,12 +74,12 @@ test('legacy controlled shell upgrades to v11, preserves data, and keeps the cur
   expect(await page.evaluate(() => localStorage.getItem('ci-upgrade-sentinel'))).toBe('preserved');
 
   const upgradedCaches = await page.evaluate(() => caches.keys());
-  expect(upgradedCaches).toContain('crux-routine-v11');
+  expect(upgradedCaches).toContain('crux-routine-v12');
   expect(upgradedCaches).not.toContain('crux-routine-v9-fixture');
   expect(upgradedCaches).not.toContain('crux-exercise-media-v9-fixture');
 
   await page.evaluate(async () => {
-    const cache = await caches.open('crux-routine-v11');
+    const cache = await caches.open('crux-routine-v12');
     const stale = new Response('<!doctype html><main id="stale-shell">Stale cached shell</main>', {
       headers: { 'content-type': 'text/html; charset=utf-8' }
     });
