@@ -169,3 +169,30 @@ test('service worker caches the app shell and reloads it offline', async ({ page
 
   await context.setOffline(false);
 });
+
+test('manual update check notices a changed app shell when the worker script is unchanged', async ({ page, context }) => {
+  let shellVersion = 'v1';
+  await context.route(/\/[^/]*(?:index\.html)?(?:\?.*)?$/, async route => {
+    const response = await route.fetch();
+    const body = await response.text();
+    const versionedBody = body.replace('</body>', `<meta name="ci-shell-version" content="${shellVersion}"></body>`);
+    await route.fulfill({ response, body: versionedBody });
+  });
+
+  await page.goto('/');
+  await expect(page.locator('#view-today')).toBeVisible();
+  await page.evaluate(() => navigator.serviceWorker.ready);
+  await page.waitForFunction(() => Boolean(navigator.serviceWorker.controller));
+
+  await page.locator('[data-open-settings]').first().click();
+  await expect(page.locator('[data-action="check-update"]')).toBeVisible();
+  shellVersion = 'v2';
+
+  await page.locator('[data-action="check-update"]').click();
+  await expect(page.locator('#pwa-update-status')).toContainText('update available');
+  await expect(page.locator('[data-action="apply-update"]:visible')).toHaveCount(2);
+
+  await page.keyboard.press('Escape');
+  await page.locator('#update-banner [data-action="apply-update"]').click();
+  await expect(page.locator('meta[name="ci-shell-version"]')).toHaveAttribute('content', 'v2');
+});

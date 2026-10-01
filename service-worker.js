@@ -3,6 +3,7 @@
 const CACHE_PREFIX = 'crux-routine-';
 const WORKER_VERSION = 'v12';
 const CACHE_NAME = `${CACHE_PREFIX}${WORKER_VERSION}`;
+const PENDING_SHELL_CACHE = `${CACHE_PREFIX}pending-shell`;
 const MEDIA_CACHE_PREFIX = 'crux-exercise-media-';
 const DATASET_COMMIT = '7455efae41b330c265e7cd4b78dfa848e7ce5ebd';
 const MEDIA_CACHE_NAME = `${MEDIA_CACHE_PREFIX}${DATASET_COMMIT.slice(0, 12)}`;
@@ -56,6 +57,44 @@ async function handleDatasetMediaRequest(request) {
   }
 }
 
+async function stageLatestAppShell() {
+  const cache = await caches.open(CACHE_NAME);
+  const current = await cache.match(INDEX_URL);
+  const updateUrl = new URL(INDEX_URL);
+  updateUrl.searchParams.set('update-check', String(Date.now()));
+  const response = await fetch(new Request(updateUrl.href, { cache: 'no-store' }));
+  if (!response.ok) throw new Error(`App shell request failed with ${response.status}`);
+
+  const [currentText, latestText] = await Promise.all([
+    current ? current.text() : Promise.resolve(''),
+    response.clone().text()
+  ]);
+  if (currentText === latestText) {
+    await caches.delete(PENDING_SHELL_CACHE);
+    return false;
+  }
+
+  const pending = await caches.open(PENDING_SHELL_CACHE);
+  await Promise.all([
+    pending.put(INDEX_URL, response.clone()),
+    pending.put(ROOT_URL, response.clone())
+  ]);
+  return true;
+}
+
+async function applyStagedAppShell() {
+  const pending = await caches.open(PENDING_SHELL_CACHE);
+  const current = await caches.open(CACHE_NAME);
+  const keys = await pending.keys();
+  if (!keys.length) return false;
+  await Promise.all(keys.map(async request => {
+    const response = await pending.match(request);
+    if (response) await current.put(request, response);
+  }));
+  await caches.delete(PENDING_SHELL_CACHE);
+  return true;
+}
+
 self.addEventListener('install', event => {
   event.waitUntil((async () => {
     const cache = await caches.open(CACHE_NAME);
@@ -70,7 +109,7 @@ self.addEventListener('activate', event => {
       .then(keys => Promise.all(
         keys
           .filter(key => (
-            (key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME)
+            (key.startsWith(CACHE_PREFIX) && key !== CACHE_NAME && key !== PENDING_SHELL_CACHE)
             || (key.startsWith(MEDIA_CACHE_PREFIX) && key !== MEDIA_CACHE_NAME)
           ))
           .map(key => caches.delete(key))
@@ -80,7 +119,33 @@ self.addEventListener('activate', event => {
 });
 
 self.addEventListener('message', event => {
-  if (event.data?.type === 'ACTIVATE_UPDATE') event.waitUntil(self.skipWaiting());
+  if (event.data?.type === 'ACTIVATE_UPDATE') {
+    event.waitUntil(self.skipWaiting());
+    return;
+  }
+
+  if (event.data?.type === 'CHECK_APP_SHELL_UPDATE') {
+    event.waitUntil((async () => {
+      try {
+        const available = await stageLatestAppShell();
+        event.ports[0]?.postMessage({ type: 'APP_SHELL_UPDATE_RESULT', available });
+      } catch (error) {
+        event.ports[0]?.postMessage({ type: 'APP_SHELL_UPDATE_RESULT', available: false, error: 'network' });
+      }
+    })());
+    return;
+  }
+
+  if (event.data?.type === 'APPLY_APP_SHELL_UPDATE') {
+    event.waitUntil((async () => {
+      try {
+        const applied = await applyStagedAppShell();
+        event.ports[0]?.postMessage({ type: 'APP_SHELL_UPDATE_APPLIED', applied });
+      } catch (error) {
+        event.ports[0]?.postMessage({ type: 'APP_SHELL_UPDATE_APPLIED', applied: false, error: 'cache' });
+      }
+    })());
+  }
 });
 
 self.addEventListener('fetch', event => {
