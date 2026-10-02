@@ -3,6 +3,10 @@ import { expect } from '@playwright/test';
 const TINY_GIF = Buffer.from('R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=', 'base64');
 const TINY_JPEG = Buffer.from('/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgICAgMCAgIDAwMDBAYEBAQEBAgGBgUGCQgKCgkICQkKDA8MCgsOCwkJDRENDg8QEBEQCgwSExIQEw8QEBD/wAALCAACAAIBAREA/8QAFAABAAAAAAAAAAAAAAAAAAAACf/EABQQAQAAAAAAAAAAAAAAAAAAAAD/2gAIAQEAAD8AVN//2Q==', 'base64');
 
+const EXPECTED_BROWSER_DIAGNOSTICS = new Set([
+  'Viewport argument key "interactive-widget" not recognized and ignored.'
+]);
+
 export async function stubDatasetMedia(page, { failGifs = false } = {}) {
   await page.route(/^https:\/\/raw\.githubusercontent\.com\/hasaneyldrm\/exercises-dataset\//, route => {
     const isGif = new URL(route.request().url()).pathname.endsWith('.gif');
@@ -20,7 +24,8 @@ export function watchForBrowserProblems(page) {
   const problems = [];
   page.on('pageerror', error => problems.push(`pageerror: ${error.message}`));
   page.on('console', message => {
-    if (message.type() === 'error' || message.type() === 'warning') {
+    if ((message.type() === 'error' || message.type() === 'warning')
+      && !EXPECTED_BROWSER_DIAGNOSTICS.has(message.text())) {
       problems.push(`console ${message.type()}: ${message.text()}`);
     }
   });
