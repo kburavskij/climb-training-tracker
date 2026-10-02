@@ -1878,6 +1878,7 @@
     const viewScrollPositions = new Map();
     let swRegistration = null;
     let waitingWorker = null;
+    let shellUpdateAvailable = false;
     let updateReloading = false;
     let updateCheckPromise = null;
     let updateActivationRequested = false;
@@ -1930,6 +1931,7 @@
 
     function showWaitingUpdate(worker) {
       waitingWorker=worker;
+      shellUpdateAvailable=false;
       $('#update-banner').hidden=false;
       $('#update-banner small').textContent=navigator.onLine?'Installing automatically. Your saved data and timer will stay.':'Downloaded and ready. It will install when you reconnect, or you can update now.';
       $$('[data-action="apply-update"]').forEach(button=>{button.hidden=false;button.disabled=false;});
@@ -1940,6 +1942,55 @@
           if (readyWorker?.state==='installed'&&!updateActivationRequested) applyAppUpdate();
         });
       }
+    }
+
+    function showAppShellUpdate() {
+      shellUpdateAvailable=true;
+      $('#update-banner').hidden=false;
+      $('#update-banner small').textContent='A newer app shell is downloaded and ready. Your saved data and timer will stay.';
+      $$('[data-action="apply-update"]').forEach(button=>{button.hidden=false;button.disabled=false;});
+      setPwaUpdateStatus('update available');
+    }
+
+    function requestAppShellUpdate(registration, type='CHECK_APP_SHELL_UPDATE') {
+      return new Promise(resolve=>{
+        const worker=registration?.active||navigator.serviceWorker.controller;
+        if (!worker||typeof MessageChannel==='undefined') { resolve({available:false,error:false}); return; }
+        const channel=new MessageChannel();
+        let settled=false;
+        const finish=result=>{
+          if (settled) return;
+          settled=true;
+          clearTimeout(timeout);
+          resolve(result);
+        };
+        const timeout=setTimeout(()=>finish({available:false,error:true}),10000);
+        channel.port1.onmessage=event=>{
+          const result=event.data||{};
+          if (type==='CHECK_APP_SHELL_UPDATE') finish({available:Boolean(result.available),error:Boolean(result.error)});
+          else finish({applied:Boolean(result.applied),error:Boolean(result.error)});
+        };
+        try { worker.postMessage({type},[channel.port2]); }
+        catch (error) { finish({available:false,applied:false,error:true}); }
+      });
+    }
+
+    async function applyAppShellUpdate() {
+      const registration=swRegistration||await navigator.serviceWorker.ready;
+      setPwaUpdateStatus('applying update…');
+      $('#update-banner small').textContent='Updating safely; your local data and active timer will stay.';
+      $$('[data-action="apply-update"]').forEach(button=>button.disabled=true);
+      saveState();
+      const result=await requestAppShellUpdate(registration,'APPLY_APP_SHELL_UPDATE');
+      if (result.applied) {
+        shellUpdateAvailable=false;
+        updateReloading=true;
+        setPwaUpdateStatus('update installed; reopening…');
+        location.reload();
+        return;
+      }
+      setPwaUpdateStatus('could not apply that update; the current app is unchanged');
+      $$('[data-action="apply-update"]').forEach(button=>button.disabled=false);
     }
 
     function watchInstallingWorker(worker) {
@@ -1983,7 +2034,12 @@
           await registration.update();
           if (registration.waiting) showWaitingUpdate(registration.waiting);
           else if (registration.installing) watchInstallingWorker(registration.installing);
-          else { setPwaUpdateStatus(`up to date · checked ${formatTime(new Date().toTimeString().slice(0,5))}`); if (manual) toast('Crux Routine is up to date.'); }
+          else {
+            const shellResult=await requestAppShellUpdate(registration);
+            if (shellResult.error) throw new Error('App shell update check failed');
+            if (shellResult.available) showAppShellUpdate();
+            else { setPwaUpdateStatus(`up to date · checked ${formatTime(new Date().toTimeString().slice(0,5))}`); if (manual) toast('Crux Routine is up to date.'); }
+          }
         } catch (error) {
           setPwaUpdateStatus('could not reach the update server; using the installed app');
           if (manual) toast('Could not check online. Your installed app is unchanged.',true);
@@ -1995,6 +2051,7 @@
     }
 
     function applyAppUpdate() {
+      if (!swRegistration?.waiting&&shellUpdateAvailable) { void applyAppShellUpdate(); return; }
       const worker=swRegistration?.waiting||waitingWorker;
       if (!worker) { void checkForAppUpdate(true); return; }
       if (worker.state!=='installed') {
@@ -4265,6 +4322,7 @@
         updateActivationRequested=false;
         clearTimeout(updateActivationTimer);
         waitingWorker=null;
+        shellUpdateAvailable=false;
         $('#update-banner').hidden=true;
         $$('[data-action="apply-update"]').forEach(button=>{button.disabled=false;button.hidden=true;});
         if (shouldReload&&!updateReloading) {
